@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!-- iPad-INSPECT_PLATFORM v2.1 landscape -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>平台/天线/避雷针</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/app-frame.css">
+<link rel="stylesheet" href="../../../../assets/app-embed.css">
+<link rel="stylesheet" href="../../../../assets/app-inspect-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-tokens.css">
+<link rel="stylesheet" href="../../../../assets/ipad-frame.css">
+<link rel="stylesheet" href="../../../../assets/ipad-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-visual.css">
+<link rel="stylesheet" href="../../../../assets/ipad-inspect-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-inspect-basic.css">
+<link rel="stylesheet" href="../../../../assets/ipad-embed.css">
+<script src="../../../../assets/ipad-adapt.js" defer></script>
+<script src="../../../../assets/app-embed.js" defer></script>
+<script src="../../../../assets/app-inspect-back.js" defer></script>
+</head>
+<body class="inspect-app-layout ipad-adapt">
+<div id="appStatusBar">
+  <span>9:41</span>
+  <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+</div>
+<div id="appNavBar">
+  <a href="../../任务/填报主页/ipad_task_inspect_home.html" data-app-inspect-back style="color:#165DFF; text-decoration:none; font-size:14px;"><i class="fa-solid fa-chevron-left"></i> 返回</a>
+  <span style="flex:1; text-align:center; font-size:16px; font-weight:600;">平台/天线/避雷针</span>
+  <span style="width:40px;"></span>
+</div>
+
+<div id="appEmbedContent" class="platform-inspect-page">
+
+  <section class="basic-card" aria-labelledby="platformCardTitle" data-platform-card>
+    <div class="card-switch-head">
+      <h3 id="platformCardTitle" class="basic-card-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>是否有平台</h3>
+      <button type="button" class="ios-switch" data-switch aria-checked="true" aria-label="是否有平台">
+        <span class="ios-switch-thumb"></span>
+      </button>
+    </div>
+    <div class="platform-card-body" data-platform-body>
+      <div class="basic-grid-2">
+        <div class="basic-field">
+          <label class="basic-label" for="platformQty"><i class="fa-solid fa-ruler" aria-hidden="true"></i>数量</label>
+          <input id="platformQty" type="number" class="form-input" value="2" placeholder="请输入平台数量">
+        </div>
+        <div class="basic-field">
+          <label class="basic-label" for="platformCond"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>平台状况</label>
+          <select id="platformCond" class="form-input">
+            <option selected>完好</option>
+            <option>轻微锈蚀</option>
+            <option>中度锈蚀</option>
+            <option>严重损坏</option>
+          </select>
+        </div>
+      </div>
+      <div class="basic-field">
+        <label class="basic-label" for="platformRemark"><i class="fa-solid fa-pen" aria-hidden="true"></i>备注</label>
+        <textarea id="platformRemark" class="form-textarea" placeholder="请输入备注">两层平台均状况良好</textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="basic-card" aria-labelledby="antennaCardTitle" data-platform-card>
+    <div class="card-switch-head">
+      <h3 id="antennaCardTitle" class="basic-card-title"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i>是否有天线</h3>
+      <button type="button" class="ios-switch" data-switch aria-checked="true" aria-label="是否有天线">
+        <span class="ios-switch-thumb"></span>
+      </button>
+    </div>
+    <div class="platform-card-body" data-platform-body>
+      <div class="basic-grid-2">
+        <div class="basic-field">
+          <label class="basic-label" for="antennaQty"><i class="fa-solid fa-ruler" aria-hidden="true"></i>数量</label>
+          <input id="antennaQty" type="number" class="form-input" value="6" placeholder="请输入天线数量">
+        </div>
+        <div class="basic-field">
+          <label class="basic-label" for="antennaBrand"><i class="fa-solid fa-tag" aria-hidden="true"></i>品牌</label>
+          <input id="antennaBrand" type="text" class="form-input" value="华为" placeholder="请输入天线品牌">
+        </div>
+      </div>
+      <div class="basic-field">
+        <label class="basic-label" for="antennaCond"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>状况</label>
+        <select id="antennaCond" class="form-input">
+          <option selected>正常</option>
+          <option>倾斜</option>
+          <option>损坏</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section class="basic-card card-span-full" aria-labelledby="rodCardTitle" data-platform-card>
+    <div class="card-switch-head">
+      <h3 id="rodCardTitle" class="basic-card-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i>是否有避雷针</h3>
+      <button type="button" class="ios-switch" data-switch aria-checked="false" aria-label="是否有避雷针">
+        <span class="ios-switch-thumb"></span>
+      </button>
+    </div>
+    <div class="platform-card-body is-disabled" data-platform-body>
+      <div class="basic-grid-2">
+        <div class="basic-field">
+          <label class="basic-label" for="rodQty"><i class="fa-solid fa-ruler" aria-hidden="true"></i>数量</label>
+          <input id="rodQty" type="number" class="form-input" value="1" placeholder="请输入避雷针数量">
+        </div>
+        <div class="basic-field">
+          <label class="basic-label" for="rodCond"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>状况</label>
+          <select id="rodCond" class="form-input">
+            <option selected>完好</option>
+            <option>锈蚀</option>
+            <option>损坏</option>
+          </select>
+        </div>
+      </div>
+      <div class="basic-field">
+        <label class="basic-label" for="rodRemark"><i class="fa-solid fa-pen" aria-hidden="true"></i>备注</label>
+        <textarea id="rodRemark" class="form-textarea" placeholder="请输入备注"></textarea>
+      </div>
+    </div>
+    <p class="card-empty-hint" data-platform-hint><i class="fa-solid fa-circle-info" aria-hidden="true"></i>开启后可填写避雷针信息</p>
+  </section>
+
+</div>
+
+<div class="ipad-flow-footer flow-footer-split" data-app-flow-footer data-inspect-module-actions="1">
+  <a href="../../任务/备忘录/ipad_task_memo.html" class="btn-memo"><i class="fa-solid fa-microphone" aria-hidden="true"></i> 备忘录</a>
+  <button type="button" class="btn-photo" id="btnPlatformPhoto"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照</button>
+  <a href="../../检测/馈线/ipad_inspect_feed.html" class="btn-primary">下一步</a>
+</div>
+
+<script>
+(function () {
+  document.querySelectorAll('[data-platform-card]').forEach(function (card) {
+    var sw = card.querySelector('[data-switch]');
+    var body = card.querySelector('[data-platform-body]');
+    var hint = card.querySelector('[data-platform-hint]');
+    if (!sw || !body) return;
+
+    function sync() {
+      var on = sw.getAttribute('aria-checked') === 'true';
+      body.classList.toggle('is-disabled', !on);
+      if (hint) hint.style.display = on ? 'none' : '';
+    }
+
+    sw.addEventListener('click', function () {
+      var on = sw.getAttribute('aria-checked') === 'true';
+      sw.setAttribute('aria-checked', on ? 'false' : 'true');
+      sync();
+    });
+    sync();
+  });
+
+  document.getElementById('btnPlatformPhoto').addEventListener('click', function () {
+    alert('拍照：记录平台 / 天线 / 避雷针现场照片（原型演示）。');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<!-- iPad-TASK_INSPECT_HOME v2.1 landscape -->
+<html lang="zh-CN" class="ipad-task-html">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>检测填报</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/app-frame.css">
+<link rel="stylesheet" href="../../../../assets/ipad-tokens.css">
+<link rel="stylesheet" href="../../../../assets/ipad-frame.css">
+<link rel="stylesheet" href="../../../../assets/ipad-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-visual.css">
+<link rel="stylesheet" href="../../../../assets/ipad-embed.css">
+<link rel="stylesheet" href="../../../../assets/ipad-task-shell.css">
+<script src="../../../../assets/ipad-adapt.js" defer></script>
+<style>
+.progress-card {
+  background: #fff;
+  border-radius: var(--ipad-radius-lg, 12px);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--ipad-border, #e5e6eb);
+  box-shadow: var(--ipad-shadow-card, 0 0 5px rgba(0, 0, 0, 0.3));
+}
+.prog-h {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--ipad-fs-sub, 13px);
+  color: var(--ipad-text-3, #86909c);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.prog-h span:last-child {
+  font-weight: 600;
+  color: var(--ipad-success, #00b42a);
+}
+.prog-bar {
+  height: 8px;
+  background: #e5e6eb;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+.prog-in {
+  height: 100%;
+  width: 38%;
+  background: linear-gradient(90deg, #52c41a, #95de64);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+/* 导出：iPad 居中弹窗 */
+.export-sheet-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.45);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.export-sheet-mask.show { display: flex; }
+.export-sheet {
+  width: min(480px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+.export-sheet-h {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d2129;
+}
+.export-sheet-sub {
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #86909c;
+  line-height: 1.45;
+}
+.export-sheet-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  margin: 0 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: #f7f8fa;
+  color: #1d2129;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.export-sheet-btn i { color: #165dff; }
+.export-sheet-btn:active { background: #eef0f3; }
+.export-sheet-cancel {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 4px 0 0;
+  border: none;
+  background: transparent;
+  color: #86909c;
+  font-size: 15px;
+  cursor: pointer;
+  font-family: inherit;
+}
+</style>
+</head>
+<body class="ipad-adapt ipad-task-page" data-ipad-tab-active="inspect">
+<script>try{if(/\bembed=1\b/.test(location.search))document.documentElement.classList.add('task-embed');var _k='tower_app_active_inspect_order';var _sp=new URLSearchParams(location.search);var _oid=(_sp.get('order')||'').trim().toUpperCase();if(_oid)sessionStorage.setItem(_k,_oid);}catch(e){}</script>
+
+<div class="header-fixed">
+  <div class="status-bar" aria-hidden="true">
+    <span class="status-time">9:41</span>
+    <span class="status-icons" aria-hidden="true">
+      <i class="fa-solid fa-signal"></i>
+      <i class="fa-solid fa-wifi"></i>
+      <i class="fa-solid fa-battery-full"></i>
+    </span>
+  </div>
+  <div class="top">
+    <div class="top-row">
+      <a class="top-back" href="../../工作台/首页/ipad_workbench_index.html" aria-label="返回"><i class="fa-solid fa-chevron-left"></i></a>
+      <h1 class="top-title" id="topTaskTitle">滨江基站01 · 单管</h1>
+    </div>
+    <div class="top-actions" role="toolbar" aria-label="任务操作">
+      <div class="top-actions-left">
+        <a class="top-act" href="../备忘录/ipad_task_memo.html"><i class="fa-solid fa-microphone"></i> 备忘录</a>
+        <button type="button" id="btnOcrGlobal"><i class="fa-solid fa-camera"></i> 拍照</button>
+        <button type="button" class="top-act top-act-export" id="btnExportVoice" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
+      </div>
+      <div class="top-actions-right">
+        <button type="button" class="top-act top-act-save" id="btnSave">保存</button>
+        <button type="button" class="top-act top-act-submit" id="btnSubmit" disabled title="完成全部必填后可用">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="scroll-main">
+  <section class="progress-card" aria-label="总进度">
+    <div class="prog-h"><span>总进度</span><span>38%</span></div>
+    <div class="prog-bar"><div class="prog-in"></div></div>
+  </section>
+
+  <div class="sec-title">资料与照片</div>
+  <div class="mod-grid mod-grid--media">
+    <a class="mod mod-complete" href="../../检测/塔体/ipad_inspect_tower.html">
+      <span class="mod-done-badge" title="该模块必填项已全部完成"><i class="fa-solid fa-check"></i>100%</span>
+      <div class="ic"><i class="fa-solid fa-id-card"></i></div>
+      <div class="t">基础信息</div>
+      <div class="s">检测模块配置的基础信息；地址、站址编码等可预填</div>
+    </a>
+    <a class="mod" href="../../检测/塔体/ipad_inspect_tower_photos.html">
+      <div class="ic"><i class="fa-solid fa-camera-retro"></i></div>
+      <div class="t">上传铁塔照片</div>
+      <div class="s">必拍项由检测任务模板展开，与模板同步。</div>
+    </a>
+  </div>
+
+  <div class="sec-title">检测大模块</div>
+  <div class="mod-grid mod-grid--modules">
+    <a class="mod" href="../../检测/垂直度/ipad_inspect_vertical.html">
+      <div class="ic"><i class="fa-solid fa-ruler-combined"></i></div>
+      <div class="t">整体模块</div>
+      <div class="s">总高、垂直度、外观等</div>
+    </a>
+    <a class="mod mod-complete" href="../../检测/地基/ipad_inspect_foundation.html">
+      <span class="mod-done-badge" title="该模块必填项已全部完成"><i class="fa-solid fa-check"></i>100%</span>
+      <div class="ic"><i class="fa-solid fa-monument"></i></div>
+      <div class="t">基础</div>
+      <div class="s">检测模板中「基础」配置项（尺寸、混凝土、外观等）</div>
+    </a>
+    <a class="mod" href="../../检测/地基/ipad_inspect_foundation.html">
+      <div class="ic"><i class="fa-solid fa-anchor"></i></div>
+      <div class="t">地锚</div>
+      <div class="s">与基础同页分块</div>
+    </a>
+    <a class="mod" href="../../检测/分段/ipad_inspect_segment.html">
+      <div class="ic"><i class="fa-solid fa-layer-group"></i></div>
+      <div class="t">塔段</div>
+      <div class="s">按塔段数量展示多段；每段字段随检测模板配置。</div>
+    </a>
+    <a class="mod" href="../../检测/平台/ipad_inspect_platform.html">
+      <div class="ic"><i class="fa-solid fa-satellite-dish"></i></div>
+      <div class="t">平台及设备</div>
+      <div class="s">天线、馈线、爬梯、平台附属等模板配置项</div>
+    </a>
+    <a class="mod" href="../../检测/防腐层/ipad_inspect_coating.html">
+      <div class="ic"><i class="fa-solid fa-paint-roller"></i></div>
+      <div class="t">防腐层质量</div>
+      <div class="s">与模板二维表 / 照片类字段同源（逻辑同检测模块配置）</div>
+    </a>
+    <a class="mod" href="../../检测/焊接/ipad_inspect_weld.html">
+      <div class="ic"><i class="fa-solid fa-wrench"></i></div>
+      <div class="t">焊接</div>
+      <div class="s">焊缝抽检、记录表</div>
+    </a>
+    <a class="mod" href="../../检测/馈线/ipad_inspect_feed.html">
+      <div class="ic"><i class="fa-solid fa-door-open"></i></div>
+      <div class="t">馈线门高度</div>
+      <div class="s">模板中馈线门相关限值与测量项</div>
+    </a>
+    <a class="mod" href="../../检测/馈线/ipad_inspect_feed.html">
+      <div class="ic"><i class="fa-solid fa-ruler-horizontal"></i></div>
+      <div class="t">馈线孔余量 / 排列 / 爬梯 / 拉线</div>
+      <div class="s">馈线孔空间余量、直径与排列宽度；爬梯规格、拉线等（模板配置）</div>
+    </a>
+    <a class="mod" href="../../检测/连接/ipad_inspect_connection.html">
+      <div class="ic"><i class="fa-solid fa-link"></i></div>
+      <div class="t">连接质量</div>
+      <div class="s">螺栓扭矩、连接副等模板配置项</div>
+    </a>
+    <a class="mod" href="../../检测/接地/ipad_inspect_ground.html">
+      <div class="ic"><i class="fa-solid fa-bolt"></i></div>
+      <div class="t">构建质量与接地避雷</div>
+      <div class="s">构建质量检测、基础情况、避雷针体、引下线、接地电阻、接地装置、扁铁等</div>
+    </a>
+  </div>
+
+  <div class="sec-title">便捷与校验</div>
+  <div class="mod-grid mod-grid--utils">
+    <a class="mod" href="../../检测/备注/ipad_inspect_note.html">
+      <div class="ic"><i class="fa-solid fa-note-sticky"></i></div>
+      <div class="t">模块语音备忘</div>
+      <div class="s">各模块内也可进入录制</div>
+    </a>
+    <a class="mod" href="../详情/ipad_task_detail.html">
+      <div class="ic"><i class="fa-solid fa-list-ol"></i></div>
+      <div class="t">模板包分步视图</div>
+      <div class="s">与引擎 Section 顺序对齐</div>
+    </a>
+    <a class="mod" href="../../检测/校验/ipad_inspect_validate.html">
+      <div class="ic"><i class="fa-solid fa-check-double"></i></div>
+      <div class="t">校验与提交</div>
+      <div class="s">必填通过后提交锁定</div>
+    </a>
+    <a class="mod" href="../../系统/同步/ipad_sync_index.html">
+      <div class="ic"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <div class="t">同步队列</div>
+      <div class="s">弱网重试</div>
+    </a>
+  </div>
+</main>
+
+<nav id="ipadMainTabBar" class="ipad-main-tabbar" aria-label="主导航">
+  <a href="../../工作台/首页/ipad_workbench_index.html"><i class="fa-solid fa-house" aria-hidden="true"></i><span>工作台</span></a>
+  <a href="../../检测/ipad_detect_entry.html" class="is-active"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i><span>检测</span></a>
+  <a href="../../个人中心/首页/ipad_profile_index.html"><i class="fa-solid fa-user" aria-hidden="true"></i><span>我的</span></a>
+</nav>
+
+<div class="export-sheet-mask" id="exportSheetMask" role="dialog" aria-modal="true" aria-labelledby="exportSheetTitle">
+  <div class="export-sheet" id="exportSheetPanel" role="document">
+    <div class="export-sheet-h" id="exportSheetTitle">导出</div>
+    <p class="export-sheet-sub">请选择要导出的内容</p>
+    <button type="button" class="export-sheet-btn" id="exportOptVoice"><i class="fa-solid fa-microphone"></i> 导出语音备忘录</button>
+    <button type="button" class="export-sheet-btn" id="exportOptTask"><i class="fa-solid fa-table-list"></i> 导出检测任务数据</button>
+    <button type="button" class="export-sheet-cancel" id="exportSheetCancel">取消</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var TITLES = {
+    DD20260506001: '滨江基站01 · 单管',
+    DD20260507002: '城西枢纽站 · 角钢',
+    DD20260508004: '余杭南枢纽 · 四管',
+    DD20260505003: '拱墅北环站 · 三管',
+    DD20260504005: '西湖景区东 · 单管'
+  };
+  var KEY = 'tower_app_active_inspect_order';
+  var oid = '';
+  try { oid = (new URLSearchParams(location.search).get('order') || '').trim().toUpperCase(); } catch (e) {}
+  if (!oid) { try { oid = (sessionStorage.getItem(KEY) || '').trim().toUpperCase(); } catch (e2) {} }
+  if (!oid) oid = 'DD20260506001';
+  var el = document.getElementById('topTaskTitle');
+  if (el) el.textContent = TITLES[oid] || TITLES.DD20260506001;
+
+  var exportMask = document.getElementById('exportSheetMask');
+  function openExportSheet() {
+    exportMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeExportSheet() {
+    exportMask.classList.remove('show');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('btnExportVoice').addEventListener('click', openExportSheet);
+  exportMask.addEventListener('click', function (e) {
+    if (e.target === exportMask) closeExportSheet();
+  });
+  document.getElementById('exportSheetCancel').addEventListener('click', closeExportSheet);
+  document.getElementById('exportOptVoice').addEventListener('click', function () {
+    closeExportSheet();
+    alert('正在导出语音备忘录：已合并任务整体备忘与各检测大模块语音备份录及转写，生成 Word 并唤起系统分享。');
+  });
+  document.getElementById('exportOptTask').addEventListener('click', function () {
+    closeExportSheet();
+    alert('正在导出检测任务数据：将打包当前任务各模块已填字段、附件清单与校验状态，生成 Excel（多工作表）并唤起系统分享。');
+  });
+  document.getElementById('btnOcrGlobal').addEventListener('click', function () {
+    alert('拍照：上传或拍摄照片 → OCR 映射到可填字段草稿 → 须人工确认后落库。');
+  });
+  document.getElementById('btnSave').addEventListener('click', function () {
+    alert('已保存');
+  });
+  document.getElementById('btnSubmit').addEventListener('click', function () {
+    if (document.getElementById('btnSubmit').disabled) return;
+    alert('提交成功后将生成 V1 并锁定');
+  });
+})();
+</script>
+</body>
+</html>

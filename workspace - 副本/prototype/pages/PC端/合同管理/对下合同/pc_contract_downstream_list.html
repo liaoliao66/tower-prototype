@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对下合同 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .link-muted { font-size:12px; color:var(--text-3); text-decoration:none; margin-left:10px; }
+  .link-muted:hover { color:var(--primary); }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="page-header">
+    <div class="page-title">对下合同</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a href="pc_contract_downstream_edit.html" class="btn btn-primary"><i class="fa-solid fa-file-circle-plus"></i> 新增对下合同</a>
+      <a href="../合同列表/pc_contract_list.html" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> 对上合同</a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="form-input" placeholder="对下合同名称/编码" style="width:200px">
+          <input type="text" class="form-input" placeholder="对上合同编号" style="width:160px">
+          <select class="form-select">
+            <option>全部类型</option>
+            <option>劳务分包</option>
+            <option>服务采购</option>
+            <option>协作检测</option>
+            <option>其他</option>
+          </select>
+          <select class="form-select">
+            <option>全部状态</option>
+            <option>履行中</option>
+            <option>已结束</option>
+          </select>
+          <button type="button" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+        </div>
+      </div>
+      <p class="toolbar-note" style="margin-bottom:12px;font-size:12px;color:var(--text-3)">
+        <a href="../合同列表/pc_contract_list.html" class="link-muted">对上合同</a>
+        <a href="../合同付款/pc_contract_payment.html" class="link-muted">对下付款</a>
+      </p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:120px">合同编码</th>
+            <th>合同名称</th>
+            <th style="width:100px">合同类型</th>
+            <th style="width:140px">检测单位</th>
+            <th style="width:100px">合同金额(元)</th>
+            <th style="width:120px">对上合同编号</th>
+            <th>对上合同名称</th>
+            <th style="width:200px">起止日期</th>
+            <th style="width:80px">状态</th>
+            <th class="col-action" style="width:140px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DX2026-0101</td>
+            <td>单站检测外协服务包</td>
+            <td><span class="tag tag-blue">劳务分包</span></td>
+            <td>杭州某某检测技术有限公司</td>
+            <td>400.00</td>
+            <td>HT2026-0512</td>
+            <td>杭州移动 2026 年度铁塔检测框架</td>
+            <td>2026-01-01 ~ 2026-12-31</td>
+            <td><span class="tag tag-green">履行中</span></td>
+            <td class="col-action">
+              <a href="pc_contract_downstream_edit.html" class="btn-text"><i class="fa-solid fa-pen-to-square"></i> 编辑</a>
+              <button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td>DX2026-0102</td>
+            <td>塔身焊缝抽检协作</td>
+            <td><span class="tag tag-orange">协作检测</span></td>
+            <td>外协协作单位</td>
+            <td>96,000.00</td>
+            <td>HT2026-0428</td>
+            <td>城西改造专项检测分包</td>
+            <td>2026-04-01 ~ 2026-09-30</td>
+            <td><span class="tag tag-green">履行中</span></td>
+            <td class="col-action">
+              <a href="pc_contract_downstream_edit.html" class="btn-text"><i class="fa-solid fa-pen-to-square"></i> 编辑</a>
+              <button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 详情</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>共 2 条</span>
+        <div class="pagination-btns">
+          <button type="button" class="page-btn active">1</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'contract_downstream', breadcrumb: ['合同管理', '对下合同'] };
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对下合同新增 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-mask.open { display:flex; }
+  .modal-dialog { background:#fff; border-radius:8px; width:min(900px,98vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+  .modal-body { padding:16px 18px; }
+  .modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+  .modal-close { border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:18px; line-height:1; padding:4px; }
+  .modal-close:hover { color:var(--text-1); }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="page-header">
+    <div class="page-title">对下合同 · 新增</div>
+    <a href="pc_contract_downstream_list.html" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> 返回对下合同列表</a>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">基础信息</div></div>
+    <div class="card-body">
+      <div class="form-grid form-grid-3">
+        <div class="form-group full">
+          <label class="form-label">合同名称 <span class="required">*</span></label>
+          <input type="text" class="form-input" id="fName" style="width:100%" placeholder="请输入对下合同名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同编码 <span class="required">*</span></label>
+          <input type="text" class="form-input" id="fCode" style="width:100%" placeholder="如 DX2026-xxxx">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同类型 <span class="required">*</span></label>
+          <select class="form-select" id="fType" style="width:100%">
+            <option>劳务分包</option>
+            <option>服务采购</option>
+            <option>协作检测</option>
+            <option>其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">检测单位 <span class="required">*</span></label>
+          <select class="form-select" id="fUnit" style="width:100%">
+            <option value="">请选择检测单位</option>
+            <option>浙江中能工程检测有限公司</option>
+            <option>杭州某某检测技术有限公司</option>
+            <option>外协协作单位</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同单价(元) <span class="required">*</span></label>
+          <input type="number" class="form-input" id="fPrice" style="width:100%" min="0" step="0.01" placeholder="含税单价">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同金额(元) <span class="required">*</span></label>
+          <input type="number" class="form-input" id="fAmount" style="width:100%" min="0" step="0.01" value="400">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">关联信息</div></div>
+    <div class="card-body">
+      <div style="margin-bottom:14px">
+        <button type="button" class="btn btn-primary" id="btnPickUp"><i class="fa-solid fa-link"></i> 关联对上合同</button>
+        <span id="pickHint" style="margin-left:10px;font-size:12px;color:var(--text-3)">未选择</span>
+      </div>
+      <input type="hidden" id="fUpCode" value="">
+      <div class="form-grid form-grid-3">
+        <div class="form-group full">
+          <label class="form-label">合同名称（带出）</label>
+          <input type="text" class="form-input" id="fUpName" readonly style="width:100%;background:#F7F8FA" placeholder="选择对上合同后自动带出">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">所属客户（带出）</label>
+          <input type="text" class="form-input" id="fCustomer" readonly style="width:100%;background:#F7F8FA" placeholder="选择对上合同后自动带出">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同金额含税（带出）</label>
+          <input type="text" class="form-input" id="fUpTax" readonly style="width:100%;background:#F7F8FA">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同金额不含税（带出）</label>
+          <input type="text" class="form-input" id="fUpNoTax" readonly style="width:100%;background:#F7F8FA">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">其他信息</div></div>
+    <div class="card-body">
+      <div class="form-grid form-grid-3">
+        <div class="form-group">
+          <label class="form-label">合同起始 <span class="required">*</span></label>
+          <input type="date" class="form-input" id="fStart" style="width:100%">
+        </div>
+        <div class="form-group">
+          <label class="form-label">合同截止 <span class="required">*</span></label>
+          <input type="date" class="form-input" id="fEnd" style="width:100%">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">备注</label>
+          <textarea class="form-input" id="fRemark" style="width:100%;min-height:72px;resize:vertical" rows="3" placeholder="选填"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">其他配置</div></div>
+    <div class="card-body">
+      <div style="font-size:13px;font-weight:600;color:var(--text-1);margin:0 0 12px">付款提醒（分阶段）</div>
+      <div style="overflow-x:auto">
+        <table class="data-table" id="payReminderTable">
+          <thead>
+            <tr>
+              <th style="width:88px">操作</th>
+              <th>阶段名称</th>
+              <th style="width:240px">提醒时间</th>
+            </tr>
+          </thead>
+          <tbody id="payReminderBody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-default btn-sm" id="btnAddPayRow" style="margin-top:12px"><i class="fa-solid fa-plus"></i> 增加一行</button>
+    </div>
+  </div>
+
+  <div class="form-footer" style="margin-top:16px">
+    <a href="pc_contract_downstream_list.html" class="btn btn-default">取消</a>
+    <button type="button" class="btn btn-primary" id="btnSave"><i class="fa-solid fa-check"></i> 保存</button>
+  </div>
+
+  <div class="modal-mask" id="modalMask" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <h3 id="modalTitle">选择对上合同</h3>
+        <button type="button" class="modal-close" id="btnModalX" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:120px">合同编号</th>
+              <th>合同名称</th>
+              <th>所属客户</th>
+              <th style="width:110px">金额(含税)</th>
+              <th style="width:110px">金额(不含税)</th>
+              <th class="col-action" style="width:88px">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-code="HT2026-0512" data-name="杭州移动 2026 年度铁塔检测框架" data-customer="中国移动通信集团浙江有限公司" data-tax="2860000" data-notax="2522123.89">
+              <td>HT2026-0512</td>
+              <td>杭州移动 2026 年度铁塔检测框架</td>
+              <td>中国移动通信集团浙江有限公司</td>
+              <td>¥ 2,860,000.00</td>
+              <td>¥ 2,522,123.89</td>
+              <td class="col-action"><button type="button" class="btn-text js-pick">选择</button></td>
+            </tr>
+            <tr data-code="HT2026-0428" data-name="城西改造专项检测分包" data-customer="浙江某建设集团有限公司" data-tax="480000" data-notax="424778.76">
+              <td>HT2026-0428</td>
+              <td>城西改造专项检测分包</td>
+              <td>浙江某建设集团有限公司</td>
+              <td>¥ 480,000.00</td>
+              <td>¥ 424,778.76</td>
+              <td class="col-action"><button type="button" class="btn-text js-pick">选择</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-default" id="btnModalCancel">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'contract_downstream', breadcrumb: ['合同管理', '对下合同', '新增'] };
+
+function fmtMoney(n) {
+  var x = Number(n);
+  if (n == null || n === '' || isNaN(x)) return '';
+  return '¥ ' + x.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  var mask = document.getElementById('modalMask');
+  var y = new Date().getFullYear();
+  document.getElementById('fStart').value = y + '-01-01';
+  document.getElementById('fEnd').value = y + '-12-31';
+
+  var payBody = document.getElementById('payReminderBody');
+  function addPayReminderRow() {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="col-action"><button type="button" class="btn-text js-del-pay-row" style="color:var(--danger)">删除</button></td>' +
+      '<td><input type="text" class="form-input" name="payStageName" style="width:100%;box-sizing:border-box" placeholder="如：首付款、进度款"></td>' +
+      '<td><input type="datetime-local" class="form-input" name="payReminderAt" style="width:100%;box-sizing:border-box"></td>';
+    payBody.appendChild(tr);
+    tr.querySelector('.js-del-pay-row').addEventListener('click', function () {
+      tr.remove();
+    });
+  }
+  document.getElementById('btnAddPayRow').addEventListener('click', function () {
+    addPayReminderRow();
+  });
+  addPayReminderRow();
+
+  function openModal() { mask.classList.add('open'); }
+  function closeModal() { mask.classList.remove('open'); }
+
+  document.getElementById('btnPickUp').addEventListener('click', openModal);
+  document.getElementById('btnModalX').addEventListener('click', closeModal);
+  document.getElementById('btnModalCancel').addEventListener('click', closeModal);
+  mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+
+  document.querySelectorAll('.js-pick').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var tr = btn.closest('tr');
+      if (!tr) return;
+      document.getElementById('fUpCode').value = tr.dataset.code || '';
+      document.getElementById('fUpName').value = tr.dataset.name || '';
+      document.getElementById('fCustomer').value = tr.dataset.customer || '';
+      document.getElementById('fUpTax').value = fmtMoney(tr.dataset.tax);
+      document.getElementById('fUpNoTax').value = fmtMoney(tr.dataset.notax);
+      document.getElementById('pickHint').textContent = '已关联 ' + (tr.dataset.code || '');
+      var nm = document.getElementById('fName');
+      if (nm && !nm.value.trim()) nm.value = (tr.dataset.name || '') + '（对下）';
+      closeModal();
+    });
+  });
+
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!document.getElementById('fName').value.trim()) { alert('请填写合同名称'); return; }
+    if (!document.getElementById('fCode').value.trim()) { alert('请填写合同编码'); return; }
+    if (!document.getElementById('fUnit').value) { alert('请选择检测单位'); return; }
+    var pr = document.getElementById('fPrice').value;
+    if (pr === '' || Number(pr) < 0) { alert('请填写合同单价'); return; }
+    var am = document.getElementById('fAmount').value;
+    if (am === '' || Number(am) <= 0) { alert('请填写有效的合同金额'); return; }
+    if (!document.getElementById('fUpCode').value) { alert('请关联对上合同'); return; }
+    if (!document.getElementById('fStart').value || !document.getElementById('fEnd').value) {
+      alert('请填写合同起止日期');
+      return;
+    }
+    var payRows = payBody.querySelectorAll('tr');
+    var payFilled = 0;
+    for (var i = 0; i < payRows.length; i++) {
+      var ins = payRows[i].querySelectorAll('input');
+      var stage = ins[0] && ins[0].value.trim();
+      var at = ins[1] && ins[1].value.trim();
+      if (stage || at) {
+        if (!stage || !at) {
+          alert('付款提醒：已填写部分信息的行须同时填写「阶段名称」与「提醒时间」。');
+          return;
+        }
+        payFilled++;
+      }
+    }
+    alert('【对下合同】校验通过。已配置付款提醒 ' + payFilled + ' 条。数据未落库。');
+  });
+});
+</script>
+</body>
+</html>

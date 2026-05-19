@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>区域风压 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .wind-modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .wind-modal-mask.open { display:flex; }
+  .wind-modal-dialog { background:#fff; border-radius:8px; width:min(520px,96vw); max-height:88vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .wind-modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .wind-modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+  .wind-modal-close { border:none; background:transparent; cursor:pointer; color:var(--text-3); padding:4px 8px; font-size:16px; line-height:1; }
+  .wind-modal-close:hover { color:var(--text-1); }
+  .wind-modal-body { padding:18px 20px; }
+  .wind-modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+  .wind-casc-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .wind-casc-row .form-select { flex:1; min-width:120px; }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">区域风压</div>
+    </div>
+    <div class="card-body">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="form-input" placeholder="省/市/区关键字">
+          <button type="button" class="btn btn-primary">查询</button>
+          <button type="button" class="btn btn-default">重置</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-primary" id="btnWindAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+          <button type="button" class="btn btn-default"><i class="fa-solid fa-file-import"></i> 导入</button>
+          <button type="button" class="btn btn-default" id="btnWindExport"><i class="fa-solid fa-file-export"></i> 导出</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>省</th>
+            <th>市</th>
+            <th>区</th>
+            <th>基本风压 (kN/m²)</th>
+            <th>备注</th>
+            <th>启用状态</th>
+            <th class="col-action">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>浙江省</td>
+            <td>杭州市</td>
+            <td>滨江区</td>
+            <td>0.45</td>
+            <td>与站点「滨江基站」匹配示例</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>浙江省</td>
+            <td>杭州市</td>
+            <td>西湖区</td>
+            <td>0.45</td>
+            <td>—</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>江苏省</td>
+            <td>南京市</td>
+            <td>鼓楼区</td>
+            <td>0.40</td>
+            <td>—</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>共 3 条记录</span>
+        <div class="pagination-btns"><button type="button" class="page-btn active">1</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wind-modal-mask" id="windModal" aria-hidden="true">
+    <div class="wind-modal-dialog" role="dialog" aria-labelledby="windModalTitle">
+      <div class="wind-modal-head">
+        <h3 id="windModalTitle">新增区域风压</h3>
+        <button type="button" class="wind-modal-close" id="windModalClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wind-modal-body">
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group full">
+            <span class="form-label">省-市-区<span class="required">*</span></span>
+            <p style="font-size:12px;color:var(--text-3);margin:0 0 8px">级联选择行政区。</p>
+            <div class="wind-casc-row">
+              <select class="form-select" id="windFormProv" title="省"></select>
+              <select class="form-select" id="windFormCity" title="市"></select>
+              <select class="form-select" id="windFormDist" title="区"></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="form-label">基本风压 (kN/m²)<span class="required">*</span></span>
+            <input type="text" class="form-input" id="windFormPressure" placeholder="手动输入，如 0.45" style="width:100%">
+          </div>
+          <div class="form-group full">
+            <span class="form-label">备注</span>
+            <textarea class="form-textarea" id="windFormRemark" rows="2" placeholder="可选" style="width:100%"></textarea>
+          </div>
+          <div class="form-group">
+            <span class="form-label">状态<span class="required">*</span></span>
+            <select class="form-select" id="windFormStatus" style="width:100%">
+              <option value="1" selected>启用</option>
+              <option value="0">停用</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="wind-modal-foot">
+        <button type="button" class="btn btn-default" id="windModalCancel">取消</button>
+        <button type="button" class="btn btn-primary" id="windModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../../../assets/shared-layout.js"></script>
+<script>window.__layoutConfig = { active: 'data_wind', breadcrumb: ['基础数据', '区域风压'] };</script>
+<script>
+(function () {
+  var WIND_REGION = {
+    '浙江省': {
+      '杭州市': ['滨江区', '西湖区', '拱墅区', '余杭区'],
+      '宁波市': ['鄞州区', '海曙区']
+    },
+    '江苏省': {
+      '南京市': ['鼓楼区', '玄武区'],
+      '苏州市': ['姑苏区', '工业园区']
+    }
+  };
+
+  function getModal() { return document.getElementById('windModal'); }
+
+  function fillProvinces() {
+    var p = document.getElementById('windFormProv');
+    if (!p) return;
+    p.innerHTML = '<option value="">请选择省</option>';
+    Object.keys(WIND_REGION).sort().forEach(function (name) {
+      var o = document.createElement('option');
+      o.value = name;
+      o.textContent = name;
+      p.appendChild(o);
+    });
+  }
+
+  function refillCities() {
+    var prov = document.getElementById('windFormProv').value;
+    var city = document.getElementById('windFormCity');
+    var dist = document.getElementById('windFormDist');
+    city.innerHTML = '<option value="">请选择市</option>';
+    dist.innerHTML = '<option value="">请选择区</option>';
+    if (!prov || !WIND_REGION[prov]) return;
+    Object.keys(WIND_REGION[prov]).sort().forEach(function (name) {
+      var o = document.createElement('option');
+      o.value = name;
+      o.textContent = name;
+      city.appendChild(o);
+    });
+  }
+
+  function refillDistricts() {
+    var prov = document.getElementById('windFormProv').value;
+    var cname = document.getElementById('windFormCity').value;
+    var dist = document.getElementById('windFormDist');
+    dist.innerHTML = '<option value="">请选择区</option>';
+    if (!prov || !cname || !WIND_REGION[prov] || !WIND_REGION[prov][cname]) return;
+    WIND_REGION[prov][cname].forEach(function (name) {
+      var o = document.createElement('option');
+      o.value = name;
+      o.textContent = name;
+      dist.appendChild(o);
+    });
+  }
+
+  function openModal() {
+    var m = getModal();
+    if (!m) return;
+    fillProvinces();
+    document.getElementById('windFormCity').innerHTML = '<option value="">请选择市</option>';
+    document.getElementById('windFormDist').innerHTML = '<option value="">请选择区</option>';
+    document.getElementById('windFormPressure').value = '';
+    document.getElementById('windFormRemark').value = '';
+    document.getElementById('windFormStatus').value = '1';
+    document.getElementById('windModalTitle').textContent = '新增区域风压';
+    m.classList.add('open');
+    m.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeModal() {
+    var m = getModal();
+    if (!m) return;
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden', 'true');
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    fillProvinces();
+    document.getElementById('windFormCity').innerHTML = '<option value="">请选择市</option>';
+    document.getElementById('windFormDist').innerHTML = '<option value="">请选择区</option>';
+
+    document.getElementById('windFormProv').addEventListener('change', function () {
+      refillCities();
+    });
+    document.getElementById('windFormCity').addEventListener('change', function () {
+      refillDistricts();
+    });
+
+    var btnAdd = document.getElementById('btnWindAdd');
+    if (btnAdd) btnAdd.addEventListener('click', openModal);
+
+    ['windModalClose', 'windModalCancel'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', closeModal);
+    });
+
+    var mask = getModal();
+    if (mask) mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+
+    var save = document.getElementById('windModalSave');
+    if (save) save.addEventListener('click', function () {
+      var pv = document.getElementById('windFormProv').value;
+      var cv = document.getElementById('windFormCity').value;
+      var dv = document.getElementById('windFormDist').value;
+      var pr = document.getElementById('windFormPressure').value.trim();
+      var st = document.getElementById('windFormStatus').value === '1' ? '启用' : '停用';
+      var rm = document.getElementById('windFormRemark').value.trim();
+      if (!pv || !cv || !dv) {
+        alert('请完整选择省、市、区');
+        return;
+      }
+      if (!pr) {
+        alert('请填写基本风压');
+        return;
+      }
+      alert('将保存「' + pv + ' / ' + cv + ' / ' + dv + '」风压 ' + pr + ' kN/m²，状态「' + st + '」' + (rm ? '，备注：' + rm : '') + '。');
+      closeModal();
+    });
+
+    var exp = document.getElementById('btnWindExport');
+    if (exp) exp.addEventListener('click', function () {
+      alert('按当前筛选条件导出区域风压列表（Excel）。');
+    });
+  });
+})();
+</script>
+</body>
+</html>

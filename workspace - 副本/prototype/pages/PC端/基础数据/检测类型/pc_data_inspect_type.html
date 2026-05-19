@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>检测类型 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .it-modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .it-modal-mask.open { display:flex; }
+  .it-modal-dialog { background:#fff; border-radius:8px; width:min(560px,96vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .it-modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .it-modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+  .it-modal-close { border:none; background:transparent; cursor:pointer; color:var(--text-3); padding:4px 8px; font-size:16px; line-height:1; }
+  .it-modal-body { padding:18px 20px; }
+  .it-modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+  .it-pick-list { border:1px solid var(--border); border-radius:8px; padding:8px 12px; max-height:180px; overflow-y:auto; background:#FAFBFC; }
+  .it-pick-item { display:flex; align-items:flex-start; gap:8px; padding:8px 0; cursor:pointer; font-size:13px; color:var(--text-2); border-bottom:1px solid var(--border); }
+  .it-pick-item:last-child { border-bottom:none; }
+  .it-pick-item input { margin-top:3px; flex-shrink:0; accent-color:var(--primary); }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">检测类型</div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px">主档：<strong>编码</strong>、<strong>名称</strong>、<strong>所需使用设备类型</strong>（可多选，关联「设备类型」主数据）、<strong>启用状态</strong>。</p>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="form-input" placeholder="编码/名称">
+          <button type="button" class="btn btn-primary">查询</button>
+          <button type="button" class="btn btn-default">重置</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-primary" id="btnInspectTypeAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>编码</th>
+            <th>名称</th>
+            <th>所需使用设备类型</th>
+            <th>启用状态</th>
+            <th class="col-action">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>INSP-AQ</td>
+            <td>安全性鉴定</td>
+            <td>测量仪器、无损检测</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>INSP-DQ</td>
+            <td>定期检测</td>
+            <td>测量仪器</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>INSP-TZ</td>
+            <td>铁塔垂直度专项</td>
+            <td>测量仪器</td>
+            <td><span class="tag tag-gray">停用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>共 3 条记录</span>
+        <div class="pagination-btns"><button type="button" class="page-btn active">1</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="it-modal-mask" id="inspectTypeModal" aria-hidden="true">
+    <div class="it-modal-dialog" role="dialog" aria-labelledby="inspectTypeModalTitle">
+      <div class="it-modal-head">
+        <h3 id="inspectTypeModalTitle">新增检测类型</h3>
+        <button type="button" class="it-modal-close" id="inspectTypeModalClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="it-modal-body">
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <span class="form-label">编码<span class="required">*</span></span>
+            <input type="text" class="form-input" id="inspectTypeFormCode" placeholder="如 INSP-XXX" style="width:100%">
+          </div>
+          <div class="form-group">
+            <span class="form-label">名称<span class="required">*</span></span>
+            <input type="text" class="form-input" id="inspectTypeFormName" placeholder="请输入检测类型名称" style="width:100%">
+          </div>
+          <div class="form-group full">
+            <span class="form-label">所需使用设备类型<span class="required">*</span></span>
+            <p style="font-size:12px;color:var(--text-3);margin:0 0 8px">可多选，选项来自「设备类型」主数据。</p>
+            <div class="it-pick-list" id="inspectTypeDevPick">
+              <label class="it-pick-item"><input type="checkbox" name="inspectTypeDevRef" value="DEV-T-CL"><span>DEV-T-CL　测量仪器</span></label>
+              <label class="it-pick-item"><input type="checkbox" name="inspectTypeDevRef" value="DEV-T-NDT"><span>DEV-T-NDT　无损检测</span></label>
+              <label class="it-pick-item"><input type="checkbox" name="inspectTypeDevRef" value="DEV-T-MEC"><span>DEV-T-MEC　力学试验</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <span class="form-label">启用状态</span>
+            <select class="form-select" id="inspectTypeFormStatus" style="width:100%">
+              <option value="1" selected>启用</option>
+              <option value="0">停用</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="it-modal-foot">
+        <button type="button" class="btn btn-default" id="inspectTypeModalCancel">取消</button>
+        <button type="button" class="btn btn-primary" id="inspectTypeModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../../../assets/shared-layout.js"></script>
+<script>window.__layoutConfig = { active: 'data_inspect_type', breadcrumb: ['基础数据', '检测类型'] };</script>
+<script>
+(function () {
+  function getModal() { return document.getElementById('inspectTypeModal'); }
+  function clearDevChecks() {
+    document.querySelectorAll('input[name="inspectTypeDevRef"]').forEach(function (c) { c.checked = false; });
+  }
+  function openModal() {
+    var m = getModal();
+    if (!m) return;
+    document.getElementById('inspectTypeFormCode').value = '';
+    document.getElementById('inspectTypeFormName').value = '';
+    document.getElementById('inspectTypeFormStatus').value = '1';
+    clearDevChecks();
+    document.getElementById('inspectTypeModalTitle').textContent = '新增检测类型';
+    m.classList.add('open');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeModal() {
+    var m = getModal();
+    if (!m) return;
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden', 'true');
+  }
+  function selectedDevTypes() {
+    var a = [];
+    document.querySelectorAll('input[name="inspectTypeDevRef"]:checked').forEach(function (c) { a.push(c.value); });
+    return a;
+  }
+  window.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('btnInspectTypeAdd');
+    if (btn) btn.addEventListener('click', openModal);
+    ['inspectTypeModalClose', 'inspectTypeModalCancel'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', closeModal);
+    });
+    var mask = getModal();
+    if (mask) mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+    var save = document.getElementById('inspectTypeModalSave');
+    if (save) save.addEventListener('click', function () {
+      var code = document.getElementById('inspectTypeFormCode').value.trim();
+      var name = document.getElementById('inspectTypeFormName').value.trim();
+      var devs = selectedDevTypes();
+      if (!code || !name) { alert('请填写编码与名称'); return; }
+      if (!devs.length) { alert('请至少选择一种所需使用设备类型'); return; }
+      alert('将保存检测类型「' + code + ' / ' + name + '」，设备类型：' + devs.join('、'));
+      closeModal();
+    });
+  });
+})();
+</script>
+</body>
+</html>

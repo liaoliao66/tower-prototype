@@ -1,0 +1,44 @@
+/* iPad 嵌入检测 Shell（?embed=1） */
+html.app-embed.ipad-embed #appStatusBar,
+html.app-embed.ipad-embed #appNavBar {
+  display: none !important;
+}
+html.app-embed.ipad-embed body.ipad-adapt {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+}
+html.app-embed.ipad-embed #appSegmentTabBar {
+  flex-shrink: 0;
+}
+html.app-embed.ipad-embed #appEmbedContent {
+  flex: 1;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-y: auto !important;
+}
+/* 检测填报嵌入：模块说明文字正常换行 */
+html.task-embed.ipad-embed body.ipad-adapt .mod .t,
+html.task-embed.ipad-embed body.ipad-adapt .mod .s {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  writing-mode: horizontal-tb !important;
+}
+html.task-embed.ipad-embed body.ipad-adapt .grid2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+html.app-embed.ipad-embed [data-app-flow-footer] {
+  display: none !important;
+}
+/* 嵌入填报 Shell：去掉底栏留白，表单区铺满 iframe */
+html.task-embed.ipad-embed body.inspect-app-layout.ipad-adapt #appEmbedContent {
+  max-width: none !important;
+  margin: 0 !important;
+  padding-bottom: var(--ipad-space-2, 20px) !important;
+}
+html.app-embed.ipad-embed .ipad-global-tabbar {
+  display: none !important;
+}

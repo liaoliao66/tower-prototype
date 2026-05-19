@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>订单详情 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .od-dl { display:grid; grid-template-columns:repeat(3,1fr); gap:12px 20px; font-size:13px; }
+  @media (max-width:1100px) { .od-dl { grid-template-columns:repeat(2,1fr); } }
+  .od-dl dt { color:var(--text-3); font-weight:400; margin:0; }
+  .od-dl dd { margin:2px 0 0; color:var(--text-1); font-weight:500; }
+  .od-dl .full { grid-column:1 / -1; }
+  .od-empty { font-size:13px; color:var(--text-3); margin:0; padding:8px 0; }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="page-header">
+    <div class="page-title" id="odPageTitle">订单详情</div>
+    <a href="pc_order_list.html" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> 返回列表</a>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">订单信息</div></div>
+    <div class="card-body">
+      <dl class="od-dl" id="odBase"></dl>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">催办记录</div></div>
+    <div class="card-body">
+      <div id="odUrgeWrap"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-header"><div class="card-title">拒绝 / 驳回记录</div></div>
+    <div class="card-body">
+      <div id="odRejectWrap"></div>
+    </div>
+  </div>
+</div>
+
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'order_list', breadcrumb: ['营销管理', '订单管理', '订单详情'] };
+
+var ORDER_MOCK = {
+  ZJHC20260505001: {
+    orderName: '城西改造项目检', contract: 'HT2026-0428 · 城西改造专项检测分包', siteAddrCode: 'ZZ-HZ-CX03', project: '城西区域改造项目', unit: '华东某外协检测',
+    inspectType: '可靠性鉴定', status: '已派', urgeStatus: '已催办', dispatchAt: '2026-05-05', deadline: '2026-05-20',
+    overdue: '正常', inspector: '李明', creator: '合同部-刘洋', contact: '0571-88****01', remark: '—',
+    urges: [
+      { time: '2026-05-07 09:30', operator: '张伟', channel: '系统消息 + 短信', target: '华东某外协检测 · 现场负责人', content: '请于截止日期前完成可靠性鉴定现场作业并回传进度。' },
+      { time: '2026-05-06 14:05', operator: '张伟', channel: '系统消息', target: '华东某外协检测 · 单位负责人', content: '客户侧关注本单进度，请优先安排。' }
+    ],
+    rejects: []
+  },
+  ZJHYH20260503002: {
+    orderName: '余杭5G升级检测', contract: 'HT2026-0512 · 杭州移动 2026 年度铁塔检测框架', siteAddrCode: 'ZZ-YH-12', project: '余杭5G升级项目', unit: '浙江中能检测',
+    inspectType: '安全性鉴定', status: '已派', urgeStatus: '已催办', dispatchAt: '2026-05-03', deadline: '2026-05-15',
+    overdue: '即将过期', inspector: '王强', creator: '合同部-刘洋', contact: '0571-88****02', remark: '—',
+    urges: [
+      { time: '2026-05-08 10:12', operator: '李娜', channel: '系统消息', target: '浙江中能检测 · 检测一组负责人', content: '截止日期临近，请确认现场计划。' }
+    ],
+    rejects: []
+  },
+  ZJHBJ20260506001: {
+    orderName: '滨江基站安全性鉴定', contract: 'HT2026-0512 · 杭州移动 2026 年度铁塔检测框架', siteAddrCode: 'ZZ-HZ-BJ01', project: '杭州移动铁塔工程', unit: '浙江中能检测',
+    inspectType: '安全性鉴定', status: '待派', urgeStatus: '未催办', dispatchAt: '2026-05-06', deadline: '2026-06-30',
+    overdue: '正常', inspector: '—', creator: '合同部-王敏', contact: '0571-88****03', remark: '待派单',
+    urges: [], rejects: []
+  },
+  ZJHC20260507001: {
+    orderName: '江北园区单管塔鉴定', contract: 'HT2026-0401 · 江北智慧园区通信配套', siteAddrCode: 'ZZ-JB-01', project: '江北智慧园区工程', unit: '浙江中能检测',
+    inspectType: '安全性鉴定', status: '已派', urgeStatus: '未催办', dispatchAt: '2026-05-07', deadline: '2026-05-10',
+    overdue: '已过期', inspector: '—', creator: '合同部-刘洋', contact: '0571-88****04', remark: '待指派检测人员',
+    urges: [], rejects: []
+  },
+  ZJHG20260504001: {
+    orderName: '拱墅区基站检', contract: 'HT2026-0512 · 杭州移动 2026 年度铁塔检测框架', siteAddrCode: 'ZZ-HZ-GS05', project: '拱墅区域项目', unit: '浙江中能检测',
+    inspectType: '安全性鉴定', status: '已完', urgeStatus: '未催办', dispatchAt: '2026-05-04', deadline: '2026-04-28',
+    overdue: '已过期', inspector: '王强', creator: '合同部-王敏', contact: '0571-88****05', remark: '已闭环归档',
+    urges: [], rejects: []
+  },
+  ZJHYH20260503001: {
+    orderName: '余杭区铁塔安全检', contract: 'HT2026-0512 · 杭州移动 2026 年度铁塔检测框架', siteAddrCode: 'ZZ-YH-12', project: '余杭5G升级项目', unit: '—',
+    inspectType: '抗震鉴定', status: '待派', urgeStatus: '未催办', dispatchAt: '2026-05-03', deadline: '2026-05-14',
+    overdue: '即将过期', inspector: '—', creator: '合同部-刘洋', contact: '0571-88****06', remark: '待派检测单位',
+    urges: [], rejects: []
+  },
+  ZJHXS20260502001: {
+    orderName: '萧山机场基站鉴定', contract: 'HT2026-0315 · 萧山机场通信保障年度检', siteAddrCode: 'ZZ-XS-08', project: '萧山通信保障项目', unit: '浙江中能检测',
+    inspectType: '安全性鉴定', status: '已驳', urgeStatus: '未催办', dispatchAt: '2026-05-02', deadline: '2026-05-25',
+    overdue: '正常', inspector: '张华', creator: '合同部-王敏', contact: '0571-88****07', remark: '—',
+    urges: [],
+    rejects: [
+      { time: '2026-05-03 14:22', actor: '张华', role: '检测人员', unit: '浙江中能检测', reason: '现场塔体维护中，不具备登高与仪器架设条件，建议改期后再派单。', action: '驳回派单' },
+      { time: '2026-05-02 16:40', actor: '张华', role: '检测人员', unit: '浙江中能检测', reason: '当日航班管制区域与站点冲突，无法进场。', action: '拒绝接单' }
+    ]
+  },
+  ZJHXH20260502001: {
+    orderName: '西湖文化广场铁塔复检', contract: 'HT2026-0208 · 西湖区设施维护框架', siteAddrCode: 'ZZ-XH-WH01', project: '西湖区通信设施维护', unit: '浙江中能检测',
+    inspectType: '可靠性鉴定', status: '已派', urgeStatus: '未催办', dispatchAt: '2026-05-02', deadline: '2026-05-22',
+    overdue: '正常', inspector: '王强', creator: '合同部-刘洋', contact: '0571-88****08', remark: '与检测任务 RW202606003 关联',
+    urges: [
+      { time: '2026-05-08 11:00', operator: '李娜', channel: '系统消息', target: '浙江中能检测 · 王强', content: '请按周计划完成角钢塔复检外业。' }
+    ],
+    rejects: []
+  },
+  ZJJD20260508001: {
+    orderName: '建德山区单站检测', contract: 'HT2026-0501 · 山区覆盖补强专项', siteAddrCode: 'ZZ-JD-08', project: '山区覆盖补强工程', unit: '华东某外协检测有限公司',
+    inspectType: '安全性鉴定', status: '已完', urgeStatus: '未催办', dispatchAt: '2026-04-20', deadline: '2026-05-05',
+    overdue: '正常', inspector: '赵六', creator: '合同部-王敏', contact: '0571-88****09', remark: '外协单位执行，与任务 RW202606005 关联',
+    urges: [],
+    rejects: []
+  }
+};
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/"/g, '&quot;');
+}
+
+function renderBase(code, d) {
+  var el = document.getElementById('odBase');
+  var rows = [
+    ['订单编码', code], ['订单名称', d.orderName], ['关联合同', d.contract || '—'],
+    ['站址编码', d.siteAddrCode], ['关联工程', d.project], ['检测单位', d.unit], ['检测类型', d.inspectType],
+    ['订单状态', d.status], ['催办状态', d.urgeStatus], ['派单时间', d.dispatchAt],
+    ['截止日期', d.deadline], ['是否过期', d.overdue], ['检测人', d.inspector],
+    ['创建人', d.creator], ['联系电话', d.contact], ['备注', d.remark]
+  ];
+  el.innerHTML = rows.map(function (r) {
+    return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>';
+  }).join('');
+}
+
+function renderUrges(list) {
+  var wrap = document.getElementById('odUrgeWrap');
+  if (!list || !list.length) {
+    wrap.innerHTML = '<p class="od-empty">暂无催办记录。</p>';
+    return;
+  }
+  var thead = '<thead><tr><th style="width:160px">催办时间</th><th style="width:100px">催办人</th><th style="width:120px">渠道</th><th>通知对象</th><th>催办说明</th></tr></thead>';
+  var body = list.map(function (u) {
+    return '<tr><td>' + esc(u.time) + '</td><td>' + esc(u.operator) + '</td><td>' + esc(u.channel) + '</td><td>' + esc(u.target) + '</td><td>' + esc(u.content) + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table class="data-table">' + thead + '<tbody>' + body + '</tbody></table>';
+}
+
+function renderRejects(list) {
+  var wrap = document.getElementById('odRejectWrap');
+  if (!list || !list.length) {
+    wrap.innerHTML = '<p class="od-empty">暂无拒绝或驳回记录。</p>';
+    return;
+  }
+  var thead = '<thead><tr><th style="width:160px">时间</th><th style="width:100px">操作人</th><th style="width:100px">身份</th><th style="width:140px">所属单位</th><th style="width:100px">类型</th><th>原因说明</th></tr></thead>';
+  var body = list.map(function (r) {
+    return '<tr><td>' + esc(r.time) + '</td><td>' + esc(r.actor) + '</td><td>' + esc(r.role) + '</td><td>' + esc(r.unit) + '</td><td>' + esc(r.action) + '</td><td>' + esc(r.reason) + '</td></tr>';
+  }).join('');
+  wrap.innerHTML = '<table class="data-table">' + thead + '<tbody>' + body + '</tbody></table>';
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  var code = '';
+  try {
+    code = (new URLSearchParams(location.search).get('code') || '').trim();
+  } catch (e) {}
+  if (!code || !ORDER_MOCK[code]) {
+    code = 'ZJHC20260505001';
+  }
+  var d = ORDER_MOCK[code];
+  document.getElementById('odPageTitle').textContent = '订单详情 · ' + code;
+  renderBase(code, d);
+  renderUrges(d.urges);
+  renderRejects(d.rejects);
+});
+</script>
+</body>
+</html>

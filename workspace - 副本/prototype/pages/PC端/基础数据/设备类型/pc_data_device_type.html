@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设备类型 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .dt-modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .dt-modal-mask.open { display:flex; }
+  .dt-modal-dialog { background:#fff; border-radius:8px; width:min(480px,96vw); max-height:88vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .dt-modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .dt-modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+  .dt-modal-close { border:none; background:transparent; cursor:pointer; color:var(--text-3); padding:4px 8px; font-size:16px; line-height:1; }
+  .dt-modal-body { padding:18px 20px; }
+  .dt-modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">设备类型</div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px">主档：<strong>编码</strong>、<strong>名称</strong>、<strong>启用状态</strong>；供<strong>设备管理</strong>、<strong>检测类型</strong>引用。</p>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="form-input" placeholder="编码/名称">
+          <button type="button" class="btn btn-primary">查询</button>
+          <button type="button" class="btn btn-default">重置</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-primary" id="btnDevTypeAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>编码</th>
+            <th>名称</th>
+            <th>启用状态</th>
+            <th class="col-action">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DEV-T-CL</td>
+            <td>测量仪器</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>DEV-T-NDT</td>
+            <td>无损检测</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+          <tr>
+            <td>DEV-T-MEC</td>
+            <td>力学试验</td>
+            <td><span class="tag tag-green">启用</span></td>
+            <td class="col-action"><button type="button" class="btn btn-text">编辑</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>共 3 条记录</span>
+        <div class="pagination-btns"><button type="button" class="page-btn active">1</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dt-modal-mask" id="devTypeModal" aria-hidden="true">
+    <div class="dt-modal-dialog" role="dialog" aria-labelledby="devTypeModalTitle">
+      <div class="dt-modal-head">
+        <h3 id="devTypeModalTitle">新增设备类型</h3>
+        <button type="button" class="dt-modal-close" id="devTypeModalClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="dt-modal-body">
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <span class="form-label">编码<span class="required">*</span></span>
+            <input type="text" class="form-input" id="devTypeFormCode" placeholder="如 DEV-T-XXX" style="width:100%">
+          </div>
+          <div class="form-group">
+            <span class="form-label">名称<span class="required">*</span></span>
+            <input type="text" class="form-input" id="devTypeFormName" placeholder="请输入类型名称" style="width:100%">
+          </div>
+          <div class="form-group">
+            <span class="form-label">启用状态</span>
+            <select class="form-select" id="devTypeFormStatus" style="width:100%">
+              <option value="1" selected>启用</option>
+              <option value="0">停用</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="dt-modal-foot">
+        <button type="button" class="btn btn-default" id="devTypeModalCancel">取消</button>
+        <button type="button" class="btn btn-primary" id="devTypeModalSave">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../../../assets/shared-layout.js"></script>
+<script>window.__layoutConfig = { active: 'data_device_type', breadcrumb: ['基础数据', '设备类型'] };</script>
+<script>
+(function () {
+  function getModal() { return document.getElementById('devTypeModal'); }
+  function openModal() {
+    var m = getModal();
+    if (!m) return;
+    document.getElementById('devTypeFormCode').value = '';
+    document.getElementById('devTypeFormName').value = '';
+    document.getElementById('devTypeFormStatus').value = '1';
+    document.getElementById('devTypeModalTitle').textContent = '新增设备类型';
+    m.classList.add('open');
+    m.setAttribute('aria-hidden', 'false');
+  }
+  function closeModal() {
+    var m = getModal();
+    if (!m) return;
+    m.classList.remove('open');
+    m.setAttribute('aria-hidden', 'true');
+  }
+  window.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('btnDevTypeAdd');
+    if (btn) btn.addEventListener('click', openModal);
+    ['devTypeModalClose', 'devTypeModalCancel'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('click', closeModal);
+    });
+    var save = document.getElementById('devTypeModalSave');
+    if (save) save.addEventListener('click', function () {
+      var code = document.getElementById('devTypeFormCode').value.trim();
+      var name = document.getElementById('devTypeFormName').value.trim();
+      if (!code || !name) { alert('请填写编码与名称'); return; }
+      alert('将保存设备类型「' + code + ' / ' + name + '」');
+      closeModal();
+    });
+    var mask = getModal();
+    if (mask) mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+  });
+})();
+</script>
+</body>
+</html>

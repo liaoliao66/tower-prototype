@@ -25,6 +25,7 @@ const MENU = [
     {id:'report_generate', label:'报告编制', href:'../../铁塔检测业务/报告编制/report-list.html'},
   ]},
   { id:'ttjcpz', label:'模板配置', icon:'fa-sliders', items:[
+    {id:'message_template_list', label:'消息模板配置', href:'../../消息模板配置/消息模板管理/pc_message_template_list.html'},
     {id:'task_template_list', label:'任务模板管理', href:'../../任务模板配置/任务模板管理/pc_task_template_list.html'},
     {id:'report_template_list', label:'报告模板管理', href:'../../报告模板配置/报告模板管理/pc_report_template_list.html'},
     {id:'report_rating_level', label:'评定等级管理', href:'../../报告模板配置/报告模板管理/pc_report_rating_level.html'},
@@ -130,12 +131,32 @@ function initLayout(config) {
   }
 }
 
+function loadPcListDelete() {
+  if (window.__pcListDeleteLoaded) return;
+  window.__pcListDeleteLoaded = true;
+  var scripts = document.getElementsByTagName('script');
+  var base = '';
+  for (var i = 0; i < scripts.length; i++) {
+    var src = scripts[i].getAttribute('src') || '';
+    if (src.indexOf('shared-layout.js') >= 0) {
+      base = src.replace(/shared-layout\.js.*$/, 'pc-list-delete.js');
+      break;
+    }
+  }
+  if (!base) return;
+  var s = document.createElement('script');
+  s.src = base;
+  s.async = false;
+  document.head.appendChild(s);
+}
+
 window.addEventListener('DOMContentLoaded', function () {
   try {
     if (window.__layoutConfig) initLayout(window.__layoutConfig);
   } catch (e) {
     console.error('[prototype] initLayout', e);
   }
+  loadPcListDelete();
   var boot = window.__prototypePageInit;
   if (typeof boot === 'function') {
     window.__prototypePageInit = undefined;

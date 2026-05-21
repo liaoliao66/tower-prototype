@@ -32,6 +32,16 @@
   <div class="card">
     <div class="card-body">
       <div class="form-section">
+        <div class="section-title">审核信息</div>
+        <div class="row-grid">
+          <div><div class="form-label">审核状态</div><div class="readonly-box" id="auditStatus"></div></div>
+          <div><div class="form-label">审核节点</div><div class="readonly-box" id="auditNode"></div></div>
+          <div><div class="form-label">审核人</div><div class="readonly-box" id="auditor"></div></div>
+          <div><div class="form-label">审核时间</div><div class="readonly-box" id="auditAt"></div></div>
+        </div>
+      </div>
+
+      <div class="form-section">
         <div class="section-title">1. 报告基本信息</div>
         <div class="row-grid">
           <div><div class="form-label">报告编号</div><div class="readonly-box" id="reportNo"></div></div>
@@ -113,13 +123,33 @@
       '已驳回': { cls:'bg-red-100 text-red-700', progress:'已迁移为「编制中」' }
     };
 
+    function deriveAuditFields(r) {
+      if (r.auditStatus) return;
+      if (r.status === '待编制') {
+        r.auditStatus = '未涉及'; r.auditNode = '—'; r.auditor = '—'; r.auditAt = '—';
+      } else if (r.status === '编制中') {
+        r.auditStatus = '未提交'; r.auditNode = '未发起审核'; r.auditor = '—'; r.auditAt = '—';
+      } else if (r.status === '已编制') {
+        r.auditStatus = '审核中'; r.auditNode = r.auditStep || '待技术部门主管审核'; r.auditor = r.auditor || '—'; r.auditAt = r.auditAt || '—';
+      } else if (r.status === '已出报告') {
+        r.auditStatus = '已通过'; r.auditNode = r.auditStep || '已完成'; r.auditor = r.auditor || '—'; r.auditAt = r.auditAt || '—';
+      }
+    }
+
     function migrateReportRow(r) {
       var s = r.status;
       if (s === '草稿') { r.status = '编制中'; }
       else if (s === '待审核') { r.status = '已编制'; if (!r.auditStep) r.auditStep = '待技术部门主管审核'; }
       else if (s === '已通过') { r.status = '已出报告'; if (!r.auditStep) r.auditStep = '已完成'; }
-      else if (s === '已驳回') { r.status = '编制中'; }
+      else if (s === '已驳回') { r.status = '编制中'; r.auditStatus = '已驳回'; }
+      deriveAuditFields(r);
       return r;
+    }
+
+    function nowText() {
+      var d = new Date();
+      var p = function (n) { return String(n).padStart(2, '0'); };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
     }
 
     function loadReportsMigrate() {
@@ -172,7 +202,12 @@
     }
 
     function renderReport(report) {
+      deriveAuditFields(report);
       document.getElementById('rejectReasonWrap').style.display = 'none';
+      setText('auditStatus', report.auditStatus);
+      setText('auditNode', report.auditNode);
+      setText('auditor', report.auditor);
+      setText('auditAt', report.auditAt);
       setText('reportNo', report.reportNo);
       setText('towerCode', report.towerCode + ' / ' + (report.towerName || '-'));
       setText('contractNo', report.contractNo);
@@ -267,6 +302,10 @@
           patchReport(report.id, function (r) {
             r.status = '编制中';
             r.auditStep = '';
+            r.auditStatus = '已驳回';
+            r.auditNode = '已驳回';
+            r.auditor = '—';
+            r.auditAt = '—';
             r.rejectReason = reason;
           });
           touchTaskSync(report.taskId, '报告编制中');
@@ -278,6 +317,10 @@
           patchReport(report.id, function (r) {
             r.status = '编制中';
             r.auditStep = '';
+            r.auditStatus = '未提交';
+            r.auditNode = '未发起审核';
+            r.auditor = '—';
+            r.auditAt = '—';
           });
           touchTaskSync(report.taskId, '报告编制中');
           location.reload();
@@ -291,23 +334,43 @@
         bind('btn-recall-audit', recallHandler);
         bind('btn-audit-reject', rejectHandler);
         bind('btn-supervisor-pass', function () {
-          patchReport(report.id, function (r) { r.auditStep = '待抄送相关人员'; });
+          patchReport(report.id, function (r) {
+            r.auditStep = '待抄送相关人员';
+            r.auditStatus = '审核中';
+            r.auditNode = '待抄送相关人员';
+            r.auditor = '技术部主管-周敏';
+            r.auditAt = nowText();
+          });
           location.reload();
         });
         bind('btn-cc-confirm', function () {
           patchReport(report.id, function (r) {
             r.auditStep = r.extraSign ? '待加签审核' : '待出具报告';
+            r.auditStatus = '审核中';
+            r.auditNode = r.auditStep;
+            r.auditor = '抄送确认-李娜';
+            r.auditAt = nowText();
           });
           location.reload();
         });
         bind('btn-extra-sign-pass', function () {
-          patchReport(report.id, function (r) { r.auditStep = '待出具报告'; });
+          patchReport(report.id, function (r) {
+            r.auditStep = '待出具报告';
+            r.auditStatus = '审核中';
+            r.auditNode = '待出具报告';
+            r.auditor = '加签-陈总';
+            r.auditAt = nowText();
+          });
           location.reload();
         });
         bind('btn-final-issue', function () {
           patchReport(report.id, function (r) {
             r.status = '已出报告';
             r.auditStep = '已完成';
+            r.auditStatus = '已通过';
+            r.auditNode = '已完成';
+            r.auditor = r.auditor && r.auditor !== '—' ? r.auditor : '终审-张伟';
+            r.auditAt = nowText();
           });
           touchTaskSync(report.taskId, '报告已出具');
           location.reload();

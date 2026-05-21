@@ -12,7 +12,6 @@
 <div id="page-content">
   <div class="page-header">
     <div class="page-title">工程管理</div>
-    <button type="button" class="btn btn-primary" onclick="location.href='pc_project_create.html'"><i class="fa-solid fa-plus"></i> 新增工程</button>
   </div>
   <div class="card">
     <div class="card-body">
@@ -35,12 +34,16 @@
           <button class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
           <button class="btn btn-default">重置</button>
         </div>
-        <div class="toolbar-right">
-          <button class="btn btn-default"><i class="fa-solid fa-file-import"></i> 导入</button>
-          <button class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
-        </div>
       </div>
+
       <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.55">站址、经纬度等<strong>站点信息</strong>在<strong>订单管理 → 新增订单</strong>中维护；工程主档仅保留合同与工程客户等主数据。</p>
+      
+      <div class="pc-table-actions">
+        <button class="btn btn-default"><i class="fa-solid fa-file-import"></i> 导入</button>
+          <button class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+        <button type="button" class="btn btn-primary" onclick="location.href='pc_project_create.html'"><i class="fa-solid fa-plus"></i> 新增工程</button>
+      </div>
+
       <table class="data-table">
         <thead>
           <tr>
@@ -65,7 +68,7 @@
             <td>¥ 2,860,000</td>
             <td>杭州移动 — 网络部</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button></td>
+            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button></td>
           </tr>
           <tr>
             <td>GC-202601015-002</td>
@@ -76,7 +79,7 @@
             <td>¥ 2,860,000</td>
             <td>杭州移动 — 运维中心</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button></td>
+            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button></td>
           </tr>
           <tr>
             <td>GC-202602028-001</td>
@@ -87,7 +90,7 @@
             <td>¥ 480,000</td>
             <td>杭州分公司 — 项目部</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button></td>
+            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button></td>
           </tr>
           <tr>
             <td>GC-202603010-001</td>
@@ -98,7 +101,7 @@
             <td>¥ 128,000</td>
             <td>南湖区域中心</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button></td>
+            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button></td>
           </tr>
           <tr>
             <td>GC-202603010-002</td>
@@ -109,7 +112,7 @@
             <td>¥ 128,000</td>
             <td>秀洲区域中心</td>
             <td><span class="tag tag-gray">停用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button></td>
+            <td class="col-action"><a class="btn-text" href="pc_project_create.html"><i class="fa-solid fa-pen-to-square"></i> 编辑</a><button type="button" class="btn-text"><i class="fa-solid fa-eye"></i> 查看</button><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button></td>
           </tr>
         </tbody>
       </table>

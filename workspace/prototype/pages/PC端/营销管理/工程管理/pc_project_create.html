@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -229,6 +229,18 @@
   }
 
   window.addEventListener('DOMContentLoaded', function () {
+    var preCode = '';
+    try { preCode = (new URLSearchParams(location.search).get('contractCode') || '').trim(); } catch (e) {}
+    if (preCode) {
+      for (var i = 0; i < CONTRACTS.length; i++) {
+        if (CONTRACTS[i].code === preCode) {
+          selectedIdx = i;
+          applyContract();
+          break;
+        }
+      }
+    }
+
     var mask = document.getElementById('contractPickMask');
     var btnPick = document.getElementById('btnPickContract');
     if (btnPick) btnPick.addEventListener('click', openPick);

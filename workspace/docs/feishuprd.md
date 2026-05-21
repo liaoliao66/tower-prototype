@@ -489,6 +489,8 @@ iPad 横屏（1024×768 基准）下的 **任务级填报壳**：
 | 需求 | 原型路径 |
 | --- | --- |
 | R-006 模板配置 | `pages/PC端/任务模板配置/任务模板管理/pc_task_template_create.html` |
+| R-001 消息模板（合同/任务提醒） | `pages/PC端/消息模板配置/消息模板管理/pc_message_template_list.html` |
+| R-001 对上合同详情 | `pages/PC端/合同管理/合同编辑/pc_contract_detail.html` |
 | R-006-1 序列默认值 | `assets/pc-template-field-default.js` |
 | R-011 填报主页 | `pages/iPad端/任务/填报主页/ipad_task_inspect_home.html` |
 | R-012 同步/校验/地图 | `pages/iPad端/系统/同步/ipad_sync_index.html` 等 |

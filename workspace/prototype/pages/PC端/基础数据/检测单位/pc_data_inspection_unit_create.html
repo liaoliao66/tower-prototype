@@ -36,12 +36,12 @@
   <div class="page-header">
     <div style="display:flex;align-items:center;gap:12px">
       <a href="pc_data_inspection_unit.html" class="btn btn-default btn-sm"><i class="fa-solid fa-arrow-left"></i> 返回列表</a>
-      <h1 class="page-title">检测单位维护</h1>
+      <h1 class="page-title" id="pageTitle">检测单位维护</h1>
     </div>
   </div>
   <div class="card">
     <div class="card-body">
-      <div class="form-section">
+      <div class="form-section" id="sectionBasic">
         <div class="form-section-title">基础信息</div>
         <div class="form-grid form-grid-3">
           <div class="form-group full">
@@ -67,7 +67,7 @@
         </div>
       </div>
 
-      <div class="form-section">
+      <div class="form-section" id="sectionOrg">
         <div class="form-section-title">检测组架构</div>
         <p style="font-size:12px;color:var(--text-3);margin:-4px 0 12px">左侧维护<strong>检测组名称</strong>；右侧为当前选中组的<strong>检测组人员</strong>。负责人使用单选，<strong>同一检测组仅允许一名负责人</strong>。</p>
 
@@ -156,8 +156,8 @@
         </div>
       </div>
 
-      <div class="form-footer">
-        <button type="button" class="btn btn-primary">保存</button>
+      <div class="form-footer" id="formFooter">
+        <button type="button" class="btn btn-primary" id="btnSave">保存</button>
         <button type="button" class="btn btn-default" onclick="location.href='pc_data_inspection_unit.html'">取消</button>
       </div>
     </div>
@@ -167,6 +167,47 @@
 <script>window.__layoutConfig = { active: 'data_inspection_unit', breadcrumb: ['基础数据', '检测单位', '维护'] };</script>
 <script>
 (function () {
+  var params = new URLSearchParams(location.search);
+  var pageMode = params.get('mode') || (params.get('view') === 'org' ? '' : 'edit');
+  var viewOrg = params.get('view') === 'org';
+  var unitCode = params.get('code') || '';
+  var titleEl = document.getElementById('pageTitle');
+  var sectionBasic = document.getElementById('sectionBasic');
+  var sectionOrg = document.getElementById('sectionOrg');
+  var formFooter = document.getElementById('formFooter');
+
+  function setReadonlyIn(root) {
+    if (!root) return;
+    root.querySelectorAll('input.form-input, textarea, select.form-select').forEach(function (el) {
+      if (el.type === 'radio' || el.type === 'checkbox') {
+        el.disabled = true;
+      } else {
+        el.setAttribute('readonly', 'readonly');
+        el.style.background = '#F7F8FA';
+      }
+    });
+    root.querySelectorAll('button.btn-del-group, button.btn-del-staff, #btnAddGroup, .btn-add-staff').forEach(function (btn) {
+      btn.style.display = 'none';
+    });
+  }
+
+  if (pageMode === 'detail') {
+    if (titleEl) titleEl.textContent = '检测单位详情' + (unitCode ? ' · ' + unitCode : '');
+    if (sectionOrg) sectionOrg.style.display = 'none';
+    if (formFooter) formFooter.style.display = 'none';
+    setReadonlyIn(sectionBasic);
+    if (window.__layoutConfig) window.__layoutConfig.breadcrumb = ['基础数据', '检测单位', '详情'];
+  } else if (viewOrg) {
+    if (titleEl) titleEl.textContent = '检测单位架构' + (unitCode ? ' · ' + unitCode : '');
+    if (sectionBasic) sectionBasic.style.display = 'none';
+    if (formFooter) formFooter.style.display = 'none';
+    setReadonlyIn(sectionOrg);
+    if (sectionOrg) sectionOrg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.__layoutConfig) window.__layoutConfig.breadcrumb = ['基础数据', '检测单位', '架构'];
+  } else if (unitCode && titleEl) {
+    titleEl.textContent = '检测单位维护 · ' + unitCode;
+  }
+
   function syncStaffTitle() {
     var row = document.querySelector('.group-row.active .group-name-input');
     var el = document.getElementById('staffGroupName');

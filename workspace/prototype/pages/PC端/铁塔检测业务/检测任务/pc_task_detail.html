@@ -35,7 +35,7 @@
 <div id="page-content">
 
   <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <a href="pc_task_list.html" class="btn btn-default btn-sm"><i class="fa-solid fa-arrow-left"></i> 返回检测任务</a>
+    <a href="pc_task_list.html" id="linkBackList" class="btn btn-default btn-sm"><i class="fa-solid fa-arrow-left"></i> 返回检测任务</a>
     <a href="#" id="linkDataEntry" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> 录入数据</a>
     <a href="#" id="linkVersions" class="btn btn-default btn-sm" style="display:none"><i class="fa-solid fa-clock-rotate-left"></i> 记录版本</a>
   </div>
@@ -55,6 +55,17 @@
         <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
           <div class="card-header"><div class="card-title" style="font-size:14px">检测任务</div></div>
           <div class="card-body"><div class="kv-grid kv-3" id="taskKv"></div></div>
+        </div>
+
+        <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
+          <div class="card-header card-head-row">
+            <div class="card-title" style="font-size:14px">审核信息</div>
+            <button type="button" class="btn btn-primary btn-sm" id="taskAuditBtn" style="display:none"><i class="fa-solid fa-clipboard-check"></i> 办理审核</button>
+          </div>
+          <div class="card-body">
+            <p class="empty-hint" style="margin:0 0 10px">检测数据提交后的技术审核进度；改数与版本追溯见「数据复核」与「记录版本」。</p>
+            <div class="kv-grid kv-3" id="auditKv"></div>
+          </div>
         </div>
 
         <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
@@ -102,8 +113,28 @@
 
     </div>
   </div>
+
+  <div class="modal-mask" id="pcAuditModal" aria-hidden="true">
+    <div class="modal-box">
+      <div class="modal-hd">
+        <h3 id="pcAuditModalTitle">检测数据审核</h3>
+        <button type="button" class="modal-close" id="pcAuditModalClose">&times;</button>
+      </div>
+      <div class="modal-bd">
+        <p id="pcAuditModalSub" style="font-size:13px;color:var(--text-2);margin:0 0 14px;line-height:1.55"></p>
+        <textarea class="form-textarea" id="pcAuditRemark" placeholder="审批意见（驳回时必填）"></textarea>
+        <a href="#" id="pcAuditGoDetail" class="btn-text" style="font-size:12px;margin-top:10px;display:none">进入数据复核</a>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn btn-default" id="pcAuditCancel">取消</button>
+        <button type="button" class="btn btn-default" id="pcAuditReject" style="color:var(--danger)">驳回</button>
+        <button type="button" class="btn btn-primary" id="pcAuditPass">通过</button>
+      </div>
+    </div>
+  </div>
 </div>
 <script src="../../../../assets/shared-layout.js"></script>
+<script src="../../../../assets/pc-audit-action.js"></script>
 <script>window.__layoutConfig = {active:'task_list', breadcrumb:['检测管理','检测任务','任务详情']};</script>
 <script>
 (function () {
@@ -121,7 +152,7 @@
       unit: '浙江中能工程检测有限公司',
       status: '待指派',
       person: '—',
-      auditNode: '—',
+      auditStatus: '—', auditNode: '—', auditor: '—', auditAt: '—',
       dispatchAt: '2026-05-10',
       review: false,
       dataVersion: '—',
@@ -150,7 +181,7 @@
       unit: '浙江中能工程检测有限公司',
       status: '待检测',
       person: '李明',
-      auditNode: '—',
+      auditStatus: '未提交', auditNode: '—', auditor: '—', auditAt: '—',
       dispatchAt: '2026-05-09',
       review: false,
       dataVersion: '—',
@@ -193,7 +224,7 @@
       unit: '浙江中能工程检测有限公司',
       status: '检测中',
       person: '王强',
-      auditNode: '—',
+      auditStatus: '未提交', auditNode: '—', auditor: '—', auditAt: '—',
       dispatchAt: '2026-05-08',
       review: false,
       dataVersion: '—',
@@ -234,7 +265,7 @@
       unit: '浙江中能工程检测有限公司',
       status: '已检测',
       person: '张华',
-      auditNode: '技术部主管',
+      auditStatus: '待审核', auditNode: '技术部主管', auditor: '—', auditAt: '—',
       dispatchAt: '2026-05-06',
       review: true,
       dataVersion: 'V2（PC 修订）',
@@ -268,6 +299,42 @@
         ]
       }
     },
+    RW202606006: {
+      title: 'RW202606006 · 临安铁塔定期检',
+      taskName: '临安铁塔定期检',
+      site: '临安03#站点 / TT-LA-003',
+      province: '浙江',
+      city: '杭州',
+      inspectType: '定期检测',
+      unit: '浙江中能工程检测有限公司',
+      status: '已检测',
+      person: '李明',
+      auditStatus: '审核中', auditNode: '技术部主管', auditor: '—', auditAt: '—',
+      dispatchAt: '2026-05-07',
+      review: true,
+      dataVersion: 'V2',
+      template: 'PKG_STOCK_SINGLE_PIPE_20260509 v1.2',
+      order: {
+        code: 'ZJLA20260507001',
+        name: '临安定期检测订单',
+        customer: '中国移动通信集团浙江有限公司',
+        project: '临安维护项目',
+        orderStatus: '已派',
+        deadline: '2026-05-20',
+        dispatchTime: '2026-05-07 08:00'
+      },
+      collaborationLogs: [],
+      latestEntry: {
+        savedAt: '2026-05-09 10:05',
+        versionLabel: 'V2 提交快照',
+        dataEntryHash: '#tower-spec',
+        items: [
+          ['塔体总高（m）', '36.2'],
+          ['外观结论', '局部涂层剥落需跟踪'],
+          ['接地电阻（Ω）', '1.1']
+        ]
+      }
+    },
     RW202606005: {
       title: 'RW202606005 · 建德山区塔检',
       taskName: '建德山区塔检',
@@ -278,7 +345,7 @@
       unit: '华东某外协检测有限公司',
       status: '检毕',
       person: '赵六',
-      auditNode: '已通过',
+      auditStatus: '已通过', auditNode: '已通过', auditor: '周敏', auditAt: '2026-04-29 17:05',
       dispatchAt: '2026-04-28',
       review: true,
       dataVersion: 'V3（检毕有效版）',
@@ -347,7 +414,6 @@
     ['任务名称', d.taskName],
     ['任务状态', d.status],
     ['检测人员', d.person],
-    ['审核节点', d.auditNode],
     ['派单时间', d.dispatchAt],
     ['省/市', d.province + ' / ' + d.city],
     ['站点/铁塔', d.site],
@@ -356,6 +422,44 @@
     ['模板快照', d.template],
     ['当前数据版本', d.dataVersion]
   ]);
+
+  (function () {
+    var auditEl = document.getElementById('auditKv');
+    var rows = [
+      ['审核状态', d.auditStatus || '—'],
+      ['审核节点', d.auditNode || '—'],
+      ['审核人', d.auditor || '—'],
+      ['审核时间', d.auditAt || '—']
+    ];
+    auditEl.innerHTML = rows.map(function (r) {
+      return '<div class="kv-item"><b>' + esc(r[0]) + '</b><span data-audit-col>' + esc(r[1]) + '</span></div>';
+    }).join('');
+    var tBtn = document.getElementById('taskAuditBtn');
+    if (tBtn) {
+      var pending = d.auditStatus === '待审核' || d.auditStatus === '审核中';
+      tBtn.style.display = pending ? 'inline-flex' : 'none';
+      if (pending) {
+        tBtn.className = 'btn btn-primary btn-sm btn-pc-audit';
+        tBtn.setAttribute('data-title', taskId + ' · ' + d.taskName);
+        tBtn.setAttribute('data-node', d.auditNode || '—');
+        tBtn.setAttribute('data-auditor-default', '周敏');
+        tBtn.setAttribute('data-audit-kind', 'inspect-data');
+        tBtn.setAttribute('data-version', (d.dataVersion || 'V1').replace(/（.*$/, '').trim());
+        tBtn.setAttribute('data-href', 'pc_task_detail.html?id=' + encodeURIComponent(taskId) + '&tab=review');
+      }
+    }
+  })();
+
+  var fromAudit = params.get('from') === 'audit' || params.get('tab') === 'audit';
+  var backList = document.getElementById('linkBackList');
+  if (backList) {
+    backList.href = fromAudit ? 'pc_task_list.html?tab=audit' : 'pc_task_list.html';
+    if (fromAudit) backList.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 返回待我审核';
+  }
+  if (params.get('tab') === 'review' && d.review) {
+    var reviewBtn = document.getElementById('tabReviewBtn');
+    if (reviewBtn) reviewBtn.click();
+  }
 
   renderKv(document.getElementById('orderKv'), [
     ['订单编码', d.order.code],
@@ -401,9 +505,10 @@
   if (d.review) {
     document.getElementById('tabReviewBtn').style.display = '';
     document.getElementById('linkVersions').style.display = 'inline-flex';
-    document.getElementById('linkVersions').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId);
+    var verFrom = fromAudit ? '&from=audit' : '';
+    document.getElementById('linkVersions').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId) + verFrom;
     document.getElementById('linkVersions2').style.display = 'inline-flex';
-    document.getElementById('linkVersions2').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId);
+    document.getElementById('linkVersions2').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId) + verFrom;
   }
 
   document.querySelectorAll('.detail-tabs button').forEach(function (btn) {
@@ -419,6 +524,8 @@
   document.getElementById('btnSaveReview').addEventListener('click', function () {
     alert('已保存修订：已追加 VN+1，修改前数据保留为只读快照。');
   });
+
+  if (window.initPcAuditModal) window.initPcAuditModal();
 })();
 </script>
 </body>

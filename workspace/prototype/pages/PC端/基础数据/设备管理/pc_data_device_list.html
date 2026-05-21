@@ -15,8 +15,6 @@
       <div class="card-title">设备管理</div>
     </div>
     <div class="card-body">
-      <p style="font-size:12px;color:var(--text-3);margin:0 0 8px"><strong>数据权限：</strong>每个检测单位仅维护、查看本单位检测设备；当前登录单位：<span style="color:var(--primary)">浙江中能工程检测有限公司</span>。工具栏「数据权限」可切换筛选范围（本单位 / 全部 / 指定单位）。</p>
-      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px">主流程已取消<strong>设备出入库</strong>与<strong>设备台账</strong>菜单；检校与溯源字段在档案中维护。</p>
       <div class="toolbar">
         <div class="toolbar-left">
           <select class="form-select" id="filterDataScope" title="按数据权限/检测单位范围筛选列表" style="min-width:220px">
@@ -35,11 +33,13 @@
           <button type="button" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
           <button type="button" class="btn btn-default" id="btnDeviceFilterReset">重置</button>
         </div>
-        <div class="toolbar-right">
-          <button type="button" class="btn btn-primary" onclick="location.href='pc_data_device_create.html'"><i class="fa-solid fa-plus"></i> 新增设备</button>
-          <button type="button" class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
-        </div>
       </div>
+
+      <div class="pc-table-actions">
+        <button type="button" class="btn btn-primary" onclick="location.href='pc_data_device_create.html'"><i class="fa-solid fa-plus"></i> 新增设备</button>
+          <button type="button" class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+      </div>
+
       <div style="overflow-x:auto">
         <table class="data-table">
           <thead>
@@ -55,11 +55,11 @@
               <th>溯源方式</th>
               <th>有效期</th>
               <th>检定证书号</th>
-              <th class="col-action">操作</th>
+              <th class="col-action" style="width:180px">操作</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr data-code="SB-ZN-202601-0001" data-name="超声波测厚仪">
               <td>SB-ZN-202601-0001</td>
               <td>超声波测厚仪</td>
               <td>测量仪器</td>
@@ -72,10 +72,12 @@
               <td>2027-03-14</td>
               <td>浙计检字第 2026-00118 号</td>
               <td class="col-action">
-                <button type="button" class="btn btn-text" onclick="location.href='pc_data_device_create.html'">编辑</button>
+                <a href="pc_data_device_create.html?code=SB-ZN-202601-0001&mode=detail" class="btn btn-text">详情</a>
+                <a href="pc_data_device_create.html?code=SB-ZN-202601-0001&mode=edit" class="btn btn-text">编辑</a>
+                <button type="button" class="btn btn-text btn-dev-delete" style="color:var(--danger)">删除</button>
               </td>
             </tr>
-            <tr>
+            <tr data-code="SB-ZN-202601-0002" data-name="全站仪">
               <td>SB-ZN-202601-0002</td>
               <td>全站仪</td>
               <td>测量仪器</td>
@@ -88,7 +90,9 @@
               <td>2026-07-31</td>
               <td>浙校字第 2025-00902 号</td>
               <td class="col-action">
-                <button type="button" class="btn btn-text">编辑</button>
+                <a href="pc_data_device_create.html?code=SB-ZN-202601-0002&mode=detail" class="btn btn-text">详情</a>
+                <a href="pc_data_device_create.html?code=SB-ZN-202601-0002&mode=edit" class="btn btn-text">编辑</a>
+                <button type="button" class="btn btn-text btn-dev-delete" style="color:var(--danger)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -116,6 +120,16 @@ window.addEventListener('DOMContentLoaded', function () {
     if (kw) kw.value = '';
     var ty = document.getElementById('filterDeviceType');
     if (ty) ty.value = '';
+  });
+  document.querySelector('tbody').addEventListener('click', function (e) {
+    var btnDel = e.target.closest('.btn-dev-delete');
+    if (!btnDel) return;
+    var row = btnDel.closest('tr[data-code]');
+    if (!row) return;
+    var label = (row.dataset.name || '') + '（' + (row.dataset.code || '') + '）';
+    if (confirm('确定要删除「' + label + '」吗？删除后不可恢复。')) {
+      alert('已删除（原型）');
+    }
   });
 });
 </script>

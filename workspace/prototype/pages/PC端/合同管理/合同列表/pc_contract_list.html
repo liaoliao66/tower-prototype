@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -7,41 +7,15 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../../assets/pc-layout.css">
-<style>
-  .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
-  .modal-mask.open { display:flex; }
-  .modal-dialog { background:#fff; border-radius:8px; width:min(720px,96vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
-  .modal-dialog-lg { width:min(960px,98vw); max-height:92vh; }
-  .modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
-  .modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
-  .modal-body { padding:16px 18px; }
-  .modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-  .modal-foot-right { display:flex; gap:8px; margin-left:auto; }
-  .modal-close { border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:18px; line-height:1; padding:4px; }
-  .modal-close:hover { color:var(--text-1); }
-  .type-row { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
-  .type-row .form-label { margin:0; min-width:72px; }
-  .link-muted { font-size:12px; color:var(--text-3); text-decoration:none; margin-left:10px; }
-  .link-muted:hover { color:var(--primary); }
-  .contract-sec { font-size:14px; font-weight:600; margin:18px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--border); color:var(--text-1); }
-  .contract-sec:first-of-type { margin-top:0; }
-  .sub-table { width:100%; font-size:13px; border-collapse:collapse; margin-bottom:8px; }
-  .sub-table th, .sub-table td { border:1px solid var(--border); padding:6px 8px; vertical-align:middle; }
-  .sub-table th { background:#F7F8FA; font-weight:500; text-align:left; }
-  .sub-table input.form-input, .sub-table input[type="text"], .sub-table input[type="number"], .sub-table input[type="datetime-local"] { width:100%; min-width:0; box-sizing:border-box; }
-  .sub-table .cell-readonly { background:#F7F8FA; color:var(--text-2); font-size:12px; }
-  .btn-row-del { color:var(--danger); border:none; background:transparent; cursor:pointer; font-size:12px; padding:2px 4px; }
-  .btn-row-del:hover { text-decoration:underline; }
-</style>
 </head>
 <body>
 <div id="page-content">
   <div class="page-header">
     <div class="page-title">对上合同</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button type="button" class="btn btn-primary" id="btnOpenContractModal"><i class="fa-solid fa-file-circle-plus"></i> 新增对上合同</button>
-      <a href="../对下合同/pc_contract_downstream_list.html" class="btn btn-default"><i class="fa-solid fa-list"></i> 对下合同列表</a>
-      <a href="../对下合同/pc_contract_downstream_edit.html" class="btn btn-default"><i class="fa-solid fa-file-contract"></i> 新增对下合同</a>
+  </div>
+  <div class="card" style="margin-bottom:16px;border:1px solid #E8E8E8">
+    <div class="card-body" style="padding:10px 14px;font-size:12px;color:var(--text-2)">
+      收/付款提醒到期后仅推送<strong>消息中心</strong>（不进待办），模板在 <a href="../../消息模板配置/消息模板管理/pc_message_template_list.html" class="btn-text" style="padding:0">消息模板配置</a>；合同审批在<strong>基础平台</strong>办理。
     </div>
   </div>
   <div class="card">
@@ -49,27 +23,20 @@
       <div class="toolbar">
         <div class="toolbar-left">
           <input type="text" class="form-input" placeholder="合同名称/客户" style="width:200px">
-          <select class="form-select">
-            <option>全部类型</option>
-            <option>自有</option>
-            <option>分包</option>
-          </select>
-          <select class="form-select">
-            <option>全部状态</option>
-            <option>履行中</option>
-            <option>已结束</option>
-          </select>
-          <button class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
-        </div>
-        <div class="toolbar-right">
-          <button class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+          <select class="form-select"><option>全部类型</option><option>自有</option><option>分包</option></select>
+          <select class="form-select"><option>全部状态</option><option>履行中</option><option>已结束</option><option>待生效</option></select>
+          <select class="form-select" title="审批状态"><option>全部审批状态</option><option>未提交</option><option>审核中</option><option>已通过</option><option>已驳回</option></select>
+          <button type="button" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
         </div>
       </div>
-      <p class="toolbar-note" style="margin-bottom:12px;font-size:12px;color:var(--text-3)">
-        <a href="../合同收款/pc_contract_receipt.html" class="link-muted">对上收款</a>
-        <a href="../合同付款/pc_contract_payment.html" class="link-muted">对下付款</a>
-        <a href="pc_contract_edit.html" class="link-muted">完整编辑页</a>
-      </p>
+
+      <div class="pc-table-actions">
+        <a href="../合同编辑/pc_contract_detail.html?mode=create" class="btn btn-primary"><i class="fa-solid fa-file-circle-plus"></i> 新增对上合同</a>
+        <a href="../对下合同/pc_contract_downstream_detail.html?mode=create" class="btn btn-default"><i class="fa-solid fa-file-contract"></i> 新增对下合同</a>
+        <a href="../对下合同/pc_contract_downstream_list.html" class="btn btn-default"><i class="fa-solid fa-list"></i> 对下合同列表</a>
+        <button type="button" class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+      </div>
+
       <table class="data-table">
         <thead>
           <tr>
@@ -80,11 +47,13 @@
             <th style="width:110px">金额(含税)</th>
             <th style="width:200px">起止日期</th>
             <th style="width:80px">状态</th>
+            <th style="width:140px">审批（平台）</th>
+            <th style="width:130px">收款进度</th>
             <th class="col-action" style="width:240px">操作</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr data-code="HT2026-0512" data-name="杭州移动 2026 年度铁塔检测框架">
             <td>HT2026-0512</td>
             <td>杭州移动 2026 年度铁塔检测框架</td>
             <td>中国移动通信集团浙江有限公司</td>
@@ -92,13 +61,16 @@
             <td>¥ 2,860,000</td>
             <td>2026-01-01 ~ 2026-12-31</td>
             <td><span class="tag tag-green">履行中</span></td>
+            <td><span class="tag tag-green">已通过</span> · 合同部终审</td>
+            <td>120万 / 286万 (42%)</td>
             <td class="col-action">
-              <a href="pc_contract_edit.html" class="btn-text"><i class="fa-solid fa-pen-to-square"></i> 编辑</a>
-              <button type="button" class="btn-text btnQuickPay" data-code="HT2026-0512" data-name="杭州移动 2026 年度铁塔检测框架" data-amt="2860000" data-rcv="1200000" data-paid="320000"><i class="fa-solid fa-coins"></i> 收付款</button>
-              <a href="../../营销管理/工程管理/pc_project_create.html" class="btn-text"><i class="fa-solid fa-diagram-project"></i> 新建工程</a>
+              <a href="../合同编辑/pc_contract_detail.html?code=HT2026-0512" class="btn-text">详情</a>
+              <a href="../合同编辑/pc_contract_detail.html?code=HT2026-0512&mode=edit" class="btn-text">编辑</a>
+              <a href="../合同收款/pc_contract_receipt.html?contractCode=HT2026-0512" class="btn-text">收款</a>
+              <button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button>
             </td>
           </tr>
-          <tr>
+          <tr data-code="HT2026-0428" data-name="城西改造专项检测分包">
             <td>HT2026-0428</td>
             <td>城西改造专项检测分包</td>
             <td>浙江某建设集团有限公司</td>
@@ -106,445 +78,25 @@
             <td>¥ 480,000</td>
             <td>2026-04-01 ~ 2026-09-30</td>
             <td><span class="tag tag-green">履行中</span></td>
+            <td><span class="tag tag-blue">审核中</span> · 法务审核</td>
+            <td>16万 / 48万 (33%)</td>
             <td class="col-action">
-              <a href="pc_contract_edit.html" class="btn-text"><i class="fa-solid fa-pen-to-square"></i> 编辑</a>
-              <button type="button" class="btn-text btnQuickPay" data-code="HT2026-0428" data-name="城西改造专项检测分包" data-amt="480000" data-rcv="160000" data-paid="95000"><i class="fa-solid fa-coins"></i> 收付款</button>
-              <button class="btn-text"><i class="fa-solid fa-eye"></i> 详情</button>
+              <a href="../合同编辑/pc_contract_detail.html?code=HT2026-0428" class="btn-text">详情</a>
+              <a href="../../工作台/流程中心/pc_workflow_approve.html?bizType=contract_up&bizId=HT2026-0428" class="btn-text" style="color:var(--primary)">审批(平台)</a>
+              <a href="../合同编辑/pc_contract_detail.html?code=HT2026-0428&mode=edit" class="btn-text">编辑</a>
+              <button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button>
             </td>
           </tr>
         </tbody>
       </table>
       <div class="pagination">
         <span>共 24 条</span>
-        <div class="pagination-btns">
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 收付款弹窗（须在 #page-content 内） -->
-  <div class="modal-mask" id="payModalMask" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
-    <div class="modal-dialog">
-      <div class="modal-head">
-        <h3 id="payModalTitle">新增收付款</h3>
-        <button type="button" class="modal-close" id="payBtnModalX" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="type-row">
-          <span class="form-label">业务类型</span>
-          <select class="form-select" id="mType" style="min-width:200px">
-            <option value="receipt">对上收款登记</option>
-            <option value="payment">对下付款登记</option>
-          </select>
-        </div>
-        <div class="form-grid form-grid-3">
-          <div class="form-group full">
-            <label class="form-label" id="mContractLabel">关联对上合同 <span class="required">*</span></label>
-            <select class="form-select" style="width:100%" id="mContract">
-              <option value="">请选择</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同金额(含税，只读)</label>
-            <input type="text" class="form-input" id="mContractAmt" readonly style="width:100%;background:#F7F8FA">
-          </div>
-          <div class="form-group">
-            <label class="form-label" id="mSumLabel">累计已收(只读)</label>
-            <input type="text" class="form-input" id="mSumField" readonly style="width:100%;background:#F7F8FA">
-          </div>
-          <div class="form-group full" id="mPayeeFullWrap" style="display:none">
-            <label class="form-label">收款方 / 用途说明 <span class="required">*</span></label>
-            <input type="text" class="form-input" id="mPayeeFull" style="width:100%" placeholder="协作单位、费用性质等">
-          </div>
-          <div class="form-group">
-            <label class="form-label" id="mAmountLabel">本次收款金额(元) <span class="required">*</span></label>
-            <input type="number" class="form-input" id="mAmount" style="width:100%" min="0" step="0.01" placeholder="含税金额">
-          </div>
-          <div class="form-group">
-            <label class="form-label" id="mDateLabel">收款日期 <span class="required">*</span></label>
-            <input type="date" class="form-input" id="mDate" style="width:100%">
-          </div>
-          <div class="form-group">
-            <label class="form-label" id="mMethodLabel">收款方式 <span class="required">*</span></label>
-            <select class="form-select" id="mMethod" style="width:100%">
-              <option>银行转账</option>
-              <option>银行承兑汇票</option>
-              <option>现金</option>
-              <option>其他</option>
-            </select>
-          </div>
-          <div class="form-group full">
-            <label class="form-label">备注</label>
-            <input type="text" class="form-input" id="mRemark" style="width:100%" placeholder="可选">
-          </div>
-        </div>
-      </div>
-      <div class="modal-foot">
-        <div></div>
-        <div class="modal-foot-right">
-          <button type="button" class="btn btn-default" id="payBtnModalCancel">取消</button>
-          <button type="button" class="btn btn-primary" id="payBtnModalSave"><i class="fa-solid fa-check"></i> 确定</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 新增合同弹窗 -->
-  <div class="modal-mask" id="contractModalMask" role="dialog" aria-modal="true" aria-labelledby="contractModalTitle">
-    <div class="modal-dialog modal-dialog-lg">
-      <div class="modal-head">
-        <h3 id="contractModalTitle">新增对上合同</h3>
-        <button type="button" class="modal-close" id="contractBtnModalX" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="contract-sec">基础信息</div>
-        <div class="form-grid form-grid-3">
-          <div class="form-group full">
-            <label class="form-label">合同名称 <span class="required">*</span></label>
-            <input type="text" class="form-input" id="cName" style="width:100%" placeholder="请输入合同名称">
-          </div>
-          <div class="form-group full">
-            <label class="form-label">所属客户 <span class="required">*</span></label>
-            <select class="form-select" id="cCustomer" style="width:100%">
-              <option value="">请选择客户</option>
-              <option>中国移动通信集团浙江有限公司</option>
-              <option>浙江某建设集团有限公司</option>
-              <option>其他客户</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同金额(含税) <span class="required">*</span></label>
-            <input type="number" class="form-input" id="cAmtTax" style="width:100%" min="0" step="0.01" placeholder="元">
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同金额(不含税) <span class="required">*</span></label>
-            <input type="number" class="form-input" id="cAmtNoTax" style="width:100%" min="0" step="0.01" placeholder="元">
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同类型 <span class="required">*</span></label>
-            <select class="form-select" id="cType" style="width:100%">
-              <option value="自有">自有</option>
-              <option value="分包">分包</option>
-            </select>
-          </div>
-          <div class="form-group" id="cSubWrap" style="display:none">
-            <label class="form-label">分包比例(%) <span class="required">*</span></label>
-            <input type="number" class="form-input" id="cSubRate" style="width:100%" min="0" max="100" step="0.1" placeholder="分包时必填">
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同起始 <span class="required">*</span></label>
-            <input type="date" class="form-input" id="cDateStart" style="width:100%">
-          </div>
-          <div class="form-group">
-            <label class="form-label">合同截止 <span class="required">*</span></label>
-            <input type="date" class="form-input" id="cDateEnd" style="width:100%">
-          </div>
-        </div>
-
-        <div class="contract-sec">单价模块</div>
-        <p class="toolbar-note" style="margin:-4px 0 8px">含税合计 = 含税单价 × 数量；不含税合计 = 不含税单价 × 数量（自动计算）。</p>
-        <table class="sub-table" id="priceTable">
-          <thead>
-            <tr>
-              <th style="width:44px">操作</th>
-              <th>名称</th>
-              <th style="width:100px">含税单价</th>
-              <th style="width:100px">不含税单价</th>
-              <th style="width:72px">数量</th>
-              <th style="width:110px">含税合计</th>
-              <th style="width:110px">不含税合计</th>
-            </tr>
-          </thead>
-          <tbody id="priceRows"></tbody>
-        </table>
-        <button type="button" class="btn btn-default btn-sm" id="btnAddPriceRow"><i class="fa-solid fa-plus"></i> 增加一行</button>
-
-        <div class="contract-sec">其他配置</div>
-        <p style="font-size:13px;font-weight:600;color:var(--text-2);margin:0 0 6px">付款提醒（分阶段）</p>
-        <table class="sub-table">
-          <thead>
-            <tr>
-              <th style="width:44px">操作</th>
-              <th>阶段名称</th>
-              <th style="width:200px">提醒时间</th>
-            </tr>
-          </thead>
-          <tbody id="payRemRows"></tbody>
-        </table>
-        <button type="button" class="btn btn-default btn-sm" id="btnAddPayRem" style="margin-bottom:16px"><i class="fa-solid fa-plus"></i> 增加一行</button>
-
-        <p style="font-size:13px;font-weight:600;color:var(--text-2);margin:0 0 6px">收款提醒（分阶段）</p>
-        <table class="sub-table">
-          <thead>
-            <tr>
-              <th style="width:44px">操作</th>
-              <th>阶段名称</th>
-              <th style="width:200px">提醒时间</th>
-            </tr>
-          </thead>
-          <tbody id="recvRemRows"></tbody>
-        </table>
-        <button type="button" class="btn btn-default btn-sm" id="btnAddRecvRem"><i class="fa-solid fa-plus"></i> 增加一行</button>
-      </div>
-      <div class="modal-foot">
-        <a href="pc_contract_edit.html" class="link-muted" style="margin:0">打开完整编辑页（多 Tab）</a>
-        <div class="modal-foot-right">
-          <button type="button" class="btn btn-default" id="contractBtnModalCancel">取消</button>
-          <button type="button" class="btn btn-primary" id="contractBtnModalSave"><i class="fa-solid fa-check"></i> 确定</button>
-        </div>
+        <div class="pagination-btns"><button type="button" class="page-btn active">1</button><button type="button" class="page-btn">2</button></div>
       </div>
     </div>
   </div>
 </div>
-
 <script src="../../../../assets/shared-layout.js"></script>
-<script>
-window.__layoutConfig = { active: 'contract_list', breadcrumb: ['合同管理', '对上合同'] };
-
-window.addEventListener('DOMContentLoaded', function () {
-  /* ---------- 收付款弹窗 ---------- */
-  var payMask = document.getElementById('payModalMask');
-  var btnOpenPay = document.getElementById('btnOpenPayModal');
-  if (payMask) {
-    var mType = document.getElementById('mType');
-    var mContract = document.getElementById('mContract');
-    var mAmt = document.getElementById('mContractAmt');
-    var mSum = document.getElementById('mSumField');
-    var payTitle = document.getElementById('payModalTitle');
-
-    var CONTRACT_OPTS_UP =
-      '<option value="">请选择</option>' +
-      '<option value="HT2026-0512" data-name="杭州移动 2026 年度铁塔检测框架" data-amt="2860000" data-rcv="1200000" data-paid="320000">HT2026-0512 · 杭州移动 2026 年度铁塔检测框架</option>' +
-      '<option value="HT2026-0428" data-name="城西改造专项检测分包" data-amt="480000" data-rcv="160000" data-paid="95000">HT2026-0428 · 城西改造专项检测分包</option>';
-    var CONTRACT_OPTS_DOWN =
-      '<option value="">请选择</option>' +
-      '<option value="DX2026-0101" data-name="单站检测外协服务包" data-amt="120000" data-rcv="0" data-paid="45000">DX2026-0101 · 单站检测外协服务包</option>' +
-      '<option value="DX2026-0102" data-name="塔身焊缝抽检协作" data-amt="96000" data-rcv="0" data-paid="22000">DX2026-0102 · 塔身焊缝抽检协作</option>';
-
-    function fmtMoney(n) {
-      var x = Number(n);
-      if (n == null || n === '' || isNaN(x)) return '';
-      return '¥ ' + x.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-    function isPayment() { return mType.value === 'payment'; }
-    function syncTypeUI() {
-      var pay = isPayment();
-      payTitle.textContent = pay ? '新增对下付款' : '新增对上收款';
-      document.getElementById('mSumLabel').textContent = pay ? '累计已付(只读)' : '累计已收(只读)';
-      document.getElementById('mAmountLabel').innerHTML = pay ? '本次付款金额(元) <span class="required">*</span>' : '本次收款金额(元) <span class="required">*</span>';
-      document.getElementById('mDateLabel').innerHTML = pay ? '付款日期 <span class="required">*</span>' : '收款日期 <span class="required">*</span>';
-      document.getElementById('mMethodLabel').innerHTML = pay ? '付款方式 <span class="required">*</span>' : '收款方式 <span class="required">*</span>';
-      document.getElementById('mPayeeFullWrap').style.display = pay ? 'block' : 'none';
-      var mcl = document.getElementById('mContractLabel');
-      if (mcl) mcl.innerHTML = pay ? '关联对下合同 <span class="required">*</span>' : '关联对上合同 <span class="required">*</span>';
-      mContract.innerHTML = pay ? CONTRACT_OPTS_DOWN : CONTRACT_OPTS_UP;
-      mContract.value = '';
-      mAmt.value = '';
-      mSum.value = '';
-      fillContractSums();
-    }
-    function fillContractSums() {
-      var opt = mContract.options[mContract.selectedIndex];
-      if (!opt || !opt.dataset.amt) {
-        mAmt.value = '';
-        mSum.value = '';
-        return;
-      }
-      mAmt.value = fmtMoney(opt.dataset.amt);
-      mSum.value = fmtMoney(isPayment() ? opt.dataset.paid : opt.dataset.rcv);
-    }
-    function openPayModal(preset) {
-      payMask.classList.add('open');
-      mType.value = preset && preset.forcePayment ? 'payment' : 'receipt';
-      document.getElementById('mAmount').value = '';
-      document.getElementById('mRemark').value = '';
-      document.getElementById('mPayeeFull').value = '';
-      document.getElementById('mDate').valueAsDate = new Date();
-      syncTypeUI();
-      if (preset && preset.code) {
-        for (var i = 0; i < mContract.options.length; i++) {
-          if (mContract.options[i].value === preset.code) {
-            mContract.selectedIndex = i;
-            fillContractSums();
-            break;
-          }
-        }
-      }
-    }
-    function closePayModal() { payMask.classList.remove('open'); }
-
-    mType.addEventListener('change', syncTypeUI);
-    mContract.addEventListener('change', fillContractSums);
-    if (btnOpenPay) {
-      btnOpenPay.addEventListener('click', function () { openPayModal(null); });
-    }
-    document.querySelectorAll('.btnQuickPay').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        openPayModal({
-          code: btn.getAttribute('data-code'),
-          name: btn.getAttribute('data-name'),
-          amt: btn.getAttribute('data-amt'),
-          rcv: btn.getAttribute('data-rcv'),
-          paid: btn.getAttribute('data-paid')
-        });
-      });
-    });
-    document.getElementById('payBtnModalX').addEventListener('click', closePayModal);
-    document.getElementById('payBtnModalCancel').addEventListener('click', closePayModal);
-    payMask.addEventListener('click', function (e) { if (e.target === payMask) closePayModal(); });
-    document.getElementById('payBtnModalSave').addEventListener('click', function () {
-      var opt = mContract.options[mContract.selectedIndex];
-      var amount = document.getElementById('mAmount').value;
-      var dt = document.getElementById('mDate').value;
-      var pay = isPayment();
-      if (!opt || !opt.value) { alert(pay ? '请选择关联对下合同' : '请选择关联对上合同'); return; }
-      if (!amount || Number(amount) <= 0) { alert(pay ? '请输入有效的付款金额' : '请输入有效的收款金额'); return; }
-      if (!dt) { alert(pay ? '请选择付款日期' : '请选择收款日期'); return; }
-      if (pay) {
-        var pe = document.getElementById('mPayeeFull').value.trim();
-        if (!pe) { alert('付款登记请填写收款方 / 用途说明'); return; }
-      }
-      var lines = [
-        pay ? '【付款登记】' : '【收款登记】',
-        '合同：' + opt.value + ' ' + (opt.dataset.name || ''),
-        '金额：' + fmtMoney(amount),
-        '日期：' + dt,
-        '方式：' + document.getElementById('mMethod').value
-      ];
-      if (pay) lines.push('收款方/用途：' + document.getElementById('mPayeeFull').value);
-      var rm = document.getElementById('mRemark').value.trim();
-      if (rm) lines.push('备注：' + rm);
-      lines.push('', '数据未落库。');
-      alert(lines.join('\n'));
-      closePayModal();
-    });
-  }
-
-  /* ---------- 新增合同弹窗 ---------- */
-  var cMask = document.getElementById('contractModalMask');
-  var btnOpenContract = document.getElementById('btnOpenContractModal');
-  if (!cMask || !btnOpenContract) return;
-
-  var priceRows = document.getElementById('priceRows');
-  var payRemRows = document.getElementById('payRemRows');
-  var recvRemRows = document.getElementById('recvRemRows');
-  var cType = document.getElementById('cType');
-  var cSubWrap = document.getElementById('cSubWrap');
-
-  function syncSubcontract() {
-    cSubWrap.style.display = cType.value === '分包' ? 'block' : 'none';
-  }
-  cType.addEventListener('change', syncSubcontract);
-
-  function numVal(v) {
-    var n = parseFloat(String(v).replace(/,/g, ''));
-    return isNaN(n) ? 0 : n;
-  }
-  function fmtNum(n) {
-    if (isNaN(n) || n === 0) return '';
-    return (Math.round(n * 100) / 100).toLocaleString('zh-CN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  }
-  function recalcPriceRow(tr) {
-    var taxP = numVal(tr.querySelector('.js-p-tax').value);
-    var noTaxP = numVal(tr.querySelector('.js-p-notax').value);
-    var qty = numVal(tr.querySelector('.js-p-qty').value);
-    var tdTax = tr.querySelector('.js-sum-tax');
-    var tdNo = tr.querySelector('.js-sum-notax');
-    tdTax.textContent = (taxP && qty) ? fmtNum(taxP * qty) : '';
-    tdNo.textContent = (noTaxP && qty) ? fmtNum(noTaxP * qty) : '';
-  }
-
-  function addPriceRow() {
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td><button type="button" class="btn-row-del js-del-row">删除</button></td>' +
-      '<td><input type="text" class="form-input js-p-name" placeholder="项目名称"></td>' +
-      '<td><input type="number" class="form-input js-p-tax" min="0" step="0.01" placeholder="0"></td>' +
-      '<td><input type="number" class="form-input js-p-notax" min="0" step="0.01" placeholder="0"></td>' +
-      '<td><input type="number" class="form-input js-p-qty" min="0" step="1" placeholder="1"></td>' +
-      '<td class="cell-readonly js-sum-tax"></td>' +
-      '<td class="cell-readonly js-sum-notax"></td>';
-    priceRows.appendChild(tr);
-    bindPriceRow(tr);
-  }
-  function bindPriceRow(tr) {
-    tr.querySelectorAll('.js-p-tax, .js-p-notax, .js-p-qty').forEach(function (inp) {
-      inp.addEventListener('input', function () { recalcPriceRow(tr); });
-    });
-    tr.querySelector('.js-del-row').addEventListener('click', function () {
-      if (priceRows.querySelectorAll('tr').length <= 1) { alert('至少保留一行'); return; }
-      tr.remove();
-    });
-  }
-
-  function addRemRow(tbody) {
-    var tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td><button type="button" class="btn-row-del js-del-rem">删除</button></td>' +
-      '<td><input type="text" class="form-input" placeholder="如：首付款、进度款"></td>' +
-      '<td><input type="datetime-local" class="form-input"></td>';
-    tbody.appendChild(tr);
-    tr.querySelector('.js-del-rem').addEventListener('click', function () {
-      if (tbody.querySelectorAll('tr').length <= 1) { alert('至少保留一行'); return; }
-      tr.remove();
-    });
-  }
-
-  function resetContractForm() {
-    document.getElementById('cName').value = '';
-    document.getElementById('cCustomer').value = '';
-    document.getElementById('cAmtTax').value = '';
-    document.getElementById('cAmtNoTax').value = '';
-    cType.value = '自有';
-    document.getElementById('cSubRate').value = '';
-    syncSubcontract();
-    var y = new Date().getFullYear();
-    document.getElementById('cDateStart').value = y + '-01-01';
-    document.getElementById('cDateEnd').value = y + '-12-31';
-    priceRows.innerHTML = '';
-    addPriceRow();
-    payRemRows.innerHTML = '';
-    recvRemRows.innerHTML = '';
-    addRemRow(payRemRows);
-    addRemRow(recvRemRows);
-  }
-
-  function openContractModal() {
-    cMask.classList.add('open');
-    resetContractForm();
-  }
-  function closeContractModal() { cMask.classList.remove('open'); }
-
-  document.getElementById('btnAddPriceRow').addEventListener('click', addPriceRow);
-  document.getElementById('btnAddPayRem').addEventListener('click', function () { addRemRow(payRemRows); });
-  document.getElementById('btnAddRecvRem').addEventListener('click', function () { addRemRow(recvRemRows); });
-
-  btnOpenContract.addEventListener('click', openContractModal);
-  document.getElementById('contractBtnModalX').addEventListener('click', closeContractModal);
-  document.getElementById('contractBtnModalCancel').addEventListener('click', closeContractModal);
-  cMask.addEventListener('click', function (e) { if (e.target === cMask) closeContractModal(); });
-
-  document.getElementById('contractBtnModalSave').addEventListener('click', function () {
-    if (!document.getElementById('cName').value.trim()) { alert('请填写合同名称'); return; }
-    if (!document.getElementById('cCustomer').value) { alert('请选择所属客户'); return; }
-    var tax = numVal(document.getElementById('cAmtTax').value);
-    var noTax = numVal(document.getElementById('cAmtNoTax').value);
-    if (tax <= 0) { alert('请填写有效的含税合同金额'); return; }
-    if (noTax <= 0) { alert('请填写有效的不含税合同金额'); return; }
-    if (cType.value === '分包') {
-      var sr = numVal(document.getElementById('cSubRate').value);
-      if (sr <= 0 || sr > 100) { alert('分包时请填写有效分包比例(0-100%)'); return; }
-    }
-    if (!document.getElementById('cDateStart').value || !document.getElementById('cDateEnd').value) {
-      alert('请填写合同起止日期');
-      return;
-    }
-    alert('【新增对上合同】主档字段校验通过。数据未落库。');
-    closeContractModal();
-  });
-});
-</script>
+<script>window.__layoutConfig = { active: 'contract_list', breadcrumb: ['合同管理', '对上合同'] };</script>
 </body>
 </html>

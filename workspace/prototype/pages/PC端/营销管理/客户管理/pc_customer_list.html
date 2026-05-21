@@ -30,12 +30,14 @@
           <button class="btn btn-primary"><i class="fa-solid fa-search"></i> 查询</button>
           <button class="btn btn-default">重置</button>
         </div>
-        <div class="toolbar-right">
-          <button class="btn btn-primary" onclick="location.href='pc_customer_create.html'"><i class="fa-solid fa-plus"></i> 新增客户</button>
+      </div>
+
+      <div class="pc-table-actions">
+        <button class="btn btn-primary" onclick="location.href='pc_customer_create.html'"><i class="fa-solid fa-plus"></i> 新增客户</button>
           <button class="btn btn-default"><i class="fa-solid fa-file-import"></i> 导入</button>
           <button class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
-        </div>
       </div>
+
       <table class="data-table">
         <thead>
           <tr>
@@ -58,7 +60,7 @@
             <td>张经</td>
             <td>138-0000-1111</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
+            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
           </tr>
           <tr>
             <td>KH002</td>
@@ -68,7 +70,7 @@
             <td>李主</td>
             <td>139-0000-2222</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
+            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
           </tr>
           <tr>
             <td>KH003</td>
@@ -78,7 +80,7 @@
             <td>王总监</td>
             <td>137-0000-3333</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
+            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
           </tr>
           <tr>
             <td>KH004</td>
@@ -88,7 +90,7 @@
             <td>赵科</td>
             <td>136-0000-4444</td>
             <td><span class="tag tag-green">启用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
+            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button><a class="btn-text" style="color:var(--danger)"><i class="fa-solid fa-ban"></i> 停用</a></td>
           </tr>
           <tr>
             <td>KH005</td>
@@ -98,7 +100,7 @@
             <td>刘主</td>
             <td>135-0000-5555</td>
             <td><span class="tag tag-gray">停用</span></td>
-            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><a class="btn-text" style="color:var(--primary)"><i class="fa-solid fa-check-circle"></i> 启用</a></td>
+            <td class="col-action"><a class="btn-text" href="pc_customer_create.html"><i class="fa-solid fa-edit"></i> 编辑</a><button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button><a class="btn-text" style="color:var(--primary)"><i class="fa-solid fa-check-circle"></i> 启用</a></td>
           </tr>
         </tbody>
       </table>

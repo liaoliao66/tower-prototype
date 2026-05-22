@@ -7,6 +7,7 @@
  * - 「快捷手记」页在注入逻辑入口即跳过，不注入「备忘录」「拍照识别」、不改顶栏结构（本页已有语音/拍照/手写）；body 可设 data-inspect-no-memo-toolbar="1" 关闭备忘录；
  * - 若存在 [data-app-flow-footer]（底部流程栏），则放在底栏左侧，与「下一步 / 完成检测」等主按钮同排；
  * - 否则仍在顶栏右侧（小胶囊按钮）。
+ * - iPad 填报主页 iframe（?embed=1）：子页不注入；父页顶栏「拍照识别」+ 可拖动悬浮「备忘录」。
  */
 (function () {
   function orderId() {
@@ -116,7 +117,7 @@
       '.inspect-nav-right{display:flex;align-items:center;justify-content:flex-end;gap:4px;flex-shrink:0}' +
       '.inspect-nav-title{font-size:16px;font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       '.inspect-mod-btn{border:none;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;-webkit-tap-highlight-color:transparent;line-height:1.2}' +
-      '.inspect-mod-btn--memo{background:#FFECE8;color:#F53F3F}' +
+      '.inspect-mod-btn--memo{background:#FFF7E8;color:#FF7D00}' +
       '.inspect-mod-btn--memo:active{opacity:.88}' +
       '.inspect-mod-btn--cam{background:#E8F3FF;color:#165DFF}' +
       '.inspect-mod-btn--cam:active{opacity:.88}' +
@@ -126,8 +127,10 @@
       '.inspect-flow-footer-side{flex:0 0 auto;display:flex;flex-direction:row;align-items:center;gap:8px;padding:0 2px;min-width:0}' +
       '.inspect-flow-footer-main{flex:1;min-width:0;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px;justify-content:stretch}' +
       '.inspect-flow-footer-main > *{flex:1 1 0;min-width:0;box-sizing:border-box}' +
-      '.inspect-mod-btn--footer{min-height:40px;padding:0 10px;border-radius:10px;font-size:11px;font-weight:600;justify-content:center;box-sizing:border-box;text-decoration:none;line-height:1.2;flex-direction:row;align-items:center;gap:5px;white-space:nowrap}' +
-      '.inspect-mod-btn--footer i{font-size:14px;line-height:1;flex-shrink:0}';
+      '.inspect-mod-btn--footer{min-height:56px;padding:6px 10px;border-radius:10px;font-size:12px;font-weight:600;justify-content:center;box-sizing:border-box;text-decoration:none;line-height:1.25;flex-direction:column;align-items:center;gap:4px;white-space:nowrap;border:1px solid #E5E6EB;background:#fff;color:#4E5969}' +
+      '.inspect-mod-btn--footer.inspect-mod-btn--memo i,.inspect-mod-btn--footer.inspect-mod-btn--cam i{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;font-size:16px}' +
+      '.inspect-mod-btn--footer.inspect-mod-btn--memo i{background:linear-gradient(145deg,#FFF7E8 0%,#FFE8CC 100%);color:#FF7D00}' +
+      '.inspect-mod-btn--footer.inspect-mod-btn--cam i{background:linear-gradient(145deg,#E8F3FF 0%,#D6E8FF 100%);color:#165DFF}';
     var st = document.getElementById('inspect-mod-toolbar-style');
     if (!st) {
       st = document.createElement('style');
@@ -223,7 +226,7 @@
       return;
     }
 
-    /* iPad 填报主页 iframe 嵌入：底栏由父页承载，子页不注入备忘/拍照 */
+    /* iPad 填报主页 iframe 嵌入：备忘/拍照/下一步由父页承载，子页不注入 */
     if (isIpadEmbedShell()) {
       try {
         nav.setAttribute('data-inspect-toolbar', '1');

@@ -47,12 +47,6 @@
   <div id="segmentFormHost"></div>
 </div>
 
-<div class="ipad-flow-footer flow-footer-split" data-app-flow-footer data-inspect-module-actions="1">
-  <a href="../../任务/备忘录/ipad_task_memo.html" class="btn-memo"><i class="fa-solid fa-microphone" aria-hidden="true"></i> 备忘录</a>
-  <button type="button" class="btn-photo" id="btnSegPhoto"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照</button>
-  <a href="../../检测/平台/ipad_inspect_platform.html" class="btn-primary">下一步</a>
-</div>
-
 <div id="segDeleteMask" class="seg-del-mask" role="dialog" aria-modal="true" aria-labelledby="segDelTitle">
   <div class="seg-del-dialog">
     <h3 id="segDelTitle">删除塔段</h3>
@@ -287,10 +281,6 @@
   delMask.addEventListener('click', function (e) {
     if (e.target === delMask) closeDeleteConfirm();
   });
-  document.getElementById('btnSegPhoto').addEventListener('click', function () {
-    alert('拍照：为「' + segmentLabel(activeIndex) + '」拍摄现场照片（原型演示）。');
-  });
-
   renderTabs();
   renderForm();
 })();

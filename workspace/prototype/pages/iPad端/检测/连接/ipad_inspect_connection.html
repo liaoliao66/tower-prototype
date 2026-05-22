@@ -136,12 +136,6 @@
 
 </div>
 
-<div class="ipad-flow-footer flow-footer-split" data-app-flow-footer data-inspect-module-actions="1">
-  <a href="../../任务/备忘录/ipad_task_memo.html" class="btn-memo"><i class="fa-solid fa-microphone" aria-hidden="true"></i> 备忘录</a>
-  <button type="button" class="btn-photo" id="btnConnPhoto"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照</button>
-  <a href="../../检测/接地/ipad_inspect_ground.html" class="btn-primary">下一步</a>
-</div>
-
 <script>
 (function () {
   document.querySelectorAll('[data-conn-toggle]').forEach(function (toggle) {
@@ -163,7 +157,6 @@
   function openPhoto() {
     alert('拍照：记录连接部位现场照片（原型演示）。');
   }
-  document.getElementById('btnConnPhoto').addEventListener('click', openPhoto);
   document.querySelectorAll('[data-conn-photo]').forEach(function (el) {
     el.addEventListener('click', openPhoto);
     el.addEventListener('keydown', function (e) {

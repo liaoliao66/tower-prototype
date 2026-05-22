@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- iPad-INSPECT_VALIDATE v2.1 landscape -->
+<!-- iPad-INSPECT_VALIDATE v3.0 landscape · 双列卡片 + 整页滚动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -34,100 +34,140 @@
 
 <div id="appEmbedContent" class="validate-page-stack">
 
-  <section class="validate-summary" aria-label="校验进度">
-    <div class="validate-summary-num">8<span>/9</span></div>
-    <p class="validate-summary-desc">项已完成，1 项待补充</p>
-  </section>
-
-  <section class="basic-card validate-checklist" aria-label="检测项校验列表">
-    <a class="validate-row validate-row--ok" href="../../检测/塔体/ipad_inspect_tower.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">铁塔信息</div>
-        <div class="validate-row-status">已完成</div>
+  <header class="validate-dash" aria-label="校验概览">
+    <section class="validate-progress-card" aria-label="完成进度">
+      <div class="validate-progress-top">
+        <span class="validate-progress-label">校验进度</span>
+        <span class="validate-progress-frac"><strong>8</strong><span>/9</span></span>
       </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
-
-    <a class="validate-row validate-row--ok" href="../../检测/地基/ipad_inspect_foundation.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">基础及地锚</div>
-        <div class="validate-row-status">已完成</div>
+      <div class="validate-progress-bar" role="progressbar" aria-valuenow="8" aria-valuemin="0" aria-valuemax="9">
+        <div class="validate-progress-in" style="width:88.9%;"></div>
       </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
+      <p class="validate-progress-hint">1 项待补充后可提交</p>
+    </section>
 
-    <a class="validate-row validate-row--ok" href="../../检测/结构图/ipad_inspect_diagram.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">结构简图</div>
-        <div class="validate-row-status">已完成</div>
+    <div class="validate-stats-row" role="group" aria-label="校验统计">
+      <div class="validate-stat-card">
+        <div class="validate-stat-num validate-stat-num--ok">8</div>
+        <div class="validate-stat-label">已完成</div>
       </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
+      <div class="validate-stat-card">
+        <div class="validate-stat-num validate-stat-num--pending">1</div>
+        <div class="validate-stat-label">待补充</div>
+      </div>
+      <div class="validate-stat-card">
+        <div class="validate-stat-num validate-stat-num--total">9</div>
+        <div class="validate-stat-label">检测项</div>
+      </div>
+    </div>
+  </header>
 
-    <a class="validate-row validate-row--ok" href="../../检测/分段/ipad_inspect_segment.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">塔段检测</div>
-        <div class="validate-row-status">已完成（5/5 段）</div>
-      </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
+  <section class="validate-panel-list" aria-labelledby="validateListTitle">
+    <div class="validate-list-head">
+      <h2 class="validate-list-title" id="validateListTitle">检测项校验</h2>
+      <span class="validate-list-count">共 9 项</span>
+    </div>
 
-    <a class="validate-row validate-row--fail" href="../../检测/平台/ipad_inspect_platform.html">
-      <i class="fa-solid fa-circle-xmark validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">平台检测</div>
-        <div class="validate-row-status validate-row-status--fail">未完成 — 缺少照片</div>
-      </div>
-      <span class="validate-row-action">去补充 <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
-    </a>
-
-    <a class="validate-row validate-row--ok" href="../../检测/馈线/ipad_inspect_feed.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">馈线检测</div>
-        <div class="validate-row-status">已完成</div>
-      </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
-
-    <a class="validate-row validate-row--ok" href="../../检测/回弹/ipad_inspect_rebound.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">回弹强度</div>
-        <div class="validate-row-status">已完成</div>
-      </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
-
-    <a class="validate-row validate-row--ok" href="../../检测/接地/ipad_inspect_ground.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">接地电阻</div>
-        <div class="validate-row-status">已完成</div>
-      </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
-
-    <a class="validate-row validate-row--ok validate-row--last" href="../../检测/垂直度/ipad_inspect_vertical.html">
-      <i class="fa-solid fa-circle-check validate-row-icon" aria-hidden="true"></i>
-      <div class="validate-row-body">
-        <div class="validate-row-title">垂直度</div>
-        <div class="validate-row-status">已完成</div>
-      </div>
-      <i class="fa-solid fa-chevron-right validate-row-chevron" aria-hidden="true"></i>
-    </a>
+    <ul class="validate-card-grid" role="list">
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/塔体/ipad_inspect_tower.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">铁塔信息</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/地基/ipad_inspect_foundation.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">基础及地锚</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/结构图/ipad_inspect_diagram.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">结构简图</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/分段/ipad_inspect_segment.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">塔段检测</span>
+            <span class="validate-card-status">已完成（5/5 段）</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--fail" href="../../检测/平台/ipad_inspect_platform.html">
+          <span class="validate-card-icon validate-card-icon--fail" aria-hidden="true"><i class="fa-solid fa-circle-xmark"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">平台检测</span>
+            <span class="validate-card-status validate-card-status--fail">未完成 · 缺少照片</span>
+            <span class="validate-card-action">去补充 <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/馈线/ipad_inspect_feed.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">馈线检测</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/回弹/ipad_inspect_rebound.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">回弹强度</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/接地/ipad_inspect_ground.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">接地电阻</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="validate-card validate-card--ok" href="../../检测/垂直度/ipad_inspect_vertical.html">
+          <span class="validate-card-icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          <div class="validate-card-body">
+            <span class="validate-card-name">垂直度</span>
+            <span class="validate-card-status">已完成</span>
+          </div>
+        </a>
+      </li>
+    </ul>
   </section>
 
 </div>
 
-<div class="ipad-flow-footer validate-flow-footer" data-app-flow-footer data-inspect-module-actions="1">
-  <a href="../../任务/填报主页/ipad_task_inspect_home.html" class="btn-validate-back" data-app-inspect-back>返回补充</a>
-  <button type="button" class="btn-validate-submit" disabled aria-disabled="true">确认提交</button>
+<div class="ipad-flow-footer validate-flow-footer" data-app-flow-footer aria-hidden="true">
+  <button type="button" class="btn-validate-submit" disabled aria-disabled="true" tabindex="-1">确认提交</button>
 </div>
 
+<script>
+(function () {
+  try {
+    if (new URLSearchParams(location.search).get('embed') === '1') return;
+  } catch (e) {}
+  var footer = document.querySelector('.validate-flow-footer');
+  if (footer) footer.removeAttribute('aria-hidden');
+})();
+</script>
 </body>
 </html>

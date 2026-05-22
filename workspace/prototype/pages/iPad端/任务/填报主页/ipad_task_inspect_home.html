@@ -103,10 +103,15 @@
     <div class="top-actions" role="toolbar" aria-label="任务操作">
       <div class="top-actions-left">
         <button type="button" class="top-act top-act-export" id="btnExportVoice" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
+        <button type="button" class="top-act top-act-photo" id="btnPhotoRecognize" title="本模块拍照识别"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照识别</button>
       </div>
       <div class="top-actions-right">
         <button type="button" class="top-act top-act-save" id="btnSave">保存</button>
         <button type="button" class="top-act top-act-submit" id="btnSubmit" disabled title="完成全部必填后可用">提交</button>
+        <button type="button" class="top-act top-act-sync" id="btnSyncAll" hidden>
+          <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>一键同步
+        </button>
+        <button type="button" class="top-act top-act-validate-submit" id="btnValidateSubmit" hidden disabled aria-disabled="true">确认提交</button>
       </div>
     </div>
   </div>
@@ -119,16 +124,19 @@
       <div class="prog-bar"><div class="prog-in" id="progBarIn"></div></div>
     </div>
     <nav class="inspect-mod-nav" id="inspectModNav" aria-label="模块列表"></nav>
-    <div class="inspect-split-nav-foot">
-      <button type="button" id="btnModPrev" disabled>上一项</button>
-      <button type="button" id="btnModNext">下一项</button>
-    </div>
   </aside>
   <section class="inspect-split-pane" aria-label="模块填报区">
     <header class="inspect-pane-head">
       <h2 id="paneModuleTitle">基础信息</h2>
     </header>
     <iframe id="moduleFrame" class="inspect-module-frame" title="当前检测模块" src="about:blank"></iframe>
+    <a
+      id="inspectMemoFab"
+      class="inspect-memo-fab"
+      href="../备忘录/ipad_task_memo.html"
+      aria-label="本模块备忘录"
+      title="本模块备忘录"
+    ><i class="fa-solid fa-microphone" aria-hidden="true"></i></a>
   </section>
 </main>
 
@@ -167,7 +175,7 @@
 
   var MODULES = [
     { group: '资料与照片', name: '基础信息', icon: 'fa-id-card', src: '../../检测/塔体/ipad_inspect_tower.html', done: true },
-    { group: '资料与照片', name: '上传铁塔照片', icon: 'fa-camera-retro', src: '../../检测/塔体/ipad_inspect_tower_photos.html', done: false },
+    { group: '资料与照片', name: '上传铁塔照片', icon: 'fa-camera-retro', src: '../../检测/塔体/ipad_inspect_tower_photos.html', done: false, noPhoto: true },
     { group: '检测大模块', name: '整体模块', icon: 'fa-ruler-combined', src: '../../检测/垂直度/ipad_inspect_vertical.html', done: false },
     { group: '检测大模块', name: '基础', icon: 'fa-monument', src: '../../检测/地基/ipad_inspect_foundation.html', done: true },
     { group: '检测大模块', name: '地锚', icon: 'fa-anchor', src: '../../检测/地基/ipad_inspect_foundation.html', done: false },
@@ -179,18 +187,64 @@
     { group: '检测大模块', name: '馈线孔 / 爬梯 / 拉线', icon: 'fa-ruler-horizontal', src: '../../检测/馈线/ipad_inspect_feed.html', done: false },
     { group: '检测大模块', name: '连接质量', icon: 'fa-link', src: '../../检测/连接/ipad_inspect_connection.html', done: false },
     { group: '检测大模块', name: '构建质量与接地避雷', icon: 'fa-bolt', src: '../../检测/接地/ipad_inspect_ground.html', done: false },
-    { group: '便捷与校验', name: '模块语音备忘', icon: 'fa-note-sticky', src: '../../检测/备注/ipad_inspect_note.html', done: false },
-    { group: '便捷与校验', name: '模板包分步视图', icon: 'fa-list-ol', src: '../详情/ipad_task_detail.html', done: false },
-    { group: '便捷与校验', name: '校验与提交', icon: 'fa-check-double', src: '../../检测/校验/ipad_inspect_validate.html', done: false },
-    { group: '便捷与校验', name: '同步队列', icon: 'fa-cloud-arrow-up', src: '../../系统/同步/ipad_sync_index.html', done: false }
+    { group: '便捷与校验', name: '模块语音备忘', icon: 'fa-note-sticky', src: '../../检测/备注/ipad_inspect_note.html', done: false, id: 'note', noShellTools: true },
+    { group: '便捷与校验', name: '校验与提交', icon: 'fa-check-double', src: '../../检测/校验/ipad_inspect_validate.html', done: false, id: 'validate' },
+    { group: '便捷与校验', name: '同步队列', icon: 'fa-cloud-arrow-up', src: '../../系统/同步/ipad_sync_index.html', done: false, id: 'sync' }
   ];
 
   var navEl = document.getElementById('inspectModNav');
   var frame = document.getElementById('moduleFrame');
   var paneTitle = document.getElementById('paneModuleTitle');
-  var btnPrev = document.getElementById('btnModPrev');
-  var btnNext = document.getElementById('btnModNext');
+  var btnSave = document.getElementById('btnSave');
+  var btnSubmit = document.getElementById('btnSubmit');
+  var btnSyncAll = document.getElementById('btnSyncAll');
+  var btnValidateSubmit = document.getElementById('btnValidateSubmit');
+  var btnPhotoRecognize = document.getElementById('btnPhotoRecognize');
+  var memoFab = document.getElementById('inspectMemoFab');
   var activeIdx = 0;
+
+  var MODULE_ID_BY_FILE = {
+    'ipad_inspect_tower.html': 'tower',
+    'ipad_inspect_tower_photos.html': 'tower_photos',
+    'ipad_inspect_vertical.html': 'vertical',
+    'ipad_inspect_foundation.html': 'foundation',
+    'ipad_inspect_segment.html': 'segment',
+    'ipad_inspect_platform.html': 'platform',
+    'ipad_inspect_coating.html': 'coating',
+    'ipad_inspect_weld.html': 'weld',
+    'ipad_inspect_feed.html': 'feed',
+    'ipad_inspect_connection.html': 'connection',
+    'ipad_inspect_ground.html': 'ground',
+    'ipad_inspect_note.html': 'note',
+    'ipad_inspect_validate.html': 'validate',
+    'ipad_sync_index.html': 'sync'
+  };
+
+  function moduleMeta(mod) {
+    if (!mod) return null;
+    var fn = (mod.src || '').split('/').pop() || '';
+    return {
+      id: mod.id || MODULE_ID_BY_FILE[fn] || fn.replace(/\.html$/i, ''),
+      name: mod.name,
+      noPhoto: !!(mod.noPhoto || mod.noShellTools || mod.id === 'sync' || mod.id === 'validate' || mod.id === 'note' || /tower_photos|inspect_note|ipad_sync/i.test(fn)),
+      noShellTools: !!(mod.noShellTools || mod.id === 'sync' || mod.id === 'validate' || mod.id === 'note')
+    };
+  }
+
+  function buildMemoHref(meta) {
+    if (!meta || !memoFab) return '#';
+    try {
+      var u = new URL('../备忘录/ipad_task_memo.html', window.location.href);
+      u.searchParams.set('scope', 'module');
+      u.searchParams.set('moduleId', meta.id);
+      u.searchParams.set('moduleName', meta.name);
+      u.searchParams.set('return', window.location.href);
+      if (oid) u.searchParams.set('order', oid);
+      return u.pathname + u.search + u.hash;
+    } catch (e) {
+      return memoFab.getAttribute('href') || '#';
+    }
+  }
   var flatItems = [];
 
   function embedUrl(path) {
@@ -239,6 +293,44 @@
     });
   }
 
+  function isSyncModule(mod) {
+    return !!(mod && (mod.id === 'sync' || /ipad_sync_index/i.test(mod.src || '')));
+  }
+
+  function isValidateModule(mod) {
+    return !!(mod && (mod.id === 'validate' || /ipad_inspect_validate/i.test(mod.src || '')));
+  }
+
+  function syncValidateSubmitState() {
+    if (!btnValidateSubmit || !frame) return;
+    var canSubmit = false;
+    try {
+      var doc = frame.contentDocument;
+      if (doc) {
+        canSubmit = !doc.querySelector('.validate-card--fail, .validate-row--fail');
+      }
+    } catch (e) {}
+    btnValidateSubmit.disabled = !canSubmit;
+    btnValidateSubmit.setAttribute('aria-disabled', canSubmit ? 'false' : 'true');
+  }
+
+  function updateHeaderActions(mod) {
+    var syncMode = isSyncModule(mod);
+    var validateMode = isValidateModule(mod);
+    var hideDefaultActs = syncMode || validateMode;
+    var meta = moduleMeta(mod);
+    var hideShellTools = !!(meta && meta.noShellTools);
+    document.body.classList.toggle('ipad-sync-module-active', syncMode);
+    document.body.classList.toggle('ipad-validate-module-active', validateMode);
+    document.body.classList.toggle('ipad-inspect-shell-tools-hidden', hideShellTools);
+    if (btnSave) btnSave.hidden = hideDefaultActs;
+    if (btnSubmit) btnSubmit.hidden = hideDefaultActs;
+    if (btnSyncAll) btnSyncAll.hidden = !syncMode;
+    if (btnValidateSubmit) btnValidateSubmit.hidden = !validateMode;
+    if (btnPhotoRecognize) btnPhotoRecognize.hidden = hideShellTools || !!(meta && meta.noPhoto);
+    if (memoFab && meta) memoFab.href = buildMemoHref(meta);
+  }
+
   function selectModule(idx) {
     if (idx < 0 || idx >= MODULES.length) return;
     activeIdx = idx;
@@ -248,9 +340,13 @@
       btn.classList.toggle('is-active', itemIdx === idx);
     });
     if (paneTitle) paneTitle.textContent = m.name;
-    if (frame) frame.src = embedUrl(m.src);
-    if (btnPrev) btnPrev.disabled = idx <= 0;
-    if (btnNext) btnNext.disabled = idx >= MODULES.length - 1;
+    updateHeaderActions(m);
+    if (frame) {
+      frame.onload = function () {
+        if (isValidateModule(m)) syncValidateSubmitState();
+      };
+      frame.src = embedUrl(m.src);
+    }
     var activeBtn = flatItems.filter(function (b) { return parseInt(b.getAttribute('data-idx'), 10) === idx; })[0];
     if (activeBtn && typeof activeBtn.scrollIntoView === 'function') {
       activeBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -259,13 +355,6 @@
 
   buildNav();
   selectModule(0);
-
-  if (btnPrev) {
-    btnPrev.addEventListener('click', function () { selectModule(activeIdx - 1); });
-  }
-  if (btnNext) {
-    btnNext.addEventListener('click', function () { selectModule(activeIdx + 1); });
-  }
 
   var exportMask = document.getElementById('exportSheetMask');
   function openExportSheet() {
@@ -289,13 +378,165 @@
     closeExportSheet();
     alert('正在导出检测任务数据：将打包当前任务各模块已填字段、附件清单与校验状态，生成 Excel（多工作表）并唤起系统分享。');
   });
-  document.getElementById('btnSave').addEventListener('click', function () {
-    alert('已保存当前任务全部模块数据');
-  });
-  document.getElementById('btnSubmit').addEventListener('click', function () {
-    if (document.getElementById('btnSubmit').disabled) return;
-    alert('提交成功后将生成 V1 并锁定');
-  });
+  if (btnSave) {
+    btnSave.addEventListener('click', function () {
+      alert('已保存当前任务全部模块数据');
+    });
+  }
+  if (btnSubmit) {
+    btnSubmit.addEventListener('click', function () {
+      if (btnSubmit.disabled) return;
+      alert('提交成功后将生成 V1 并锁定');
+    });
+  }
+  if (btnSyncAll) {
+    btnSyncAll.addEventListener('click', function () {
+      alert('开始同步待上传数据（原型演示）。');
+    });
+  }
+  if (btnValidateSubmit) {
+    btnValidateSubmit.addEventListener('click', function () {
+      if (btnValidateSubmit.disabled) return;
+      alert('确认提交成功后将生成 V1 并锁定（原型演示）。');
+    });
+  }
+  if (btnPhotoRecognize) {
+    btnPhotoRecognize.addEventListener('click', function () {
+      var m = MODULES[activeIdx];
+      var meta = moduleMeta(m);
+      if (!meta) return;
+      alert(
+        '拍照：上传或拍摄照片 → OCR 映射到可填字段草稿 → 须人工确认后落库（与填报主页一致）。\n\n' +
+          '当前作用域：「' +
+          meta.name +
+          '」模块，仅识别并预填本页模板字段，不影响其它模块。'
+      );
+    });
+  }
+
+  (function initMemoFabDrag() {
+    if (!memoFab) return;
+    var pane = memoFab.closest('.inspect-split-pane');
+    if (!pane) return;
+    var STORAGE_KEY = 'tower_ipad_inspect_memo_fab_pos';
+    var DRAG_THRESHOLD = 6;
+    var dragging = false;
+    var moved = false;
+    var startX = 0;
+    var startY = 0;
+    var startLeft = 0;
+    var startTop = 0;
+
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function fabSize() {
+      var r = memoFab.getBoundingClientRect();
+      return { w: r.width || 52, h: r.height || 52 };
+    }
+
+    function applyPos(left, top) {
+      var pr = pane.getBoundingClientRect();
+      var sz = fabSize();
+      var maxL = Math.max(8, pr.width - sz.w - 8);
+      var maxT = Math.max(8, pr.height - sz.h - 8);
+      var l = clamp(left, 8, maxL);
+      var t = clamp(top, 8, maxT);
+      memoFab.style.left = l + 'px';
+      memoFab.style.top = t + 'px';
+      memoFab.style.right = 'auto';
+      memoFab.style.bottom = 'auto';
+      return { left: l, top: t };
+    }
+
+    function defaultPos() {
+      var pr = pane.getBoundingClientRect();
+      var sz = fabSize();
+      return {
+        left: pr.width - sz.w - 20,
+        top: pr.height - sz.h - 20
+      };
+    }
+
+    function restorePos() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          applyPos(defaultPos().left, defaultPos().top);
+          return;
+        }
+        var p = JSON.parse(raw);
+        if (typeof p.left === 'number' && typeof p.top === 'number') {
+          applyPos(p.left, p.top);
+          return;
+        }
+      } catch (e) {}
+      applyPos(defaultPos().left, defaultPos().top);
+    }
+
+    function savePos() {
+      try {
+        var l = parseFloat(memoFab.style.left);
+        var t = parseFloat(memoFab.style.top);
+        if (!isFinite(l) || !isFinite(t)) return;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: l, top: t }));
+      } catch (e2) {}
+    }
+
+    restorePos();
+    window.addEventListener('resize', function () {
+      var l = parseFloat(memoFab.style.left);
+      var t = parseFloat(memoFab.style.top);
+      if (!isFinite(l) || !isFinite(t)) restorePos();
+      else applyPos(l, t);
+    });
+
+    memoFab.addEventListener('click', function (e) {
+      if (moved) {
+        e.preventDefault();
+        moved = false;
+      }
+    });
+
+    memoFab.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      dragging = true;
+      moved = false;
+      document.body.classList.add('ipad-inspect-fab-dragging');
+      var fr = memoFab.getBoundingClientRect();
+      var pr = pane.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = fr.left - pr.left;
+      startTop = fr.top - pr.top;
+      try {
+        memoFab.setPointerCapture(e.pointerId);
+      } catch (cap) {}
+      e.preventDefault();
+    });
+
+    memoFab.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (!moved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) moved = true;
+      if (moved) applyPos(startLeft + dx, startTop + dy);
+    });
+
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      document.body.classList.remove('ipad-inspect-fab-dragging');
+      try {
+        memoFab.releasePointerCapture(e.pointerId);
+      } catch (rel) {}
+      if (moved) savePos();
+    }
+
+    memoFab.addEventListener('pointerup', endDrag);
+    memoFab.addEventListener('pointercancel', endDrag);
+  })();
 })();
 </script>
 </body>

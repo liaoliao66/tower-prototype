@@ -119,6 +119,15 @@ body.ipad-task-page {
 .top-actions button:active,
 .top-actions .top-act:active { transform: scale(0.97); opacity: 0.92; }
 .top-actions .top-act-export { background: rgba(255, 255, 255, 0.28); }
+.top-actions .top-act-photo {
+  background: rgba(255, 255, 255, 0.28);
+}
+.top-actions .top-act-photo[hidden] {
+  display: none !important;
+}
+body.ipad-inspect-shell-tools-hidden .top-actions-left .top-act-photo {
+  display: none !important;
+}
 .top-actions .top-act-save {
   background: #fff;
   color: #165dff;
@@ -132,6 +141,42 @@ body.ipad-task-page {
 .top-actions .top-act-submit:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+.top-actions .top-act-sync {
+  background: #fff;
+  color: #165dff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  min-width: 112px;
+  justify-content: center;
+}
+.top-actions .top-act-sync[hidden] {
+  display: none !important;
+}
+body.ipad-sync-module-active .top-actions-right .top-act-save,
+body.ipad-sync-module-active .top-actions-right .top-act-submit,
+body.ipad-validate-module-active .top-actions-right .top-act-save,
+body.ipad-validate-module-active .top-actions-right .top-act-submit {
+  display: none !important;
+}
+.top-actions .top-act-validate-submit {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  min-width: 112px;
+  justify-content: center;
+}
+.top-actions .top-act-validate-submit:not(:disabled) {
+  background: #fff;
+  color: #165dff;
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.top-actions .top-act-validate-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.top-actions .top-act-validate-submit[hidden] {
+  display: none !important;
 }
 
 .scroll-main {
@@ -365,7 +410,7 @@ body.ipad-task-split .inspect-mod-nav {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 8px 0 12px;
+  padding: 8px 0 calc(16px + env(safe-area-inset-bottom, 0px));
 }
 body.ipad-task-split .inspect-mod-group {
   margin-bottom: 4px;
@@ -440,35 +485,6 @@ body.ipad-task-split .inspect-mod-item .mod-badge {
   background: #e8ffea;
   color: #00b42a;
 }
-body.ipad-task-split .inspect-split-nav-foot {
-  flex-shrink: 0;
-  display: flex;
-  gap: 8px;
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid #f2f3f5;
-  background: #fafbfc;
-}
-body.ipad-task-split .inspect-split-nav-foot button {
-  flex: 1;
-  height: 40px;
-  border-radius: 8px;
-  border: 1px solid #e5e6eb;
-  background: #fff;
-  color: #4e5969;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-}
-body.ipad-task-split .inspect-split-nav-foot button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-body.ipad-task-split .inspect-split-nav-foot #btnModNext {
-  background: #165dff;
-  border-color: #165dff;
-  color: #fff;
-}
 body.ipad-task-split .inspect-split-pane {
   flex: 1;
   min-width: 0;
@@ -476,6 +492,43 @@ body.ipad-task-split .inspect-split-pane {
   flex-direction: column;
   min-height: 0;
   background: #f2f3f5;
+  position: relative;
+  overflow: hidden;
+}
+body.ipad-task-split .inspect-memo-fab {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #ffcd4d 0%, #f7a500 100%);
+  color: #5c3d00;
+  box-shadow: 0 4px 14px rgba(247, 165, 0, 0.45);
+  text-decoration: none;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+body.ipad-task-split .inspect-memo-fab i {
+  font-size: 22px;
+  pointer-events: none;
+}
+body.ipad-task-split .inspect-memo-fab:active {
+  transform: scale(0.96);
+}
+body.ipad-inspect-fab-dragging .inspect-memo-fab {
+  cursor: grabbing;
+  box-shadow: 0 6px 18px rgba(247, 165, 0, 0.55);
+}
+body.ipad-inspect-shell-tools-hidden .inspect-memo-fab {
+  display: none !important;
 }
 body.ipad-task-split .inspect-pane-head {
   flex-shrink: 0;
@@ -505,6 +558,14 @@ body.ipad-task-split .inspect-module-frame {
   border: none;
   display: block;
   background: #f2f3f5;
+  overflow: hidden;
+}
+
+/* 检测填报 · 左菜单 + 右 iframe：主区占满剩余高度 */
+body.ipad-adapt.ipad-task-page.ipad-has-tabbar .inspect-split-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 @media (max-width: 900px) {
   body.ipad-task-split .inspect-split-main {

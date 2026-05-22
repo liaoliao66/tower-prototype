@@ -14,6 +14,10 @@ body.inspect-app-layout.ipad-adapt #appEmbedContent {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
   padding: var(--ipad-space-2, 20px) var(--ipad-space-2, 20px) calc(100px + env(safe-area-inset-bottom, 0px)) !important;
   max-width: var(--ipad-content-max, 1180px);
   margin: 0 auto;
@@ -97,8 +101,8 @@ body.inspect-app-layout.ipad-adapt [data-app-flow-footer] {
   box-sizing: border-box;
 }
 
-body.inspect-app-layout.ipad-adapt [data-app-flow-footer] a,
-body.inspect-app-layout.ipad-adapt [data-app-flow-footer] button {
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer) a,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer) button {
   max-width: 480px;
   margin: 0 auto;
   display: block !important;

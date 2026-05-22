@@ -15,8 +15,9 @@
 <link rel="stylesheet" href="../../../../assets/ipad-embed.css">
 <link rel="stylesheet" href="../../../../assets/ipad-task-shell.css">
 <script src="../../../../assets/ipad-adapt.js" defer></script>
+<script src="../../../../assets/app-embed.js" defer></script>
 </head>
-<body class="ipad-adapt ipad-task-page">
+<body class="ipad-adapt ipad-task-page ipad-task-detail-page">
 
 <div class="header-fixed">
   <div class="status-bar" aria-hidden="true">
@@ -31,12 +32,7 @@
   </div>
 </div>
 
-<main class="scroll-main">
-  <div class="intro-card">
-    日常填报请用 <a href="../填报主页/ipad_task_inspect_home.html" id="linkHomeInline">检测填报主页</a>。模板包
-    <span class="pkg-badge">PKG_STOCK_SINGLE_PIPE_20260509</span> v1.2 · 自动保存已开启
-  </div>
-
+<main class="scroll-main" id="taskDetailScroll">
   <div class="sec-title">资料与照片</div>
   <div class="mod-grid mod-grid--steps">
     <a class="step done" href="../../检测/塔体/ipad_inspect_tower.html">
@@ -116,7 +112,7 @@
   </div>
 </main>
 
-<div class="task-footer">
+<div class="task-footer" id="taskDetailFooter">
   <a href="../填报主页/ipad_task_inspect_home.html" class="btn-ghost" id="linkFooterHome">填报主页</a>
   <a href="../../检测/塔体/ipad_inspect_tower.html" class="btn-primary">继续填报</a>
 </div>
@@ -138,10 +134,13 @@
   var q = '?order=' + encodeURIComponent(oid);
   var sub = document.getElementById('topTaskSub');
   if (sub) sub.textContent = ' · ' + (TITLES[oid] || TITLES.DD20260506001);
-  ['linkBackHome', 'linkHomeInline', 'linkFooterHome'].forEach(function (id) {
-    var el = document.getElementById(id);
-    if (el) el.href = '../填报主页/ipad_task_inspect_home.html' + q;
-  });
+  var linkBack = document.getElementById('linkBackHome');
+  if (linkBack) linkBack.href = '../填报主页/ipad_task_inspect_home.html' + q;
+  try {
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.body.classList.add('ipad-task-detail-embed');
+    }
+  } catch (e) {}
 })();
 </script>
 </body>

@@ -99,12 +99,6 @@
 
 </div>
 
-<div class="ipad-flow-footer flow-footer-split" data-app-flow-footer data-inspect-module-actions="1">
-  <a href="../../任务/备忘录/ipad_task_memo.html" class="btn-memo"><i class="fa-solid fa-microphone" aria-hidden="true"></i> 备忘录</a>
-  <button type="button" class="btn-photo" id="btnWeldPhoto"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照</button>
-  <a href="../../检测/馈线/ipad_inspect_feed.html" class="btn-primary">下一步</a>
-</div>
-
 <script>
 (function () {
   document.querySelectorAll('[data-weld-toggle]').forEach(function (toggle) {
@@ -126,7 +120,6 @@
   function openPhoto() {
     alert('拍照：记录焊缝现场照片（原型演示）。');
   }
-  document.getElementById('btnWeldPhoto').addEventListener('click', openPhoto);
   document.querySelectorAll('[data-weld-photo]').forEach(function (el) {
     el.addEventListener('click', openPhoto);
     el.addEventListener('keydown', function (e) {

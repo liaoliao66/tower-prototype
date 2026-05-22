@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- iPad-INSPECT_NOTE v2.0 landscape -->
+<!-- iPad-INSPECT_NOTE v3.0 landscape · 语音/拍照双 Tab + 整页滚动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>快捷手记</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>模块语音备忘</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../../assets/app-frame.css">
@@ -15,94 +15,150 @@
 <link rel="stylesheet" href="../../../../assets/ipad-layout.css">
 <link rel="stylesheet" href="../../../../assets/ipad-visual.css">
 <link rel="stylesheet" href="../../../../assets/ipad-inspect-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-inspect-basic.css">
 <link rel="stylesheet" href="../../../../assets/ipad-embed.css">
 <script src="../../../../assets/ipad-adapt.js" defer></script>
 <script src="../../../../assets/app-embed.js" defer></script>
 <script src="../../../../assets/app-inspect-back.js" defer></script>
-<style>
-body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: #F2F3F5; margin: 0; }
-.mode-tab { flex:1; text-align:center; padding:10px 0; font-size:13px; cursor:pointer; border-bottom:2px solid transparent; color:#86909C; }
-.mode-tab.active { color:#165DFF; border-bottom-color:#165DFF; font-weight:600; }
-</style>
 </head>
-<body class="inspect-app-layout inspect-embed-pad-note ipad-adapt" data-inspect-no-memo-toolbar="1" data-inspect-no-photo-recognize="1">
-<!-- Status bar -->
+<body class="inspect-app-layout inspect-embed-pad-note ipad-adapt ipad-note-page" data-inspect-no-memo-toolbar="1" data-inspect-no-photo-recognize="1">
 <div id="appStatusBar">
   <span>9:41</span>
   <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
 </div>
-<!-- Navigation bar -->
 <div id="appNavBar">
   <a href="../../任务/填报主页/ipad_task_inspect_home.html" data-app-inspect-back style="color:#165DFF; text-decoration:none; font-size:14px;"><i class="fa-solid fa-chevron-left"></i> 返回</a>
-  <span style="flex:1; text-align:center; font-size:16px; font-weight:600;">快捷手记</span>
+  <span style="flex:1; text-align:center; font-size:16px; font-weight:600;">模块语音备忘</span>
   <span style="width:40px;"></span>
 </div>
 
-<!-- Content area -->
-<div id="appEmbedContent">
+<div id="appEmbedContent" class="note-page-stack">
 
-  <!-- Mode tabs -->
-  <div style="display:flex; background:#fff; border-bottom:1px solid #E5E6EB;">
-    <div class="mode-tab active"><i class="fa-solid fa-microphone"></i> 语音记录</div>
-    <div class="mode-tab"><i class="fa-solid fa-camera"></i> 拍照记录</div>
-    <div class="mode-tab"><i class="fa-solid fa-pen"></i> 手写记录</div>
+  <div class="note-tabs" role="tablist" aria-label="记录方式">
+    <button type="button" class="note-tab is-active" role="tab" aria-selected="true" data-note-tab="voice">
+      <i class="fa-solid fa-microphone" aria-hidden="true"></i>语音记录
+    </button>
+    <button type="button" class="note-tab" role="tab" aria-selected="false" data-note-tab="photo">
+      <i class="fa-solid fa-camera" aria-hidden="true"></i>拍照记录
+    </button>
   </div>
 
-  <div style="padding:12px 16px 0;">
+  <div class="note-panels">
+    <section class="note-panel note-panel--voice is-active" id="notePanelVoice" role="tabpanel" aria-label="语音记录">
+      <div class="note-layout">
+        <div class="note-voice-card">
+          <button type="button" class="note-voice-btn" id="btnNoteRecord" aria-label="开始录音">
+            <i class="fa-solid fa-microphone" aria-hidden="true"></i>
+          </button>
+          <div class="note-timer" id="noteTimer">00:00</div>
+          <p class="note-voice-hint" id="noteRecordHint">点击开始录音</p>
+          <div class="note-trans-wrap">
+            <div class="note-trans-label">语音转文字预览</div>
+            <div class="note-trans-body" id="noteTransBody">录音后将自动转换为文字…</div>
+          </div>
+        </div>
 
-  <!-- 语音录制区域 -->
-  <div style="background:#fff; border-radius:12px; padding:24px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center;">
-    <!-- Recording button -->
-    <div style="width:80px; height:80px; background:linear-gradient(135deg, #165DFF 0%, #4080FF 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; cursor:pointer; box-shadow:0 4px 16px rgba(22,93,255,0.3);">
-      <i class="fa-solid fa-microphone" style="font-size:32px; color:#fff;"></i>
-    </div>
-    <div style="font-size:24px; font-weight:600; color:#1D2129; margin-bottom:4px;">00:00</div>
-    <div style="font-size:13px; color:#86909C;">点击开始录音</div>
-
-    <!-- 文字预览区 -->
-    <div style="margin-top:20px; padding:12px; background:#F7F8FA; border-radius:8px; text-align:left;">
-      <div style="font-size:12px; color:#C9CDD4; margin-bottom:6px;">语音转文字预览</div>
-      <div style="font-size:14px; color:#86909C; line-height:1.6;">录音后将自动转换为文字...</div>
-    </div>
-  </div>
-
-  <!-- 历史记录 -->
-  <div style="font-size:14px; font-weight:600; color:#1D2129; margin-bottom:8px;">历史记录</div>
-
-  <div style="background:#fff; border-radius:12px; padding:14px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-      <span style="font-size:13px; font-weight:500; color:#1D2129;"><i class="fa-solid fa-microphone" style="color:#165DFF; margin-right:4px;"></i> 语音记录</span>
-      <span style="font-size:11px; color:#C9CDD4;">2026-05-08 09:15</span>
-    </div>
-    <div style="font-size:13px; color:#4E5969; line-height:1.5;">基础东侧发现约5mm沉降，需要重点关注。接地装置锈蚀比较严重，建议更换。</div>
-    <div style="margin-top:6px; font-size:11px; color:#86909C;"><i class="fa-solid fa-clock"></i> 时长 0:32</div>
-  </div>
-
-  <div style="background:#fff; border-radius:12px; padding:14px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-      <span style="font-size:13px; font-weight:500; color:#1D2129;"><i class="fa-solid fa-camera" style="color:#FF7D00; margin-right:4px;"></i> 拍照记录</span>
-      <span style="font-size:11px; color:#C9CDD4;">2026-05-08 09:08</span>
-    </div>
-    <div style="font-size:13px; color:#4E5969; line-height:1.5;">基础裂缝及沉降部位拍照</div>
-    <div style="display:flex; gap:6px; margin-top:6px;">
-      <div style="width:48px; height:48px; background:#F2F3F5; border-radius:6px; display:flex; align-items:center; justify-content:center;">
-        <i class="fa-solid fa-image" style="color:#C9CDD4;"></i>
+        <div class="note-history-col">
+          <div class="note-history-head">
+            <h2 class="note-history-title">历史记录</h2>
+            <span class="note-history-count">2 条</span>
+          </div>
+          <ul class="note-history-list">
+            <li class="note-history-item">
+              <div class="note-history-item-head">
+                <span class="note-history-type note-history-type--voice"><i class="fa-solid fa-microphone" aria-hidden="true"></i>语音</span>
+                <time class="note-history-time">2026-05-08 09:15</time>
+              </div>
+              <p class="note-history-text">基础东侧发现约 5mm 沉降，需要重点关注。接地装置锈蚀比较严重，建议更换。</p>
+              <span class="note-history-meta"><i class="fa-solid fa-clock" aria-hidden="true"></i>时长 0:32</span>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div style="width:48px; height:48px; background:#F2F3F5; border-radius:6px; display:flex; align-items:center; justify-content:center;">
-        <i class="fa-solid fa-image" style="color:#C9CDD4;"></i>
+    </section>
+
+    <section class="note-panel note-panel--photo" id="notePanelPhoto" role="tabpanel" aria-label="拍照记录" hidden>
+      <div class="note-photo-toolbar">
+        <button type="button" class="note-photo-capture" id="btnNotePhoto">
+          <i class="fa-solid fa-camera" aria-hidden="true"></i>拍照记录
+        </button>
+        <span class="note-photo-hint">照片归入本模块，提交前可在校验页核对</span>
       </div>
-    </div>
+
+      <div class="note-history-head">
+        <h2 class="note-history-title">拍照历史</h2>
+        <span class="note-history-count">1 条</span>
+      </div>
+      <ul class="note-history-list">
+        <li class="note-history-item">
+          <div class="note-history-item-head">
+            <span class="note-history-type note-history-type--photo"><i class="fa-solid fa-camera" aria-hidden="true"></i>拍照</span>
+            <time class="note-history-time">2026-05-08 09:08</time>
+          </div>
+          <p class="note-history-text">基础裂缝及沉降部位拍照</p>
+          <div class="note-photo-thumbs">
+            <span class="note-photo-thumb" aria-hidden="true"><i class="fa-solid fa-image"></i></span>
+            <span class="note-photo-thumb" aria-hidden="true"><i class="fa-solid fa-image"></i></span>
+          </div>
+        </li>
+      </ul>
+    </section>
   </div>
 
-  <div style="background:#fff; border-radius:12px; padding:14px; margin-bottom:8px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-      <span style="font-size:13px; font-weight:500; color:#1D2129;"><i class="fa-solid fa-pen" style="color:#00B42A; margin-right:4px;"></i> 手写记录</span>
-      <span style="font-size:11px; color:#C9CDD4;">2026-05-08 08:55</span>
-    </div>
-    <div style="font-size:13px; color:#4E5969; line-height:1.5;">到达现场，天气晴好，开始检测准备工作。</div>
-  </div>
-
-  </div>
 </div>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.note-tab[data-note-tab]');
+  var panels = {
+    voice: document.getElementById('notePanelVoice'),
+    photo: document.getElementById('notePanelPhoto')
+  };
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var key = tab.getAttribute('data-note-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      Object.keys(panels).forEach(function (k) {
+        if (!panels[k]) return;
+        var show = k === key;
+        panels[k].classList.toggle('is-active', show);
+        panels[k].hidden = !show;
+      });
+    });
+  });
+
+  var recording = false;
+  var btnRecord = document.getElementById('btnNoteRecord');
+  var hint = document.getElementById('noteRecordHint');
+  var timerEl = document.getElementById('noteTimer');
+  var transBody = document.getElementById('noteTransBody');
+  if (btnRecord) {
+    btnRecord.addEventListener('click', function () {
+      recording = !recording;
+      btnRecord.classList.toggle('is-recording', recording);
+      if (hint) hint.textContent = recording ? '点击结束录音' : '点击开始录音';
+      if (recording) {
+        if (timerEl) timerEl.textContent = '00:12';
+        if (transBody) transBody.textContent = '基础东侧发现约 5mm 沉降，需要重点关注…';
+      } else {
+        if (timerEl) timerEl.textContent = '00:00';
+        if (transBody) transBody.textContent = '录音后将自动转换为文字…';
+      }
+    });
+  }
+
+  var btnPhoto = document.getElementById('btnNotePhoto');
+  if (btnPhoto) {
+    btnPhoto.addEventListener('click', function () {
+      alert('拍照：记录本模块现场照片（原型演示）。');
+    });
+  }
+})();
+</script>
 </body>
 </html>

@@ -72,8 +72,8 @@ body.ipad-adapt .img-ph:empty::after {
   content: "图片区域";
 }
 
-/* 按钮：最小触控区 */
-body.ipad-adapt button,
+/* 按钮：最小触控区（药丸开关除外，由 ipad-inspect-basic 单独定尺寸） */
+body.ipad-adapt button:not(.ios-switch),
 body.ipad-adapt .btn,
 body.ipad-adapt .btn-next,
 body.ipad-adapt .top-actions button,

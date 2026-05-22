@@ -125,6 +125,36 @@ body{
   display:block;width:100%;padding:12px;margin:4px 0 0;border:none;background:transparent;
   color:#86909C;font-size:15px;cursor:pointer;font-family:inherit;
 }
+/* 语音备份录：悬浮钮，默认右下角，可拖动（与 iPad 填报主页一致） */
+.app-memo-fab{
+  position:fixed;
+  right:16px;
+  bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index:60;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(145deg,#ffcd4d 0%,#f7a500 100%);
+  color:#5c3d00;
+  box-shadow:0 4px 14px rgba(247,165,0,.45);
+  text-decoration:none;
+  touch-action:none;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:box-shadow .15s,transform .1s;
+}
+.app-memo-fab i{font-size:22px;pointer-events:none}
+.app-memo-fab:active{transform:scale(.96)}
+body.app-memo-fab-dragging .app-memo-fab{
+  cursor:grabbing;
+  box-shadow:0 6px 18px rgba(247,165,0,.55);
+}
+.top-actions .top-act-photo{background:rgba(255,255,255,.32)}
 </style>
 </head>
 <body>
@@ -146,9 +176,8 @@ body{
     </div>
     <div class="top-actions top-actions-narrow" role="toolbar" aria-label="任务操作">
       <div class="top-actions-left">
-        <a class="top-act" href="../备忘录/app_task_memo.html"><i class="fa-solid fa-microphone"></i> 备忘录</a>
-        <button type="button" id="btnOcrGlobal"><i class="fa-solid fa-camera"></i> 拍照</button>
         <button type="button" class="top-act top-act-export" id="btnExportVoice" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
+        <button type="button" class="top-act top-act-photo" id="btnOcrGlobal" title="拍照识别"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照识别</button>
       </div>
       <div class="top-actions-right">
         <button type="button" class="top-act top-act-save" id="btnSave">保存</button>
@@ -205,12 +234,12 @@ body{
       <div class="t">平台及设备</div>
       <div class="s">天线、馈线、爬梯、平台附属等模板配置项</div>
     </a>
-    <a class="mod" href="../../检测/结构图/app_inspect_diagram.html">
+    <a class="mod" href="../../检测/防腐层/app_inspect_coating.html">
       <div class="ic"><i class="fa-solid fa-paint-roller"></i></div>
       <div class="t">防腐层质量</div>
       <div class="s">与模板二维表 / 照片类字段同源（逻辑同检测模块配置）</div>
     </a>
-    <a class="mod" href="../../检测/结构图/app_inspect_diagram.html">
+    <a class="mod" href="../../检测/焊接/app_inspect_weld.html">
       <div class="ic"><i class="fa-solid fa-wrench"></i></div>
       <div class="t">焊接</div>
       <div class="s">焊缝抽检、记录表</div>
@@ -244,11 +273,6 @@ body{
       <div class="t">模块语音备忘</div>
       <div class="s">各模块内也可进入录制</div>
     </a>
-    <a class="mod" href="../详情/app_task_detail.html">
-      <div class="ic"><i class="fa-solid fa-list-ol"></i></div>
-      <div class="t">模板包分步视图</div>
-      <div class="s">与引擎 Section 顺序对齐</div>
-    </a>
     <a class="mod" href="../../检测/校验/app_inspect_validate.html">
       <div class="ic"><i class="fa-solid fa-check-double"></i></div>
       <div class="t">校验与提交</div>
@@ -262,6 +286,14 @@ body{
   </div>
 </main>
 
+<a
+  id="appMemoFab"
+  class="app-memo-fab"
+  href="../备忘录/app_task_memo.html"
+  aria-label="语音备份录"
+  title="语音备份录"
+><i class="fa-solid fa-microphone" aria-hidden="true"></i></a>
+
 <div class="export-sheet-mask" id="exportSheetMask" role="dialog" aria-modal="true" aria-labelledby="exportSheetTitle">
   <div class="export-sheet" id="exportSheetPanel" role="document">
     <div class="export-sheet-h" id="exportSheetTitle">导出</div>
@@ -273,7 +305,7 @@ body{
 </div>
 
 <script>
-(function(){
+(function () {
   var TITLES = {
     DD20260506001: '滨江基站01 · 单管',
     DD20260507002: '城西枢纽站 · 角钢',
@@ -286,11 +318,21 @@ body{
   try { oid = (new URLSearchParams(location.search).get('order') || '').trim().toUpperCase(); } catch (e) {}
   if (!oid) { try { oid = (sessionStorage.getItem(KEY) || '').trim().toUpperCase(); } catch (e2) {} }
   if (!oid) oid = 'DD20260506001';
-  var el = document.getElementById('topTaskTitle');
-  if (el) el.textContent = TITLES[oid] || TITLES.DD20260506001;
-})();
-  var exportMask = document.getElementById('exportSheetMask');
+  var titleEl = document.getElementById('topTaskTitle');
+  if (titleEl) titleEl.textContent = TITLES[oid] || TITLES.DD20260506001;
 
+  var memoFab = document.getElementById('appMemoFab');
+  if (memoFab) {
+    try {
+      var mu = new URL(memoFab.getAttribute('href') || '../备忘录/app_task_memo.html', window.location.href);
+      mu.searchParams.set('scope', 'task');
+      if (oid) mu.searchParams.set('order', oid);
+      mu.searchParams.set('return', window.location.href);
+      memoFab.href = mu.pathname + mu.search + mu.hash;
+    } catch (eMu) {}
+  }
+
+  var exportMask = document.getElementById('exportSheetMask');
   function openExportSheet() {
     exportMask.classList.add('show');
     document.body.style.overflow = 'hidden';
@@ -300,9 +342,7 @@ body{
     document.body.style.overflow = '';
   }
 
-  document.getElementById('btnExportVoice').addEventListener('click', function () {
-    openExportSheet();
-  });
+  document.getElementById('btnExportVoice').addEventListener('click', openExportSheet);
   exportMask.addEventListener('click', function (e) {
     if (e.target === exportMask) closeExportSheet();
   });
@@ -315,16 +355,148 @@ body{
     closeExportSheet();
     alert('正在导出检测任务数据：将打包当前任务各模块已填字段、附件清单与校验状态，生成 Excel（多工作表）并唤起系统分享。');
   });
-document.getElementById('btnOcrGlobal').addEventListener('click', function(){
-  alert('拍照：上传或拍摄照片 → OCR 映射到可填字段草稿 → 须人工确认后落库。');
-});
-document.getElementById('btnSave').addEventListener('click', function(){
-  alert('已保存');
-});
-document.getElementById('btnSubmit').addEventListener('click', function(){
-  if (document.getElementById('btnSubmit').disabled) return;
-  alert('提交成功后将生成 V1 并锁定');
-});
+  document.getElementById('btnOcrGlobal').addEventListener('click', function () {
+    alert('拍照：上传或拍摄照片 → OCR 映射到可填字段草稿 → 须人工确认后落库。');
+  });
+  document.getElementById('btnSave').addEventListener('click', function () {
+    alert('已保存');
+  });
+  document.getElementById('btnSubmit').addEventListener('click', function () {
+    if (document.getElementById('btnSubmit').disabled) return;
+    alert('提交成功后将生成 V1 并锁定');
+  });
+
+  (function initMemoFabDrag() {
+    if (!memoFab) return;
+    var STORAGE_KEY = 'tower_app_inspect_memo_fab_pos';
+    var DRAG_THRESHOLD = 6;
+    var dragging = false;
+    var moved = false;
+    var startX = 0;
+    var startY = 0;
+    var startLeft = 0;
+    var startTop = 0;
+
+    function safeBottom() {
+      try {
+        return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function fabSize() {
+      var r = memoFab.getBoundingClientRect();
+      return { w: r.width || 52, h: r.height || 52 };
+    }
+
+    function applyPos(left, top) {
+      var sz = fabSize();
+      var pad = 8;
+      var sb = safeBottom();
+      var maxL = Math.max(pad, window.innerWidth - sz.w - pad);
+      var maxT = Math.max(pad, window.innerHeight - sz.h - pad - sb);
+      var l = clamp(left, pad, maxL);
+      var t = clamp(top, pad, maxT);
+      memoFab.style.left = l + 'px';
+      memoFab.style.top = t + 'px';
+      memoFab.style.right = 'auto';
+      memoFab.style.bottom = 'auto';
+      return { left: l, top: t };
+    }
+
+    function defaultPos() {
+      var sz = fabSize();
+      var pad = 16;
+      var sb = safeBottom();
+      return {
+        left: window.innerWidth - sz.w - pad,
+        top: window.innerHeight - sz.h - pad - sb
+      };
+    }
+
+    function restorePos() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          applyPos(defaultPos().left, defaultPos().top);
+          return;
+        }
+        var p = JSON.parse(raw);
+        if (typeof p.left === 'number' && typeof p.top === 'number') {
+          applyPos(p.left, p.top);
+          return;
+        }
+      } catch (e) {}
+      applyPos(defaultPos().left, defaultPos().top);
+    }
+
+    function savePos() {
+      try {
+        var l = parseFloat(memoFab.style.left);
+        var t = parseFloat(memoFab.style.top);
+        if (!isFinite(l) || !isFinite(t)) return;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: l, top: t }));
+      } catch (e2) {}
+    }
+
+    restorePos();
+    window.addEventListener('resize', function () {
+      var l = parseFloat(memoFab.style.left);
+      var t = parseFloat(memoFab.style.top);
+      if (!isFinite(l) || !isFinite(t)) restorePos();
+      else applyPos(l, t);
+    });
+
+    memoFab.addEventListener('click', function (e) {
+      if (moved) {
+        e.preventDefault();
+        moved = false;
+      }
+    });
+
+    memoFab.addEventListener('pointerdown', function (e) {
+      if (e.button !== undefined && e.button !== 0) return;
+      dragging = true;
+      moved = false;
+      document.body.classList.add('app-memo-fab-dragging');
+      var fr = memoFab.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      startLeft = fr.left;
+      startTop = fr.top;
+      try {
+        memoFab.setPointerCapture(e.pointerId);
+      } catch (cap) {}
+      e.preventDefault();
+    });
+
+    memoFab.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
+      if (!moved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) moved = true;
+      if (moved) applyPos(startLeft + dx, startTop + dy);
+    });
+
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      document.body.classList.remove('app-memo-fab-dragging');
+      try {
+        memoFab.releasePointerCapture(e.pointerId);
+      } catch (rel) {}
+      if (moved) savePos();
+    }
+
+    memoFab.addEventListener('pointerup', endDrag);
+    memoFab.addEventListener('pointercancel', endDrag);
+  })();
+})();
 </script>
 </body>
 </html>

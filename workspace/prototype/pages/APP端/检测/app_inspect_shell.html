@@ -80,7 +80,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
       <button type="button" id="actOcr" title="拍照"><i class="fa-solid fa-camera"></i> 拍照</button>
       <button type="button" id="actExport" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
       <button type="button" id="actSave" title="保存"><i class="fa-solid fa-floppy-disk"></i> 保存</button>
-      <button type="button" id="actSubmit" title="完成全部必填后可用"><i class="fa-solid fa-paper-plane"></i> 提交</button>
       <button type="button" id="actHub" title="检测填报主页（大模块）"><i class="fa-solid fa-table-cells-large"></i> 主页</button>
       <button type="button" id="actSync" title="同步数据"><i class="fa-solid fa-rotate"></i> 同步</button>
       <button type="button" id="actUpload" title="上传数据"><i class="fa-solid fa-cloud-arrow-up"></i> 上传</button>
@@ -241,23 +240,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     if (!tryClickIframeBtn('btnSave')) {
       alert('已保存');
     }
-  });
-  document.getElementById('actSubmit').addEventListener('click', function () {
-    try {
-      var doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
-      if (doc) {
-        var el = doc.getElementById('btnSubmit');
-        if (el) {
-          if (el.disabled) {
-            alert('完成全部必填后可用');
-            return;
-          }
-          el.click();
-          return;
-        }
-      }
-    } catch (e) {}
-    alert('完成全部必填后可用');
   });
   document.getElementById('actHub').addEventListener('click', function () {
     setFrame(TASK_HOME_EMBED);

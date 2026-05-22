@@ -107,11 +107,9 @@
       </div>
       <div class="top-actions-right">
         <button type="button" class="top-act top-act-save" id="btnSave">保存</button>
-        <button type="button" class="top-act top-act-submit" id="btnSubmit" disabled title="完成全部必填后可用">提交</button>
         <button type="button" class="top-act top-act-sync" id="btnSyncAll" hidden>
           <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>一键同步
         </button>
-        <button type="button" class="top-act top-act-validate-submit" id="btnValidateSubmit" hidden disabled aria-disabled="true">确认提交</button>
       </div>
     </div>
   </div>
@@ -196,9 +194,7 @@
   var frame = document.getElementById('moduleFrame');
   var paneTitle = document.getElementById('paneModuleTitle');
   var btnSave = document.getElementById('btnSave');
-  var btnSubmit = document.getElementById('btnSubmit');
   var btnSyncAll = document.getElementById('btnSyncAll');
-  var btnValidateSubmit = document.getElementById('btnValidateSubmit');
   var btnPhotoRecognize = document.getElementById('btnPhotoRecognize');
   var memoFab = document.getElementById('inspectMemoFab');
   var activeIdx = 0;
@@ -301,19 +297,6 @@
     return !!(mod && (mod.id === 'validate' || /ipad_inspect_validate/i.test(mod.src || '')));
   }
 
-  function syncValidateSubmitState() {
-    if (!btnValidateSubmit || !frame) return;
-    var canSubmit = false;
-    try {
-      var doc = frame.contentDocument;
-      if (doc) {
-        canSubmit = !doc.querySelector('.validate-card--fail, .validate-row--fail');
-      }
-    } catch (e) {}
-    btnValidateSubmit.disabled = !canSubmit;
-    btnValidateSubmit.setAttribute('aria-disabled', canSubmit ? 'false' : 'true');
-  }
-
   function updateHeaderActions(mod) {
     var syncMode = isSyncModule(mod);
     var validateMode = isValidateModule(mod);
@@ -324,9 +307,7 @@
     document.body.classList.toggle('ipad-validate-module-active', validateMode);
     document.body.classList.toggle('ipad-inspect-shell-tools-hidden', hideShellTools);
     if (btnSave) btnSave.hidden = hideDefaultActs;
-    if (btnSubmit) btnSubmit.hidden = hideDefaultActs;
     if (btnSyncAll) btnSyncAll.hidden = !syncMode;
-    if (btnValidateSubmit) btnValidateSubmit.hidden = !validateMode;
     if (btnPhotoRecognize) btnPhotoRecognize.hidden = hideShellTools || !!(meta && meta.noPhoto);
     if (memoFab && meta) memoFab.href = buildMemoHref(meta);
   }
@@ -342,9 +323,6 @@
     if (paneTitle) paneTitle.textContent = m.name;
     updateHeaderActions(m);
     if (frame) {
-      frame.onload = function () {
-        if (isValidateModule(m)) syncValidateSubmitState();
-      };
       frame.src = embedUrl(m.src);
     }
     var activeBtn = flatItems.filter(function (b) { return parseInt(b.getAttribute('data-idx'), 10) === idx; })[0];
@@ -383,21 +361,9 @@
       alert('已保存当前任务全部模块数据');
     });
   }
-  if (btnSubmit) {
-    btnSubmit.addEventListener('click', function () {
-      if (btnSubmit.disabled) return;
-      alert('提交成功后将生成 V1 并锁定');
-    });
-  }
   if (btnSyncAll) {
     btnSyncAll.addEventListener('click', function () {
       alert('开始同步待上传数据（原型演示）。');
-    });
-  }
-  if (btnValidateSubmit) {
-    btnValidateSubmit.addEventListener('click', function () {
-      if (btnValidateSubmit.disabled) return;
-      alert('确认提交成功后将生成 V1 并锁定（原型演示）。');
     });
   }
   if (btnPhotoRecognize) {

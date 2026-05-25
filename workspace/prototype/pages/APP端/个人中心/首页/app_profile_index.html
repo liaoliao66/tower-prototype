@@ -12,33 +12,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
 .menu-item { display:flex; align-items:center; padding:14px 16px; background:#fff; text-decoration:none; color:#1D2129; font-size:15px; }
 .menu-item:active { background:#F7F8FA; }
 .menu-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-right:12px; font-size:14px; }
-.nav-bar { height: 44px; display: flex; align-items: center; padding: 0 12px; background: #fff; border-bottom: 1px solid #E5E6EB; }
-.nav-bar .nav-back { color: #165DFF; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-.nav-bar .nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #1D2129; margin: 0; }
-.nav-bar .nav-spacer { width: 48px; flex-shrink: 0; }
+.profile-top { background: linear-gradient(135deg, #165DFF 0%, #4080FF 100%); color: #fff; }
+.profile-top .status-row {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 4px;
+}
+.profile-top .nav-back-icon {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.profile-top .status-time { font-size: 14px; font-weight: 600; margin-left: 4px; }
+.profile-top .status-spacer { flex: 1; }
+.profile-top .status-icons { font-size: 12px; opacity: 0.92; }
 </style>
 <script src="../../../../assets/app-menu-access-log.js" defer></script>
 </head>
 <body>
-<!-- Status bar -->
-<div style="height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 16px; background:#165DFF;">
-  <span style="font-size:14px; font-weight:600; color:#fff;">9:41</span>
-  <span style="font-size:12px; color:#fff;"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
-</div>
-
-<div class="nav-bar">
-  <a class="nav-back" href="../../工作台/首页/app_workbench_index.html" aria-label="返回工作台"><i class="fa-solid fa-chevron-left"></i> 返回</a>
-  <h1 class="nav-title">我的</h1>
-  <span class="nav-spacer" aria-hidden="true"></span>
-</div>
-
-<!-- User header -->
-<div style="background:linear-gradient(135deg, #165DFF 0%, #4080FF 100%); padding:24px 16px 32px; text-align:center; color:#fff;">
+<div class="profile-top">
+  <div class="status-row">
+    <a class="nav-back-icon" href="../../工作台/首页/app_workbench_index.html" aria-label="返回工作台"><i class="fa-solid fa-chevron-left"></i></a>
+    <span class="status-time">9:41</span>
+    <span class="status-spacer" aria-hidden="true"></span>
+    <span class="status-icons"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+  </div>
+  <div style="padding:24px 16px 32px; text-align:center;">
   <a href="app_profile_index.html" aria-label="我的" style="width:72px; height:72px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; border:3px solid rgba(255,255,255,0.4); text-decoration:none; color:#fff; -webkit-tap-highlight-color:transparent;">
     <i class="fa-solid fa-user" style="font-size:28px;"></i>
   </a>
   <div style="font-size:20px; font-weight:700; margin-bottom:4px;">李明</div>
   <div style="font-size:14px; opacity:0.85;">检测一组 · 检测工程师</div>
+  </div>
 </div>
 
 <!-- Content area -->

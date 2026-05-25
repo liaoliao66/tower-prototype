@@ -17,7 +17,7 @@
     <div class="card-body">
       <div class="toolbar">
         <div class="toolbar-left">
-          <input id="kw" class="form-input" placeholder="搜索铁塔编号/报告编号/检测人员">
+          <input id="kw" class="form-input" placeholder="搜索铁塔编号/报告编号/检测人员/编制人">
           <select id="statusFilter" class="form-select">
             <option value="">全部报告状态</option>
             <option value="待编制">待编制</option>
@@ -57,6 +57,7 @@
             <th>合同编号</th>
             <th>现场检测人员</th>
             <th>提交/更新时间</th>
+            <th>编制人</th>
             <th>报告状态</th>
             <th>审核状态</th>
             <th>审核节点</th>
@@ -82,14 +83,14 @@
   <div id="pcAuditModal" class="fixed inset-0 z-[2000] hidden items-center justify-center p-5" style="background:rgba(0,0,0,.45);display:none" aria-hidden="true">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
       <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-        <h3 id="pcAuditModalTitle" class="font-semibold text-slate-800">审批</h3>
+        <h3 id="pcAuditModalTitle" class="font-semibold text-slate-800">审核</h3>
         <button type="button" id="pcAuditModalClose" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-4">
         <p id="pcAuditModalSub" class="text-sm text-slate-600 mb-3 leading-relaxed"></p>
-        <label class="form-label">审批意见</label>
+        <label class="form-label">审核意见</label>
         <textarea id="pcAuditRemark" class="form-textarea w-full min-h-[72px] mt-1" placeholder="选填；驳回时建议填写原因"></textarea>
-        <a href="#" id="pcAuditGoDetail" class="btn-text text-xs mt-2 hidden"><i class="fa-solid fa-arrow-up-right-from-square"></i> 进入报告详情审批</a>
+        <a href="#" id="pcAuditGoDetail" class="btn-text text-xs mt-2 hidden"><i class="fa-solid fa-arrow-up-right-from-square"></i> 进入报告详情审核</a>
       </div>
       <div class="flex justify-end gap-2 px-4 py-3 border-t border-slate-200">
         <button type="button" class="btn btn-default" id="pcAuditCancel">取消</button>
@@ -170,7 +171,14 @@
       else if (s === '已通过') { r.status = '已出报告'; if (!r.auditStep) r.auditStep = '已完成'; }
       else if (s === '已驳回') { r.status = '编制中'; r.auditStatus = '已驳回'; }
       deriveAuditFields(r);
+      if (r.compiler === undefined || r.compiler === null || String(r.compiler).trim() === '') {
+        r.compiler = '—';
+      }
       return r;
+    }
+
+    function compilerDisplay(r) {
+      return (r.compiler != null && String(r.compiler).trim() !== '') ? String(r.compiler).trim() : '—';
     }
 
     function migrateAllReports(list) {
@@ -189,11 +197,11 @@
       const raw = localStorage.getItem(REPORT_KEY);
       if (raw) return;
       const seed = [
-        { id:'R1', reportNo:'BG202605001', towerCode:'TT-BJ-001', towerName:'滨江01#塔', inspectType:'安全性鉴定', contractNo:'HT2026-001', inspector:'李明', submitTime:'2026-05-10 09:00', inspectDate:'2026-05-04', status:'待编制', taskId:'RW202605001', rejectReason:'', auditStep:'', auditStatus:'未涉及', auditNode:'—', auditor:'—', auditAt:'—', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' },
-        { id:'R2', reportNo:'BG202605002', towerCode:'TT-BJ-002', towerName:'滨江02#塔', inspectType:'常规检测', contractNo:'HT2026-002', inspector:'王强', submitTime:'2026-05-09 14:20', inspectDate:'2026-05-05', status:'待编制', taskId:'RW202605002', rejectReason:'', auditStep:'', auditStatus:'未涉及', auditNode:'—', auditor:'—', auditAt:'—', declareFailed:true, declareFailReason:'监管平台申报失败：签名证书过期', extraSign:false, sourceNote:'检毕自动生成' },
-        { id:'R3', reportNo:'BG202605003', towerCode:'TT-XH-001', towerName:'西湖01#塔', inspectType:'可靠性鉴定', contractNo:'HT2026-003', inspector:'张华', submitTime:'2026-05-08 16:30', inspectDate:'2026-05-06', status:'编制中', taskId:'RW202605003', rejectReason:'', auditStep:'', auditStatus:'未提交', auditNode:'未发起审核', auditor:'—', auditAt:'—', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' },
-        { id:'R4', reportNo:'BG202605004', towerCode:'TT-YH-001', towerName:'余杭01#塔', inspectType:'安全性鉴定', contractNo:'HT2026-004', inspector:'赵六', submitTime:'2026-05-08 18:00', inspectDate:'2026-05-07', status:'已编制', taskId:'RW202605004', rejectReason:'', auditStep:'待技术部门主管审核', auditStatus:'审核中', auditNode:'待技术部门主管审核', auditor:'—', auditAt:'—', declareFailed:false, extraSign:true, sourceNote:'检毕自动生成' },
-        { id:'R5', reportNo:'BG202605005', towerCode:'TT-XS-002', towerName:'萧山02#塔', inspectType:'常规检测', contractNo:'HT2026-005', inspector:'李明', submitTime:'2026-05-07 11:00', inspectDate:'2026-05-06', status:'已出报告', taskId:'RW202605005', rejectReason:'', auditStep:'已完成', auditStatus:'已通过', auditNode:'已完成', auditor:'李娜', auditAt:'2026-05-08 09:40', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' }
+        { id:'R1', reportNo:'BG202605001', towerCode:'TT-BJ-001', towerName:'滨江01#塔', inspectType:'安全性鉴定', contractNo:'HT2026-001', inspector:'李明', compiler:'—', submitTime:'2026-05-10 09:00', inspectDate:'2026-05-04', status:'待编制', taskId:'RW202605001', rejectReason:'', auditStep:'', auditStatus:'未涉及', auditNode:'—', auditor:'—', auditAt:'—', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' },
+        { id:'R2', reportNo:'BG202605002', towerCode:'TT-BJ-002', towerName:'滨江02#塔', inspectType:'常规检测', contractNo:'HT2026-002', inspector:'王强', compiler:'—', submitTime:'2026-05-09 14:20', inspectDate:'2026-05-05', status:'待编制', taskId:'RW202605002', rejectReason:'', auditStep:'', auditStatus:'未涉及', auditNode:'—', auditor:'—', auditAt:'—', declareFailed:true, declareFailReason:'监管平台申报失败：签名证书过期', extraSign:false, sourceNote:'检毕自动生成' },
+        { id:'R3', reportNo:'BG202605003', towerCode:'TT-XH-001', towerName:'西湖01#塔', inspectType:'可靠性鉴定', contractNo:'HT2026-003', inspector:'张华', compiler:'李明', submitTime:'2026-05-08 16:30', inspectDate:'2026-05-06', status:'编制中', taskId:'RW202605003', rejectReason:'', auditStep:'', auditStatus:'未提交', auditNode:'未发起审核', auditor:'—', auditAt:'—', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' },
+        { id:'R4', reportNo:'BG202605004', towerCode:'TT-YH-001', towerName:'余杭01#塔', inspectType:'安全性鉴定', contractNo:'HT2026-004', inspector:'赵六', compiler:'王强', submitTime:'2026-05-08 18:00', inspectDate:'2026-05-07', status:'已编制', taskId:'RW202605004', rejectReason:'', auditStep:'待技术部门主管审核', auditStatus:'审核中', auditNode:'待技术部门主管审核', auditor:'—', auditAt:'—', declareFailed:false, extraSign:true, sourceNote:'检毕自动生成' },
+        { id:'R5', reportNo:'BG202605005', towerCode:'TT-XS-002', towerName:'萧山02#塔', inspectType:'常规检测', contractNo:'HT2026-005', inspector:'李明', compiler:'张华', submitTime:'2026-05-07 11:00', inspectDate:'2026-05-06', status:'已出报告', taskId:'RW202605005', rejectReason:'', auditStep:'已完成', auditStatus:'已通过', auditNode:'已完成', auditor:'李娜', auditAt:'2026-05-08 09:40', declareFailed:false, extraSign:false, sourceNote:'检毕自动生成' }
       ];
       saveReports(seed);
     }
@@ -237,18 +245,15 @@
       const start = (currentPage - 1) * pageSize;
       const pageRows = filtered.slice(start, start + pageSize);
       tbody.innerHTML = pageRows.map(function (r) {
-        const canDelete = r.status === '编制中';
         const detailBtn = '<a href="report-detail.html?reportId=' + encodeURIComponent(r.id) + '" class="btn btn-text">查看详情</a>';
         const editBtn = (r.status === '待编制' || r.status === '编制中')
           ? '<a href="report-edit.html?reportId=' + encodeURIComponent(r.id) + '" class="btn btn-text">' + (r.status === '待编制' ? '发起编制' : '编辑') + '</a>'
           : '';
         const exportBtn = r.status === '已出报告' ? '<button class="btn btn-text btn-export" data-id="' + r.id + '">导出PDF</button>' : '';
-        const printBtn = r.status === '已出报告' ? '<button class="btn btn-text btn-print" data-id="' + r.id + '">打印</button>' : '';
         const problemSetBtn = r.status === '已出报告' ? '<button type="button" class="btn btn-text btn-problem-set" data-id="' + r.id + '">问题集</button>' : '';
-        const deleteBtn = '<button type="button" class="btn btn-text btn-report-delete" style="color:var(--danger)" data-id="' + r.id + '" data-delete-label="' + r.reportNo + ' / ' + r.towerName + '" data-can-delete="' + (canDelete ? '1' : '0') + '">删除</button>';
         const canAudit = r.auditStatus === '待审核' || r.auditStatus === '审核中';
         const auditBtn = canAudit
-          ? '<button type="button" class="btn btn-text btn-pc-audit" style="color:var(--primary)" data-title="' + r.reportNo + ' / ' + r.towerName + '" data-node="' + (r.auditNode || '') + '" data-auditor-default="周敏" data-href="report-detail.html?reportId=' + encodeURIComponent(r.id) + '"><i class="fa-solid fa-clipboard-check"></i> 审批</button>'
+          ? '<button type="button" class="btn btn-text btn-pc-audit" data-audit-kind="report" style="color:var(--primary)" data-title="' + r.reportNo + ' / ' + r.towerName + '" data-node="' + (r.auditNode || '') + '" data-auditor-default="周敏" data-href="report-detail.html?reportId=' + encodeURIComponent(r.id) + '"><i class="fa-solid fa-clipboard-check"></i> 审核</button>'
           : '';
         const stCell = tagHtml(r.status) + statusExtraTag(r);
         return '<tr data-report-id="' + r.id + '">' +
@@ -259,12 +264,13 @@
           '<td>' + r.contractNo + '</td>' +
           '<td>' + r.inspector + '</td>' +
           '<td>' + r.submitTime + '</td>' +
+          '<td>' + compilerDisplay(r) + '</td>' +
           '<td>' + stCell + '</td>' +
           '<td data-audit-col>' + auditStatusTag(r.auditStatus) + '</td>' +
           '<td data-audit-col style="font-size:12px;color:var(--text-2);max-width:140px;">' + (r.auditNode || '—') + '</td>' +
           '<td data-audit-col>' + (r.auditor || '—') + '</td>' +
           '<td data-audit-col style="font-size:12px;white-space:nowrap;">' + (r.auditAt || '—') + '</td>' +
-          '<td class="col-action">' + auditBtn + detailBtn + editBtn + exportBtn + printBtn + problemSetBtn + deleteBtn + '</td>' +
+          '<td class="col-action">' + auditBtn + detailBtn + editBtn + exportBtn + problemSetBtn + '</td>' +
           '</tr>';
       }).join('');
 
@@ -282,7 +288,7 @@
       const startDate = (document.getElementById('startDate').value || '').trim();
       const endDate = (document.getElementById('endDate').value || '').trim();
       filtered = allData.filter(function (r) {
-        const matchesKw = !kw || [r.towerCode, r.reportNo, r.inspector].join('|').toLowerCase().indexOf(kw) > -1;
+        const matchesKw = !kw || [r.towerCode, r.reportNo, r.inspector, r.compiler].join('|').toLowerCase().indexOf(kw) > -1;
         const matchesStatus = !status || r.status === status;
         const matchesAudit = !auditStatus || r.auditStatus === auditStatus;
         const d = (r.inspectDate || '').trim();
@@ -359,34 +365,15 @@
         const target = e.target;
         if (!(target instanceof Element)) return;
         const exportBtn = target.closest('.btn-export');
-        const printBtn = target.closest('.btn-print');
-        const deleteBtn = target.closest('.btn-report-delete');
         const problemSetBtn = target.closest('.btn-problem-set');
         if (exportBtn) {
           alert('报告已导出 PDF');
-        }
-        if (printBtn) {
-          alert('报告已发送打印');
         }
         if (problemSetBtn) {
           const id = problemSetBtn.getAttribute('data-id');
           const row = allData.find(function (r) { return r.id === id; });
           if (!row || row.status !== '已出报告') return;
           window.location.href = 'report-detail.html?reportId=' + encodeURIComponent(id);
-        }
-        if (deleteBtn) {
-          const id = deleteBtn.getAttribute('data-id');
-          const row = allData.find(function (r) { return r.id === id; });
-          const label = deleteBtn.getAttribute('data-delete-label') || (row ? row.reportNo : id);
-          if (!row) return;
-          if (deleteBtn.getAttribute('data-can-delete') !== '1') {
-            return alert('仅「编制中」状态的报告草稿可删除；已出报告或审核中的记录不可删除。');
-          }
-          if (!confirm('确定要删除「' + label + '」吗？删除后不可恢复。')) return;
-          allData = allData.filter(function (r) { return r.id !== id; });
-          saveReports(allData);
-          applyFilters();
-          alert('已删除（原型）');
         }
       });
     }

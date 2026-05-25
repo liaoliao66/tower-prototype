@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>消息模板配置 - 通信铁塔检测系统</title>
+<title>消息模板 - 通信铁塔检测系统</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../../assets/pc-layout.css">
@@ -11,8 +11,12 @@
 <body>
 <div id="page-content">
   <div class="card">
-    <div class="card-header"><div class="card-title">消息模板配置</div></div>
+    <div class="card-header"><div class="card-title">消息模板</div></div>
     <div class="card-body">
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5">
+        <i class="fa-solid fa-circle-info"></i>
+        「对上合同-收款/付款提醒」「对下合同-付款提醒」需在编辑页配置<strong>消息接收人员</strong>，到期后仅向已配置人员推送至消息中心（不进待办）。
+      </p>
       <div class="toolbar">
         <div class="toolbar-left">
           <input type="text" class="form-input" placeholder="模板名称/场景" style="width:200px">
@@ -40,6 +44,7 @@
             <th style="width:200px">场景</th>
             <th>模板名称</th>
             <th style="width:120px">触发配置</th>
+            <th style="width:200px">消息接收人员</th>
             <th style="width:88px">状态</th>
             <th style="width:100px">更新人</th>
             <th style="width:160px">更新时间</th>
@@ -51,6 +56,7 @@
             <td><span class="tag tag-blue">对上合同-收款提醒</span></td>
             <td>对上收款提醒-默认</td>
             <td>按提醒行时间</td>
+            <td><span class="tag tag-blue" title="仅以下人员可收到">王敏、张伟、陈静</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>王敏</td>
             <td>2026-05-08 11:20</td>
@@ -63,6 +69,7 @@
             <td><span class="tag tag-orange">对上合同-付款提醒</span></td>
             <td>对上付款提醒-默认</td>
             <td>按提醒行时间</td>
+            <td><span class="tag tag-blue" title="仅以下人员可收到">王敏、刘洋、张伟</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>王敏</td>
             <td>2026-05-08 11:22</td>
@@ -75,6 +82,7 @@
             <td><span class="tag tag-purple">对下合同-付款提醒</span></td>
             <td>对下付款提醒-默认</td>
             <td>按提醒行时间</td>
+            <td><span class="tag tag-blue" title="仅以下人员可收到">刘洋、李娜、张伟</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>刘洋</td>
             <td>2026-05-10 09:05</td>
@@ -87,6 +95,7 @@
             <td><span class="tag tag-green">任务催办</span></td>
             <td>任务催办-默认</td>
             <td>发起催办时</td>
+            <td><span style="font-size:12px;color:var(--text-3)">按业务对象</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>李娜</td>
             <td>2026-05-12 14:00</td>
@@ -99,6 +108,7 @@
             <td><span class="tag tag-blue">任务转派</span></td>
             <td>任务转派-默认</td>
             <td>转派成功时</td>
+            <td><span style="font-size:12px;color:var(--text-3)">按业务对象</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>李娜</td>
             <td>2026-05-13 09:15</td>
@@ -111,6 +121,7 @@
             <td><span class="tag tag-red">任务截止提醒</span></td>
             <td>任务截止提醒-默认</td>
             <td>截止前 3 天</td>
+            <td><span style="font-size:12px;color:var(--text-3)">按任务检测人</span></td>
             <td><span class="tag tag-green">启用</span></td>
             <td>李娜</td>
             <td>2026-05-12 14:30</td>
@@ -126,7 +137,7 @@
 </div>
 <script src="../../../../assets/shared-layout.js"></script>
 <script>
-window.__layoutConfig = { active: 'message_template_list', breadcrumb: ['模板配置', '消息模板配置'] };
+window.__layoutConfig = { active: 'message_template_list', breadcrumb: ['模板配置', '消息模板'] };
 var PREVIEW = {
   CONTRACT_UP_RECEIPT_REMIND: '【收款提醒】杭州移动2026框架 · 首付款 将于 2026-02-01 到期',
   CONTRACT_UP_PAYMENT_REMIND: '【付款提醒】杭州移动2026框架 · 进度款',

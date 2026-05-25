@@ -25,10 +25,8 @@ const MENU = [
     {id:'report_generate', label:'报告编制', href:'../../铁塔检测业务/报告编制/report-list.html'},
   ]},
   { id:'ttjcpz', label:'模板配置', icon:'fa-sliders', items:[
-    {id:'message_template_list', label:'消息模板配置', href:'../../消息模板配置/消息模板管理/pc_message_template_list.html'},
-    {id:'task_template_list', label:'任务模板管理', href:'../../任务模板配置/任务模板管理/pc_task_template_list.html'},
-    {id:'report_template_list', label:'报告模板管理', href:'../../报告模板配置/报告模板管理/pc_report_template_list.html'},
-    {id:'report_rating_level', label:'评定等级管理', href:'../../报告模板配置/报告模板管理/pc_report_rating_level.html'},
+    {id:'inspect_template_list', label:'检测模板', href:'../../模板配置/检测模板/pc_inspect_template_list.html'},
+    {id:'message_template_list', label:'消息模板', href:'../../消息模板配置/消息模板管理/pc_message_template_list.html'},
   ]},
   { id:'jcsj', label:'基础数据', icon:'fa-database', items:[
     {id:'data_inspection_unit', label:'检测单位', href:'../../基础数据/检测单位/pc_data_inspection_unit.html'},

@@ -13,21 +13,17 @@
 
   <div class="card">
     <div class="card-body">
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5">
+        <i class="fa-solid fa-circle-info"></i> 本页仅展示<strong>审核通过</strong>的报告，供查阅、预览与下载；编制中、待审核等报告请在「报告编制 / 报告审核」中处理。
+      </p>
       <div class="toolbar">
         <div class="toolbar-left">
           <input type="text" class="form-input" placeholder="报告名称/编号" style="width:180px">
           <select class="form-select">
-            <option>全部检测类无</option>
-            <option>安全性鉴无</option>
-            <option>可靠性鉴无</option>
+            <option>全部检测类型</option>
+            <option>安全性鉴定</option>
+            <option>可靠性鉴定</option>
             <option>抗震鉴定</option>
-          </select>
-          <select class="form-select">
-            <option>全部状态</option>
-            <option>草稿</option>
-            <option>待审无</option>
-            <option>审核通过</option>
-            <option>已签无</option>
           </select>
           <button class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
           <button class="btn btn-default"><i class="fa-solid fa-rotate-right"></i> 重置</button>
@@ -46,7 +42,6 @@
             <th>关联订单</th>
             <th>检测类型</th>
             <th>编制</th>
-            <th style="width:80px">状态</th>
             <th style="width:110px">生成时间</th>
             <th class="col-action" style="width:200px">操作</th>
           </tr>
@@ -58,7 +53,6 @@
             <td>DD202605003</td>
             <td>安全性鉴定</td>
             <td>王强</td>
-            <td><span class="tag tag-green">已签</span></td>
             <td>2026-05-06</td>
             <td class="col-action">
               <button class="btn-text"><i class="fa-solid fa-eye"></i> 在线预览</button>
@@ -72,7 +66,6 @@
             <td>DD202605002</td>
             <td>可靠性鉴定</td>
             <td>李明</td>
-            <td><span class="tag tag-blue">审核通过</span></td>
             <td>2026-05-05</td>
             <td class="col-action">
               <button class="btn-text"><i class="fa-solid fa-eye"></i> 在线预览</button>
@@ -81,39 +74,11 @@
             </td>
           </tr>
           <tr>
-            <td>BG202605003</td>
-            <td>西湖区铁塔复检报告</td>
-            <td>DD202605009</td>
-            <td>安全性鉴定</td>
-            <td>张华</td>
-            <td><span class="tag tag-orange">待审核</span></td>
-            <td>2026-05-04</td>
-            <td class="col-action">
-              <button class="btn-text"><i class="fa-solid fa-eye"></i> 在线预览</button>
-              <button class="btn-text"><i class="fa-solid fa-file-pdf"></i> 下载PDF</button>
-              <button type="button" class="btn btn-text btn-row-delete" style="color:var(--danger)">删除</button>
-            </td>
-          </tr>
-          <tr>
-            <td>BG202605004</td>
-            <td>余杭12#角钢塔抗震鉴定报</td>
-            <td>DD202605004</td>
-            <td>抗震鉴定</td>
-            <td>李明</td>
-            <td><span class="tag tag-gray">草稿</span></td>
-            <td>2026-05-03</td>
-            <td class="col-action">
-              <button class="btn-text"><i class="fa-solid fa-eye"></i> 在线预览</button>
-              <button class="btn-text" style="color:var(--text-4);cursor:not-allowed"><i class="fa-solid fa-file-pdf"></i> 下载PDF</button>
-            </td>
-          </tr>
-          <tr>
             <td>BG202605005</td>
             <td>下沙02#三管塔安全性鉴定报</td>
             <td>DD202605006</td>
             <td>安全性鉴定</td>
             <td>王强</td>
-            <td><span class="tag tag-green">已签</span></td>
             <td>2026-05-02</td>
             <td class="col-action">
               <button class="btn-text"><i class="fa-solid fa-eye"></i> 在线预览</button>
@@ -125,7 +90,7 @@
       </table>
 
       <div class="pagination">
-        <span>共 56 条</span>
+        <span>共 3 条</span>
         <div class="pagination-btns">
           <button class="page-btn"><i class="fa-solid fa-chevron-left"></i></button>
           <button class="page-btn active">1</button>

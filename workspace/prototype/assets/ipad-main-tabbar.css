@@ -1,5 +1,5 @@
 /**
- * iPad 主流程 · 统一底部工作栏（工作台 / 检测 / 我的）
+ * iPad 主流程 · 原底部工作栏（工作台 / 检测 / 我的）已下线，保留样式供历史页兜底隐藏
  */
 
 /* 内嵌 flex 底栏（检测填报 / 个人中心 / 检测壳）— 横排贴底 */
@@ -130,4 +130,15 @@ body.ipad-adapt.ipad-inspect-shell-page .ipad-main-tabbar {
   position: static !important;
   flex-shrink: 0;
   box-shadow: none;
+}
+
+/* 主导航已移除：覆盖上文 display:flex 规则 */
+body.ipad-adapt .ipad-main-tabbar,
+body.ipad-adapt .ipad-global-tabbar,
+body.ipad-adapt nav#ipadMainTabBar,
+body.ipad-adapt .profile-tabbar {
+  display: none !important;
+}
+body.ipad-adapt.ipad-has-tabbar {
+  padding-bottom: 0 !important;
 }

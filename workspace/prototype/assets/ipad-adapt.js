@@ -9,32 +9,6 @@
 
     html.classList.add("ipad-env");
 
-    var fixedBottom = document.querySelector(
-      'div[style*="position:fixed"][style*="bottom:0"]'
-    );
-    if (!fixedBottom) {
-      var candidates = document.querySelectorAll('div[style*="position:fixed"]');
-      for (var i = 0; i < candidates.length; i++) {
-        var el = candidates[i];
-        var st = el.getAttribute("style") || "";
-        if (st.indexOf("bottom:0") !== -1 && el.querySelector("a")) {
-          fixedBottom = el;
-          break;
-        }
-      }
-    }
-    var tabNav =
-      document.querySelector(".ipad-main-tabbar") ||
-      document.querySelector(".profile-tabbar") ||
-      document.getElementById("ipadGlobalTabBar") ||
-      document.querySelector(".ipad-global-tabbar") ||
-      fixedBottom;
-    if (tabNav && tabNav.querySelectorAll("a").length >= 2) {
-      tabNav.id = tabNav.id || "ipadMainTabBar";
-      tabNav.classList.add("ipad-global-tabbar", "ipad-main-tabbar");
-      body.classList.add("ipad-has-tabbar");
-    }
-
     var path = (location.pathname || "").replace(/\\/g, "/");
     if (/ipad_login|登录/.test(document.title) || path.indexOf("ipad_login") !== -1) {
       body.classList.add("ipad-login-page");
@@ -62,14 +36,6 @@
       body.classList.add("ipad-portrait");
     } else {
       body.classList.add("ipad-landscape");
-    }
-
-    var needsMainTabbar =
-      tabNav ||
-      body.getAttribute("data-ipad-main-tabbar") === "auto" ||
-      /workbench_index|profile_index|inspect_shell|inspect_index|task_inspect_home/i.test(path);
-    if (needsMainTabbar && !body.classList.contains("ipad-login-page")) {
-      loadMainTabbarAssets();
     }
 
     if (body.classList.contains("inspect-app-layout")) {

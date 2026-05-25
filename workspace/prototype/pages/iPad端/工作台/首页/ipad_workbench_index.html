@@ -303,9 +303,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
 
 <div style="background:linear-gradient(135deg, #165DFF 0%, #4080FF 100%); padding:16px; color:#fff;">
   <div style="display:flex; align-items:center; gap:12px;">
-    <div style="width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center;">
+    <a href="../../个人中心/首页/ipad_profile_index.html" aria-label="我的" style="width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; text-decoration:none; color:#fff; flex-shrink:0; -webkit-tap-highlight-color:transparent;">
       <i class="fa-solid fa-user" style="font-size:20px;"></i>
-    </div>
+    </a>
     <div style="flex:1; min-width:0;">
       <div style="font-size:17px; font-weight:600;">李明</div>
       <div style="font-size:13px; opacity:0.8;">检测一组 · 检测工程师</div>
@@ -342,7 +342,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
       <button type="button" id="btnExport" style="border:none;background:none;color:#165DFF;font-size:13px;cursor:pointer;white-space:nowrap;"><i class="fa-solid fa-file-excel"></i> 导出</button>
     </div>
   </div>
-  <div id="listArea" style="padding:8px 16px 72px; overflow-y:auto; height:calc(100vh - 44px - 90px - 42px - 72px - 45px - 50px);">
+  <div id="listArea" style="padding:8px 16px 24px; overflow-y:auto; height:calc(100vh - 44px - 90px - 42px - 72px - 45px);">
 
     <div class="order-card" data-scope="todo" data-status="待检测" data-urged="1" data-deadline="2026-05-15" data-dispatch="2026-05-06" data-lat="30.2084" data-lng="120.2126" data-search="dd20260506001 滨江 滨江基站01 年检 单管 tt-bj 年度常规 王某某 120.2126 30.2084 2026-05-15 催办 催">
       <div class="order-card-inner">
@@ -595,12 +595,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
   </div>
 </div>
 
-<nav id="ipadMainTabBar" class="ipad-main-tabbar" aria-label="主导航">
-  <a href="ipad_workbench_index.html" class="is-active"><i class="fa-solid fa-house" aria-hidden="true"></i><span>工作台</span></a>
-  <a href="../../检测/ipad_detect_entry.html"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i><span>检测</span></a>
-  <a href="../../个人中心/首页/ipad_profile_index.html"><i class="fa-solid fa-user" aria-hidden="true"></i><span>我的</span></a>
-</nav>
-
 <script>
 var MSG_UNREAD_LS = 'tower_proto_msg_unread_count';
 
@@ -823,7 +817,7 @@ function openCalendarSheet() {
 
   window.syncListAreaHeight = function () {
     if (!listArea) return;
-    listArea.style.height = 'calc(100vh - 44px - 90px - 42px - 56px - 45px - 50px)';
+    listArea.style.height = 'calc(100vh - 44px - 90px - 42px - 56px - 45px)';
   };
 
   function refresh() {

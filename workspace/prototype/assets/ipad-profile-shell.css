@@ -7,14 +7,6 @@ body.ipad-profile-page {
   overflow: hidden;
 }
 body.ipad-profile-page {
-  display: flex;
-  flex-direction: column;
-  font-family: var(--ipad-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif);
-  background: var(--ipad-bg-page, #f2f3f5);
-  color: var(--ipad-text-1, #1d2129);
-}
-/* 个人中心：始终使用底部 Tab，勿套用 ipad-frame 左侧竖栏网格 */
-body.ipad-profile-page.ipad-has-tabbar {
   display: flex !important;
   flex-direction: column !important;
   grid-template-columns: unset !important;
@@ -23,15 +15,21 @@ body.ipad-profile-page.ipad-has-tabbar {
   max-height: 100% !important;
   overflow: hidden !important;
   padding-bottom: 0 !important;
+  font-family: var(--ipad-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif);
+  background: var(--ipad-bg-page, #f2f3f5);
+  color: var(--ipad-text-1, #1d2129);
 }
-body.ipad-profile-page.ipad-has-tabbar .page-status,
-body.ipad-profile-page.ipad-has-tabbar .profile-scroll {
+body.ipad-profile-page .page-status,
+body.ipad-profile-page .profile-scroll {
   grid-column: unset !important;
   grid-row: unset !important;
   width: 100% !important;
 }
 body.ipad-profile-page .profile-scroll {
-  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .page-status {
@@ -112,6 +110,10 @@ body.ipad-profile-page .profile-scroll {
   justify-content: center;
   font-size: 28px;
   flex-shrink: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
+  color: inherit;
 }
 .profile-hero-text { text-align: left; min-width: 0; }
 .profile-hero-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }

@@ -1,5 +1,5 @@
 /**
- * 列表行「审批」按钮 — 通用弹层（原型演示，不落库）
+ * 列表行「审核/审批」按钮 — 通用弹层（原型演示，不落库）
  * 页面需提供 #pcAuditModal，操作按钮 class 含 btn-pc-audit
  */
 (function () {
@@ -50,7 +50,9 @@
       row.dataset.auditStatus = '已通过';
       row.dataset.taskStatus = '检毕';
     }
-    var lines = [isDataAudit ? '【检测数据审核通过】' : '【审批通过】', '业务：' + (btn.getAttribute('data-title') || ''), '节点：' + node];
+    var isReportAudit = btn.getAttribute('data-audit-kind') === 'report';
+    var passLabel = isDataAudit ? '【检测数据审核通过】' : (isReportAudit ? '【审核通过】' : '【审批通过】');
+    var lines = [passLabel, '业务：' + (btn.getAttribute('data-title') || ''), '节点：' + node];
     if (remark) lines.push('意见：' + remark);
     if (isDataAudit) lines.push('', '任务将变为「检毕」，报告编制列表可生成草稿（原型演示）。');
     else lines.push('', '数据未落库（原型演示）。');
@@ -59,7 +61,7 @@
 
   function applyReject(btn, remark) {
     if (!remark || !String(remark).trim()) {
-      alert('驳回时请填写审批意见');
+      alert('驳回时请填写审核意见');
       return false;
     }
     var cells = findAuditCells(btn);
@@ -69,7 +71,9 @@
       cells.auditor.textContent = '当前用户';
       cells.time.textContent = nowText();
     }
-    alert('【审批驳回】\n' + (btn.getAttribute('data-title') || '') + '\n意见：' + remark + '\n\n数据未落库（原型演示）。');
+    var isReportAudit = btn.getAttribute('data-audit-kind') === 'report';
+    var rejectLabel = isReportAudit ? '【审核驳回】' : '【审批驳回】';
+    alert(rejectLabel + '\n' + (btn.getAttribute('data-title') || '') + '\n意见：' + remark + '\n\n数据未落库（原型演示）。');
     return true;
   }
 
@@ -101,8 +105,12 @@
 
     function open(btn) {
       activeBtn = btn;
-      var isDataAudit = btn.getAttribute('data-audit-kind') === 'inspect-data';
-      if (titleEl) titleEl.textContent = isDataAudit ? '检测数据审核' : '审批';
+      var kind = btn.getAttribute('data-audit-kind') || '';
+      var isDataAudit = kind === 'inspect-data';
+      var isReportAudit = kind === 'report';
+      if (titleEl) {
+        titleEl.textContent = isDataAudit ? '检测数据审核' : (isReportAudit ? '审核' : '审批');
+      }
       if (subEl) {
         var ver = btn.getAttribute('data-version') || '';
         subEl.innerHTML =
@@ -119,7 +127,9 @@
             href += (href.indexOf('?') >= 0 ? '&' : '?') + 'tab=review';
           }
           goDetail.href = href;
-          goDetail.textContent = isDataAudit ? '进入任务详情 · 数据复核' : '进入任务详情 / 数据复核';
+          goDetail.textContent = isDataAudit
+            ? '进入任务详情 · 数据复核'
+            : (isReportAudit ? '进入报告详情审核' : '进入任务详情 / 数据复核');
           goDetail.style.display = 'inline-flex';
         } else {
           goDetail.style.display = 'none';

@@ -562,7 +562,7 @@ body.ipad-task-split .inspect-module-frame {
 }
 
 /* 检测填报 · 左菜单 + 右 iframe：主区占满剩余高度 */
-body.ipad-adapt.ipad-task-page.ipad-has-tabbar .inspect-split-main {
+body.ipad-adapt.ipad-task-page .inspect-split-main {
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;

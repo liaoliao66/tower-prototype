@@ -14,6 +14,19 @@
 .var-table code { font-size:11px; color:var(--primary); }
 .btn-insert { font-size:11px; padding:2px 8px; margin:2px 4px 2px 0; }
 .offset-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.notify-personnel-wrap { margin-top:4px; padding:12px 14px; background:#F7F8FA; border:1px solid var(--border); border-radius:6px; }
+.personnel-chips { display:flex; flex-wrap:wrap; gap:8px; min-height:32px; align-items:center; }
+.personnel-chip {
+  display:inline-flex; align-items:center; gap:6px; padding:4px 10px;
+  background:#E8F3FF; color:#165DFF; border-radius:4px; font-size:13px; line-height:1.4;
+}
+.personnel-chip .dept { font-size:11px; color:#4E5969; font-weight:400; }
+.personnel-chip button {
+  border:none; background:transparent; color:#86909C; cursor:pointer; padding:0 2px; line-height:1;
+}
+.personnel-chip button:hover { color:#F53F3F; }
+.personnel-empty { font-size:13px; color:var(--text-3); }
+.personnel-add-row { display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -43,6 +56,19 @@
         <div class="form-group full">
           <label class="form-label">模板名称</label>
           <input type="text" class="form-input" id="fName" style="width:100%">
+        </div>
+        <div class="form-group full" id="notifyPersonnelWrap" style="display:none">
+          <label class="form-label">消息接收人员 <span class="required">*</span></label>
+          <div class="notify-personnel-wrap">
+            <p class="field-hint" style="margin:0 0 10px;font-size:12px;color:var(--text-3)">仅被配置的人员可收到本场景消息（写入其 PC / APP 消息中心）；未配置人员不会推送。</p>
+            <div class="personnel-chips" id="personnelChips"></div>
+            <div class="personnel-add-row">
+              <select class="form-select" id="personnelPicker" style="width:280px">
+                <option value="">从系统用户中选择…</option>
+              </select>
+              <button type="button" class="btn btn-default" id="btnAddPersonnel"><i class="fa-solid fa-plus"></i> 添加</button>
+            </div>
+          </div>
         </div>
         <div class="form-group full" id="deadlineConfigWrap" style="display:none">
           <label class="form-label">截止前提醒 <span class="required">*</span></label>
@@ -83,9 +109,19 @@
 </div>
 <script src="../../../../assets/shared-layout.js"></script>
 <script>
+var RECIPIENT_POOL = [
+  { id: 'u_wangmin', name: '王敏', dept: '合同部' },
+  { id: 'u_liuyang', name: '刘洋', dept: '合同部' },
+  { id: 'u_lina', name: '李娜', dept: '合同部' },
+  { id: 'u_zhangwei', name: '张伟', dept: '财务部' },
+  { id: 'u_chenjing', name: '陈静', dept: '财务部' },
+  { id: 'u_zhaolei', name: '赵磊', dept: '管理部' }
+];
+
 var SCENES = {
   CONTRACT_UP_RECEIPT_REMIND: {
-    label: '对上合同-收款提醒', msgType: '合同提醒',
+    label: '对上合同-收款提醒', msgType: '合同提醒', notifyPersonnel: true,
+    recipients: ['u_wangmin', 'u_zhangwei', 'u_chenjing'],
     name: '对上收款提醒-默认',
     title: '【收款提醒】{contractName} · {stageName} 将于 {remindTime} 到期',
     body: '合同 {contractCode} 含税金额 {contractAmountTax}，已累计收款 {cumulativeReceiptAmount}。请安排第 {stageName} 阶段收款。',
@@ -99,10 +135,11 @@ var SCENES = {
       { cn: '当前累计收款金额', key: '{cumulativeReceiptAmount}', desc: '已登记收款' },
       { cn: '当前累计付款金额', key: '{cumulativePaymentAmount}', desc: '已登记付款' }
     ],
-    hint: '到期后写入消息中心，类型「合同提醒」；不进待办。'
+    hint: '到期后按提醒行时间触发；仅「消息接收人员」可收到；写入消息中心，类型「合同提醒」；不进待办。'
   },
   CONTRACT_UP_PAYMENT_REMIND: {
-    label: '对上合同-付款提醒', msgType: '合同提醒',
+    label: '对上合同-付款提醒', msgType: '合同提醒', notifyPersonnel: true,
+    recipients: ['u_wangmin', 'u_liuyang', 'u_zhangwei'],
     name: '对上付款提醒-默认',
     title: '【付款提醒】{contractName} · {stageName}',
     body: '合同 {contractCode} 已累计付款 {cumulativePaymentAmount}，请关注 {stageName} 阶段付款安排。',
@@ -114,10 +151,11 @@ var SCENES = {
       { cn: '合同金额（含税）', key: '{contractAmountTax}', desc: '合同主档' },
       { cn: '当前累计付款金额', key: '{cumulativePaymentAmount}', desc: '已登记付款' }
     ],
-    hint: '到期后写入消息中心，类型「合同提醒」；不进待办。'
+    hint: '到期后按提醒行时间触发；仅「消息接收人员」可收到；写入消息中心，类型「合同提醒」；不进待办。'
   },
   CONTRACT_DOWN_PAYMENT_REMIND: {
-    label: '对下合同-付款提醒', msgType: '合同提醒',
+    label: '对下合同-付款提醒', msgType: '合同提醒', notifyPersonnel: true,
+    recipients: ['u_liuyang', 'u_lina', 'u_zhangwei'],
     name: '对下付款提醒-默认',
     title: '【对下付款提醒】{contractName} · {stageName}',
     body: '对下合同 {contractCode} 已累计付款 {cumulativePaymentAmount}，提醒时间 {remindTime}。',
@@ -128,7 +166,7 @@ var SCENES = {
       { cn: '提醒时间', key: '{remindTime}', desc: '提醒行' },
       { cn: '当前累计付款金额', key: '{cumulativePaymentAmount}', desc: '已登记付款' }
     ],
-    hint: '到期后写入消息中心，类型「合同提醒」；不进待办。'
+    hint: '到期后按提醒行时间触发；仅「消息接收人员」可收到；写入消息中心，类型「合同提醒」；不进待办。'
   },
   TASK_URGE: {
     label: '任务催办', msgType: '任务提醒',
@@ -171,6 +209,63 @@ var SCENES = {
 };
 
 var currentScene = null;
+var currentSceneKey = '';
+var selectedRecipientIds = [];
+
+function findRecipient(id) {
+  return RECIPIENT_POOL.find(function (u) { return u.id === id; });
+}
+
+function fillPersonnelPicker() {
+  var sel = document.getElementById('personnelPicker');
+  var opts = '<option value="">从系统用户中选择…</option>';
+  RECIPIENT_POOL.forEach(function (u) {
+    if (selectedRecipientIds.indexOf(u.id) >= 0) return;
+    opts += '<option value="' + u.id + '">' + u.name + '（' + u.dept + '）</option>';
+  });
+  sel.innerHTML = opts;
+}
+
+function renderPersonnelChips() {
+  var box = document.getElementById('personnelChips');
+  if (!selectedRecipientIds.length) {
+    box.innerHTML = '<span class="personnel-empty">尚未配置接收人员，请至少添加 1 人</span>';
+    return;
+  }
+  box.innerHTML = selectedRecipientIds.map(function (id) {
+    var u = findRecipient(id);
+    if (!u) return '';
+    return (
+      '<span class="personnel-chip" data-id="' + id + '">' +
+      '<span>' + u.name + '<span class="dept"> · ' + u.dept + '</span></span>' +
+      '<button type="button" title="移除" aria-label="移除 ' + u.name + '"><i class="fa-solid fa-xmark"></i></button>' +
+      '</span>'
+    );
+  }).join('');
+  box.querySelectorAll('.personnel-chip button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var chip = btn.closest('.personnel-chip');
+      var rid = chip && chip.getAttribute('data-id');
+      if (!rid) return;
+      selectedRecipientIds = selectedRecipientIds.filter(function (x) { return x !== rid; });
+      renderPersonnelChips();
+      fillPersonnelPicker();
+    });
+  });
+}
+
+function setRecipients(ids) {
+  selectedRecipientIds = (ids || []).slice();
+  renderPersonnelChips();
+  fillPersonnelPicker();
+}
+
+function recipientNamesText() {
+  return selectedRecipientIds.map(function (id) {
+    var u = findRecipient(id);
+    return u ? u.name : '';
+  }).filter(Boolean).join('、');
+}
 
 function renderVarTable(vars) {
   document.getElementById('varTableBody').innerHTML = vars.map(function (v) {
@@ -198,6 +293,7 @@ function mkBtns(containerId, targetId, vars) {
 function applyScene(sceneKey) {
   var s = SCENES[sceneKey] || SCENES.CONTRACT_UP_RECEIPT_REMIND;
   currentScene = s;
+  currentSceneKey = sceneKey;
   document.getElementById('fSceneLabel').value = s.label;
   document.getElementById('fSceneCode').value = sceneKey;
   document.getElementById('fName').value = s.name;
@@ -205,6 +301,12 @@ function applyScene(sceneKey) {
   document.getElementById('fBody').value = s.body;
   document.getElementById('sceneHint').textContent = s.hint || '';
   document.getElementById('deadlineConfigWrap').style.display = sceneKey === 'TASK_DEADLINE_REMIND' ? 'block' : 'none';
+  document.getElementById('notifyPersonnelWrap').style.display = s.notifyPersonnel ? 'block' : 'none';
+  if (s.notifyPersonnel) {
+    setRecipients(s.recipients || []);
+  } else {
+    selectedRecipientIds = [];
+  }
   if (sceneKey === 'TASK_DEADLINE_REMIND') {
     document.getElementById('fOffsetValue').value = s.offsetValue != null ? s.offsetValue : 3;
     document.getElementById('fOffsetUnit').value = s.offsetUnit || 'day';
@@ -245,16 +347,30 @@ function previewText() {
   return { title: title, body: body };
 }
 
-window.__layoutConfig = { active: 'message_template_list', breadcrumb: ['模板配置', '消息模板配置', '编辑'] };
+window.__layoutConfig = { active: 'message_template_list', breadcrumb: ['模板配置', '消息模板', '编辑'] };
 window.addEventListener('DOMContentLoaded', function () {
   var sceneKey = (new URLSearchParams(location.search).get('scene') || 'CONTRACT_UP_RECEIPT_REMIND').trim();
   applyScene(sceneKey);
 
+  document.getElementById('btnAddPersonnel').addEventListener('click', function () {
+    var sel = document.getElementById('personnelPicker');
+    var id = sel.value;
+    if (!id) { alert('请选择要添加的人员'); return; }
+    if (selectedRecipientIds.indexOf(id) >= 0) return;
+    selectedRecipientIds.push(id);
+    sel.value = '';
+    renderPersonnelChips();
+    fillPersonnelPicker();
+  });
+
   document.getElementById('btnPreview').addEventListener('click', function () {
     var p = previewText();
     var extra = '';
+    if (currentScene && currentScene.notifyPersonnel) {
+      extra = '\n\n【接收人员】' + (recipientNamesText() || '（未配置，将不推送）');
+    }
     if (sceneKey === 'TASK_DEADLINE_REMIND') {
-      extra = '\n\n【触发配置】截止前提前 ' + offsetDesc();
+      extra += '\n\n【触发配置】截止前提前 ' + offsetDesc();
     }
     alert('标题：' + p.title + '\n\n正文：' + p.body + extra);
   });
@@ -264,7 +380,14 @@ window.addEventListener('DOMContentLoaded', function () {
       var v = Number(document.getElementById('fOffsetValue').value);
       if (!v || v < 1) { alert('请填写有效的提前提醒时长'); return; }
     }
-    alert('模板已保存（原型）');
+    if (currentScene && currentScene.notifyPersonnel && !selectedRecipientIds.length) {
+      alert('请至少配置 1 名消息接收人员');
+      return;
+    }
+    if (currentScene && currentScene.notifyPersonnel) {
+      currentScene.recipients = selectedRecipientIds.slice();
+    }
+    alert('模板已保存（原型）\n接收人员：' + (recipientNamesText() || '—'));
   });
 });
 </script>

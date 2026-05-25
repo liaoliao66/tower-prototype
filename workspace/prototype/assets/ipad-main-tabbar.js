@@ -305,6 +305,8 @@
 
 
   function run() {
+    /* 主流程已移除底部「工作台 / 检测 / 我的」Tab，入口改由顶栏头像进入个人中心 */
+    return;
 
     var body = document.body;
 

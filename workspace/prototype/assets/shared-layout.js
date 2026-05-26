@@ -103,6 +103,15 @@ function initLayout(config) {
   const content = document.getElementById('page-content');
   if (!content) return;
   if (config && config.skipLayout) return;
+  // 嵌入模式（在父页 iframe 中渲染）：跳过侧边栏/顶部导航，只显示页面内容
+  try {
+    var sp = new URLSearchParams(window.location.search);
+    if (sp.get('embed') === '1') {
+      document.documentElement.classList.add('pc-embed');
+      document.body.classList.add('pc-embed');
+      return;
+    }
+  } catch (_e) {}
   const bc = config.breadcrumb || [];
   // 先整体移出 #page-content，再清空 body，避免用 innerHTML 序列化/重插导致页内脚本已绑定的监听器全部失效
   content.remove();

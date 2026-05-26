@@ -92,6 +92,11 @@ body {
 }
 /* Content */
 .page-content { padding: 20px 24px; flex: 1; }
+/* 嵌入模式（父页 iframe 内）：去掉框架，仅显示 #page-content；并压缩内边距 */
+html.pc-embed { background: #fff; }
+html.pc-embed body { background: #fff; }
+html.pc-embed #page-content { padding: 12px 14px; }
+html.pc-embed .pc-embed-hide { display: none !important; }
 .page-header { margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
 .page-title { font-size: 18px; font-weight: 600; color: var(--text-1); }
 /* Cards */

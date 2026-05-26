@@ -10,6 +10,14 @@
 <style>
   /* 方案 A：顶栏固定 + 左侧双级导航 + 右侧单面板 */
   .entry-shell { display: flex; flex-direction: column; gap: 0; min-height: calc(100vh - 120px); }
+  /* 嵌入模式（详情页 iframe 内）：去除顶栏后 entry-shell 应填满 iframe，避免底部留白 */
+  html.pc-embed body { min-height: 100vh; }
+  html.pc-embed #page-content { padding: 0 !important; min-height: 100vh; }
+  html.pc-embed .entry-shell { min-height: 100vh; padding: 10px 14px 14px; box-sizing: border-box; }
+  html.pc-embed .entry-toolbar { margin-bottom: 10px; padding: 8px 14px 10px; box-shadow: none; }
+  html.pc-embed .entry-toolbar-row--actions { padding-top: 10px; }
+  html.pc-embed .entry-nav { max-height: calc(100vh - 150px); }
+  html.pc-embed .entry-main { max-height: calc(100vh - 150px); }
   .entry-toolbar {
     position: sticky; top: 0; z-index: 20;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px;
@@ -137,14 +145,14 @@
   <div id="versionReadonlyBanner" style="display:none;margin-bottom:12px;padding:10px 14px;font-size:13px;color:var(--text-2);background:#F0F5FF;border:1px solid #BEDAFF;border-radius:6px;line-height:1.55">
     <i class="fa-solid fa-clock-rotate-left" style="color:var(--primary)"></i>
     <span id="versionReadonlyBannerText"></span>
-    <a href="#" id="versionReadonlyBack" class="btn-text" style="margin-left:10px">返回记录版本</a>
+    <a href="#" id="versionReadonlyBack" class="btn-text" style="margin-left:10px">返回检测记录</a>
   </div>
 
   <div class="entry-toolbar">
     <div class="entry-toolbar-row entry-toolbar-row--head">
       <div class="tb-left">
-        <a href="../检测任务/pc_task_list.html" class="btn btn-default btn-sm"><i class="fa-solid fa-arrow-left"></i> 返回任务</a>
-        <span style="font-size:16px;font-weight:600;color:var(--text-1);">检测数据录入</span>
+        <a href="../检测任务/pc_task_list.html" class="btn btn-default btn-sm pc-embed-hide"><i class="fa-solid fa-arrow-left"></i> 返回任务</a>
+        <span style="font-size:16px;font-weight:600;color:var(--text-1);" class="pc-embed-hide">检测数据录入</span>
       </div>
       <div class="tb-mid" id="saveStatusLine">
         <strong>DD-202605-T001</strong> · TT-BJ-001 滨江01#单管 · <span id="lastSavedText">尚未保存</span>
@@ -497,6 +505,8 @@ function initTaskDataEntry() {
   var viewTaskId = urlParams.get('task') || '';
   var viewVersion = urlParams.get('version') || '';
   var isVersionReadonly = urlParams.get('readonly') === '1' && viewVersion;
+  // 详情页「检测数据」页签内嵌：只读锁定，但不展示版本横幅
+  var isLockedView = urlParams.get('lock') === '1';
   var VERSION_SNAPSHOTS = {
     V1: { towerHeight: '42.3', conclusion: '未见明显异常' },
     V2: { towerHeight: '42.5', conclusion: '未见明显损伤' },
@@ -515,21 +525,41 @@ function initTaskDataEntry() {
     if (backVer && viewTaskId) {
       backVer.href = '../检测任务/pc_task_version_history.html?task=' + encodeURIComponent(viewTaskId);
     }
-    document.querySelectorAll('#btnValidate,#btnDraft,#btnSave,#btnSubmit,#btnAddSegment,#btnRemoveSegment').forEach(function (el) {
-      if (el) el.style.display = 'none';
-    });
     var hEl = document.getElementById('readonlyTowerHeightM');
     if (hEl) hEl.textContent = snap.towerHeight + ' m';
     var saveLine = document.getElementById('saveStatusLine');
     if (saveLine && viewTaskId) {
       saveLine.innerHTML = '<strong>' + viewTaskId + '</strong> · ' + viewVersion + ' 历史快照 · <span style="color:var(--warning)">只读</span>';
     }
+  }
+
+  if (isVersionReadonly || isLockedView) {
+    // 锁定数据：隐藏写操作类按钮 + 把所有输入/选择置只读
+    var hideSelectors = [
+      '#btnValidate', '#btnDraft', '#btnSave', '#btnSubmit',
+      '#btnAddSegment', '#btnRemoveSegment',
+      '#btnFillFromArchive', '#btnPcModuleMemo',
+      '.btn-fill-demo', '.btn-clear-panel', '.btn-copy-prev',
+      '.tb-pc-mod-boundary',
+      '.panel-tools', '.upload-wrap'
+    ];
+    document.querySelectorAll(hideSelectors.join(',')).forEach(function (el) {
+      if (el) el.style.display = 'none';
+    });
+    var lockSaveLine = document.getElementById('saveStatusLine');
+    if (isLockedView && lockSaveLine && !isVersionReadonly) {
+      lockSaveLine.innerHTML = '<i class="fa-solid fa-lock" style="margin-right:6px;color:var(--warning)"></i>查看模式：检测数据已锁定，仅供查看不可修改。';
+    }
     if (main) {
       main.querySelectorAll('input.form-input:not([readonly]), textarea.form-textarea, select.form-select').forEach(function (el) {
         el.setAttribute('readonly', 'readonly');
-        el.setAttribute('disabled', 'disabled');
+        if (el.tagName === 'SELECT') el.setAttribute('disabled', 'disabled');
         el.style.background = '#F7F8FA';
         el.style.pointerEvents = 'none';
+      });
+      main.querySelectorAll('input[type="number"], input[type="text"]').forEach(function (el) {
+        el.setAttribute('readonly', 'readonly');
+        el.style.background = '#F7F8FA';
       });
     }
   }

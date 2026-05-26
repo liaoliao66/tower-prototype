@@ -8,13 +8,20 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../../assets/pc-layout.css">
 <style>
-  .detail-tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:16px; }
+  .detail-tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:16px; flex-wrap:wrap; }
   .detail-tabs button {
     padding:10px 18px; font-size:14px; border:none; background:transparent; color:var(--text-2);
     cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; font-family:inherit;
+    display:inline-flex; align-items:center; gap:6px;
   }
   .detail-tabs button:hover { color:var(--primary); }
   .detail-tabs button.active { color:var(--primary); font-weight:600; border-bottom-color:var(--primary); }
+  .detail-tabs .tab-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:18px; height:18px; padding:0 6px; border-radius:9px;
+    background:#FFECE8; color:#F53F3F; font-size:11px; font-weight:600; line-height:1;
+  }
+  .detail-tabs button.active .tab-badge { background:#E8F3FF; color:var(--primary); }
   .tab-panel { display:none; }
   .tab-panel.active { display:block; }
   .kv-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 20px; }
@@ -29,6 +36,19 @@
   .empty-hint { font-size:13px; color:var(--text-3); margin:0; line-height:1.6; }
   .card + .card { margin-top: 14px; }
   .card-head-row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  /* 检测数据内嵌区：直接平铺录入页 */
+  #panel-data { margin: -4px -2px 0; }
+  .data-embed-wrap {
+    border:1px solid var(--border); border-radius:6px; overflow:hidden;
+    background:#fff; height:calc(100vh - 220px); min-height:520px; display:flex; flex-direction:column;
+  }
+  .data-embed-frame { flex:1; width:100%; border:none; background:#fff; min-height:0; display:block; }
+  .data-embed-empty {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    padding:36px 20px; background:#fff; text-align:center;
+  }
+  .data-embed-empty .ee-inner { max-width:420px; color:var(--text-2); font-size:13px; line-height:1.7; }
+  .data-embed-empty .ee-icon { font-size:32px; color:#C9CDD4; margin-bottom:12px; }
 </style>
 </head>
 <body>
@@ -37,7 +57,6 @@
   <div style="margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
     <a href="pc_task_list.html" id="linkBackList" class="btn btn-default btn-sm"><i class="fa-solid fa-arrow-left"></i> 返回检测任务</a>
     <a href="#" id="linkDataEntry" class="btn btn-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> 录入数据</a>
-    <a href="#" id="linkVersions" class="btn btn-default btn-sm" style="display:none"><i class="fa-solid fa-clock-rotate-left"></i> 记录版本</a>
   </div>
 
   <div class="card">
@@ -47,8 +66,8 @@
     <div class="card-body">
 
       <div class="detail-tabs" id="detailTabs" role="tablist">
-        <button type="button" class="active" data-tab="overview" role="tab">总览</button>
-        <button type="button" data-tab="review" id="tabReviewBtn" role="tab" style="display:none">数据复核</button>
+        <button type="button" class="active" data-tab="overview" role="tab"><i class="fa-solid fa-circle-info"></i> 基础信息</button>
+        <button type="button" data-tab="data" role="tab"><i class="fa-solid fa-database"></i> 检测数据</button>
       </div>
 
       <div id="panel-overview" class="tab-panel active" role="tabpanel">
@@ -59,82 +78,29 @@
 
         <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
           <div class="card-header card-head-row">
-            <div class="card-title" style="font-size:14px">审核信息</div>
-            <button type="button" class="btn btn-primary btn-sm" id="taskAuditBtn" style="display:none"><i class="fa-solid fa-clipboard-check"></i> 办理审核</button>
-          </div>
-          <div class="card-body">
-            <p class="empty-hint" style="margin:0 0 10px">检测数据提交后的技术审核进度；改数与版本追溯见「数据复核」与「记录版本」。</p>
-            <div class="kv-grid kv-3" id="auditKv"></div>
-          </div>
-        </div>
-
-        <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
-          <div class="card-header card-head-row">
             <div class="card-title" style="font-size:14px">关联订单</div>
             <a href="#" id="linkOrderDetail" class="btn btn-text btn-sm" rel="noopener">查看订单详情 <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
           </div>
           <div class="card-body"><div class="kv-grid kv-3" id="orderKv"></div></div>
         </div>
 
-        <div class="card" style="box-shadow:none;border:1px solid var(--border);margin-bottom:14px">
+        <div class="card" style="box-shadow:none;border:1px solid var(--border)">
           <div class="card-header"><div class="card-title" style="font-size:14px">拒绝 / 催办 / 转派记录</div></div>
           <div class="card-body" id="collabLogsWrap"></div>
         </div>
-
-        <div class="card" style="box-shadow:none;border:1px solid var(--border)">
-          <div class="card-header card-head-row">
-            <div class="card-title" style="font-size:14px">最新检测录入数据</div>
-            <span class="text-muted" style="font-size:12px;color:var(--text-3)" id="entryMeta"></span>
-          </div>
-          <div class="card-body" id="latestEntryWrap"></div>
-        </div>
       </div>
 
-      <div id="panel-review" class="tab-panel" role="tabpanel">
-        <div class="form-grid" style="max-width:720px">
-          <div class="form-group">
-            <label class="form-label">塔体总高（m）</label>
-            <input type="text" class="form-input" id="revHeight" value="42.5" style="width:100%">
-          </div>
-          <div class="form-group">
-            <label class="form-label">外观结论</label>
-            <input type="text" class="form-input" id="revLook" value="未见明显损伤" style="width:100%">
-          </div>
-          <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">审核意见（选填）</label>
-            <textarea class="form-textarea" id="revComment" placeholder="填写后随修订版本一并存档"></textarea>
-          </div>
-        </div>
-        <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
-          <button type="button" class="btn btn-primary" id="btnSaveReview"><i class="fa-solid fa-floppy-disk"></i> 保存修订（追加版本）</button>
-          <a href="#" id="linkVersions2" class="btn btn-default" style="display:none"><i class="fa-solid fa-list-ol"></i> 查看版本列表</a>
+      <div id="panel-data" class="tab-panel" role="tabpanel">
+        <div class="data-embed-wrap" id="dataEmbedWrap">
+          <iframe id="dataEmbedFrame" class="data-embed-frame" title="检测数据（只读）" src="about:blank" loading="lazy"></iframe>
         </div>
       </div>
 
     </div>
   </div>
 
-  <div class="modal-mask" id="pcAuditModal" aria-hidden="true">
-    <div class="modal-box">
-      <div class="modal-hd">
-        <h3 id="pcAuditModalTitle">检测数据审核</h3>
-        <button type="button" class="modal-close" id="pcAuditModalClose">&times;</button>
-      </div>
-      <div class="modal-bd">
-        <p id="pcAuditModalSub" style="font-size:13px;color:var(--text-2);margin:0 0 14px;line-height:1.55"></p>
-        <textarea class="form-textarea" id="pcAuditRemark" placeholder="审批意见（驳回时必填）"></textarea>
-        <a href="#" id="pcAuditGoDetail" class="btn-text" style="font-size:12px;margin-top:10px;display:none">进入数据复核</a>
-      </div>
-      <div class="modal-ft">
-        <button type="button" class="btn btn-default" id="pcAuditCancel">取消</button>
-        <button type="button" class="btn btn-default" id="pcAuditReject" style="color:var(--danger)">驳回</button>
-        <button type="button" class="btn btn-primary" id="pcAuditPass">通过</button>
-      </div>
-    </div>
-  </div>
 </div>
 <script src="../../../../assets/shared-layout.js"></script>
-<script src="../../../../assets/pc-audit-action.js"></script>
 <script>window.__layoutConfig = {active:'task_list', breadcrumb:['检测管理','检测任务','任务详情']};</script>
 <script>
 (function () {
@@ -403,7 +369,10 @@
 
   document.getElementById('pageTitle').textContent = d.title;
 
-  var dataEntryHref = DATA_ENTRY + (d.latestEntry && d.latestEntry.dataEntryHash ? d.latestEntry.dataEntryHash : '#tower-spec');
+  var dataEntryHash = (d.latestEntry && d.latestEntry.dataEntryHash) || '#tower-spec';
+  var dataEntryHref = DATA_ENTRY + '?task=' + encodeURIComponent(taskId) + dataEntryHash;
+  // 内嵌锁定模式：embed=1 去掉录入页自身的侧栏/顶栏，lock=1 把全部输入锁定为只读
+  var dataEntryEmbedHref = DATA_ENTRY + '?task=' + encodeURIComponent(taskId) + '&embed=1&lock=1' + dataEntryHash;
   var orderHref = ORDER_DETAIL_BASE + '?code=' + encodeURIComponent(d.order.code);
 
   document.getElementById('linkDataEntry').href = dataEntryHref;
@@ -423,44 +392,12 @@
     ['当前数据版本', d.dataVersion]
   ]);
 
-  (function () {
-    var auditEl = document.getElementById('auditKv');
-    var rows = [
-      ['审核状态', d.auditStatus || '—'],
-      ['审核节点', d.auditNode || '—'],
-      ['审核人', d.auditor || '—'],
-      ['审核时间', d.auditAt || '—']
-    ];
-    auditEl.innerHTML = rows.map(function (r) {
-      return '<div class="kv-item"><b>' + esc(r[0]) + '</b><span data-audit-col>' + esc(r[1]) + '</span></div>';
-    }).join('');
-    var tBtn = document.getElementById('taskAuditBtn');
-    if (tBtn) {
-      var pending = d.auditStatus === '待审核' || d.auditStatus === '审核中';
-      tBtn.style.display = pending ? 'inline-flex' : 'none';
-      if (pending) {
-        tBtn.className = 'btn btn-primary btn-sm btn-pc-audit';
-        tBtn.setAttribute('data-title', taskId + ' · ' + d.taskName);
-        tBtn.setAttribute('data-node', d.auditNode || '—');
-        tBtn.setAttribute('data-auditor-default', '周敏');
-        tBtn.setAttribute('data-audit-kind', 'inspect-data');
-        tBtn.setAttribute('data-version', (d.dataVersion || 'V1').replace(/（.*$/, '').trim());
-        tBtn.setAttribute('data-href', 'pc_task_detail.html?id=' + encodeURIComponent(taskId) + '&tab=review');
-      }
-    }
-  })();
-
-  var fromAudit = params.get('from') === 'audit' || params.get('tab') === 'audit';
+  var fromAudit = params.get('from') === 'audit';
   var backList = document.getElementById('linkBackList');
   if (backList) {
     backList.href = fromAudit ? 'pc_task_list.html?tab=audit' : 'pc_task_list.html';
     if (fromAudit) backList.innerHTML = '<i class="fa-solid fa-arrow-left"></i> 返回待我审核';
   }
-  if (params.get('tab') === 'review' && d.review) {
-    var reviewBtn = document.getElementById('tabReviewBtn');
-    if (reviewBtn) reviewBtn.click();
-  }
-
   renderKv(document.getElementById('orderKv'), [
     ['订单编码', d.order.code],
     ['订单名称', d.order.name],
@@ -485,47 +422,37 @@
     logsEl.innerHTML = '<div style="overflow-x:auto"><table class="data-table">' + thead + '<tbody>' + body + '</tbody></table></div>';
   }
 
-  var entryWrap = document.getElementById('latestEntryWrap');
-  var entryMeta = document.getElementById('entryMeta');
-  if (!d.latestEntry) {
-    entryMeta.textContent = '';
-    entryWrap.innerHTML = '<p class="empty-hint">尚无已保存的检测录入数据。指派并开始现场作业后，可在「录入数据」中填写；提交后将生成版本记录。</p>' +
-      '<div style="margin-top:12px"><a class="btn btn-primary btn-sm" href="' + esc(dataEntryHref) + '">去录入</a></div>';
-  } else {
-    entryMeta.textContent = '最近保存：' + d.latestEntry.savedAt + ' · ' + d.latestEntry.versionLabel;
-    var erows = d.latestEntry.items.map(function (it) {
-      return '<tr><td style="width:220px;color:var(--text-3)">' + esc(it[0]) + '</td><td>' + esc(it[1]) + '</td></tr>';
-    }).join('');
-    entryWrap.innerHTML =
-      '<p style="font-size:12px;color:var(--text-3);margin:0 0 10px">以下为该任务<strong>最近一次保存</strong>的关键字段摘录（完整表单见录入页）。</p>' +
-      '<div style="overflow-x:auto"><table class="data-table"><tbody>' + erows + '</tbody></table></div>' +
-      '<div style="margin-top:12px"><a class="btn btn-default btn-sm" href="' + esc(dataEntryHref) + '"><i class="fa-solid fa-pen-to-square"></i> 打开录入页查看/编辑全量数据</a></div>';
+  // 「检测数据」页签：内嵌录入页（懒加载，首次切到该 tab 时再加载；始终展示录入界面，锁定不可编辑）
+  var dataEmbedFrame = document.getElementById('dataEmbedFrame');
+  var dataEmbedLoaded = false;
+
+  function ensureDataEmbed() {
+    if (dataEmbedLoaded) return;
+    dataEmbedFrame.src = dataEntryEmbedHref;
+    dataEmbedLoaded = true;
   }
 
-  if (d.review) {
-    document.getElementById('tabReviewBtn').style.display = '';
-    document.getElementById('linkVersions').style.display = 'inline-flex';
-    var verFrom = fromAudit ? '&from=audit' : '';
-    document.getElementById('linkVersions').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId) + verFrom;
-    document.getElementById('linkVersions2').style.display = 'inline-flex';
-    document.getElementById('linkVersions2').href = 'pc_task_version_history.html?task=' + encodeURIComponent(taskId) + verFrom;
+  function activateTab(tab) {
+    document.querySelectorAll('.detail-tabs button').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-tab') === tab);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function (p) {
+      p.classList.toggle('active', p.id === 'panel-' + tab);
+    });
+    if (tab === 'data') ensureDataEmbed();
   }
 
   document.querySelectorAll('.detail-tabs button').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      var tab = this.getAttribute('data-tab');
-      document.querySelectorAll('.detail-tabs button').forEach(function (b) { b.classList.toggle('active', b === btn); });
-      document.querySelectorAll('.tab-panel').forEach(function (p) {
-        p.classList.toggle('active', p.id === 'panel-' + tab);
-      });
+      activateTab(this.getAttribute('data-tab'));
     });
   });
 
-  document.getElementById('btnSaveReview').addEventListener('click', function () {
-    alert('已保存修订：已追加 VN+1，修改前数据保留为只读快照。');
-  });
-
-  if (window.initPcAuditModal) window.initPcAuditModal();
+  // URL ?tab=data 直达
+  var urlTab = params.get('tab');
+  if (urlTab && ['overview', 'data'].indexOf(urlTab) !== -1) {
+    activateTab(urlTab);
+  }
 })();
 </script>
 </body>

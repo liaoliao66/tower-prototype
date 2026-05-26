@@ -101,15 +101,17 @@ body.inspect-app-layout.ipad-adapt [data-app-flow-footer] {
   box-sizing: border-box;
 }
 
-body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer) a,
-body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer) button {
-  max-width: 480px;
-  margin: 0 auto;
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer):not(.validate-flow-footer) a,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer]:not(.flow-footer-split):not(.inspect-app-flow-footer):not(.sync-flow-footer):not(.validate-flow-footer) button {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
   display: block !important;
   height: 48px !important;
   line-height: 48px !important;
   border-radius: var(--ipad-radius-md, 8px) !important;
   font-size: var(--ipad-fs-title, 16px) !important;
+  box-sizing: border-box !important;
 }
 
 /* 顶栏工具按钮（备忘录/拍照） */

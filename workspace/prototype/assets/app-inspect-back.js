@@ -2,14 +2,14 @@
  * 检测子页「返回」：优先回到进入来源（history / iframe），否则回检测填报主页并带上 order、embed。
  * 页面内为返回链接设置 data-app-inspect-back，href 为相对「填报主页」的路径（与页面深度一致）。
  *
- * 同文件：在含 #appNavBar + data-app-inspect-back 的检测子页注入「备忘录」「拍照」：
- * - 「上传铁塔照片」等纯拍照清单页不注入「拍照识别」（与卡片内拍照重复）；body 可设 data-inspect-no-photo-recognize="1" 关闭；
- * - 「快捷手记」页在注入逻辑入口即跳过，不注入「备忘录」「拍照识别」、不改顶栏结构（本页已有语音/拍照/手写）；body 可设 data-inspect-no-memo-toolbar="1" 关闭备忘录；
- * - 若存在 [data-app-flow-footer]（底部流程栏），则放在底栏左侧，与「下一步 / 完成检测」等主按钮同排；
- * - 否则仍在顶栏右侧（小胶囊按钮）。
- * - iPad 填报主页 iframe（?embed=1）：子页不注入；父页顶栏「拍照识别」+ 可拖动悬浮「备忘录」。
+ * 同文件：含 #appNavBar + data-app-inspect-back 的检测子页仅整理顶栏布局（返回左 / 标题中），
+ * 不再注入「备忘录」「拍照」；底栏 [data-app-flow-footer] 保持页面原有「下一步」全宽展示。
+ * iPad 填报主页 iframe（?embed=1）：子页不改顶栏结构。
  */
 (function () {
+  /** 检测录入子页：不再注入模块级「备忘录」「拍照」 */
+  var ENABLE_MODULE_MEMO_PHOTO = false;
+
   function orderId() {
     try {
       return (sessionStorage.getItem('tower_app_active_inspect_order') || '').trim();
@@ -241,10 +241,15 @@
       enhanceFooterMemoLink(footer, mod);
     }
 
+    var allowInjectMemo =
+      ENABLE_MODULE_MEMO_PHOTO && !skipMemoToolbar(mod) && !footerBuiltIn;
+    var allowInjectPhoto =
+      ENABLE_MODULE_MEMO_PHOTO && !skipPhotoRecognize(mod) && !footerBuiltIn;
     var useFooterActions =
       !!footer &&
       footer.getAttribute('data-inspect-module-actions') !== '1' &&
-      !footerBuiltIn;
+      !footerBuiltIn &&
+      (allowInjectMemo || allowInjectPhoto);
 
     injectToolbarStyle();
     nav.classList.add('inspect-app-nav-toolbar');
@@ -285,8 +290,6 @@
         : 'app_task_memo.html';
     var memoRel = taskRelPrefix() + '/备忘录/' + memoFile;
     var memo = null;
-    var allowInjectMemo = !skipMemoToolbar(mod) && !footerBuiltIn;
-    var allowInjectPhoto = !skipPhotoRecognize(mod) && !footerBuiltIn;
     if (allowInjectMemo) {
       memo = document.createElement('a');
       memo.className = 'inspect-mod-btn inspect-mod-btn--memo';
@@ -339,7 +342,7 @@
       }
     }
 
-    if (useFooterActions) {
+    if (useFooterActions && (memo || cam)) {
       if (memo) memo.classList.add('inspect-mod-btn--footer');
       if (cam) cam.classList.add('inspect-mod-btn--footer');
       footer.classList.add('inspect-app-flow-footer');
@@ -349,13 +352,11 @@
       while (footer.firstChild) {
         main.appendChild(footer.firstChild);
       }
-      if (memo || cam) {
-        var side = document.createElement('div');
-        side.className = 'inspect-flow-footer-side';
-        if (memo) side.appendChild(memo);
-        if (cam) side.appendChild(cam);
-        footer.appendChild(side);
-      }
+      var side = document.createElement('div');
+      side.className = 'inspect-flow-footer-side';
+      if (memo) side.appendChild(memo);
+      if (cam) side.appendChild(cam);
+      footer.appendChild(side);
       footer.appendChild(main);
 
       var spacer = document.createElement('div');

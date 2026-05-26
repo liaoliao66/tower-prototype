@@ -8,7 +8,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../assets/app-frame.css">
-<script src="../../../assets/ipad-adapt.js" defer></script>
 <style>
 html, body { height: 100%; margin: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: #E5E6EB; display: flex; flex-direction: column; overflow: hidden; }
@@ -68,7 +67,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
 #iframeHost iframe { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background: #F2F3F5; }
 </style>
 </head>
-<body class="ipad-adapt ipad-inspect-shell-page" data-ipad-tab-active="inspect">
+<body>
 <div class="shell-head">
   <div style="height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 16px;">
     <span style="font-size:14px; font-weight:600;">9:41</span>
@@ -79,8 +78,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     <div class="shell-title" style="flex:1; min-width:0; text-align:center; font-size:15px; font-weight:600;">滨江基站01 · 单管</div>
     <div class="shell-actions">
       <button type="button" id="actMemo" title="任务备忘录（语音实时转写）"><i class="fa-solid fa-microphone"></i> 备忘录</button>
-      <button type="button" id="actOcr" title="拍照"><i class="fa-solid fa-camera"></i> 拍照</button>
-      <button type="button" id="actExport" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
+      <button type="button" id="actExport" title="分享检测任务数据"><i class="fa-solid fa-share-nodes"></i> 分享</button>
       <button type="button" id="actSave" title="保存"><i class="fa-solid fa-floppy-disk"></i> 保存</button>
       <button type="button" id="actHub" title="检测填报主页（大模块）"><i class="fa-solid fa-table-cells-large"></i> 主页</button>
       <button type="button" id="actSync" title="同步数据"><i class="fa-solid fa-rotate"></i> 同步</button>
@@ -130,7 +128,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
   var TASK_HOME_EMBED = '../任务/填报主页/ipad_task_inspect_home.html?embed=1';
 
   function setFrame(src) {
-    frame.src = withOrderParam(src);
+    frame.src = src;
   }
   function tryClickIframeBtn(id) {
     try {
@@ -148,27 +146,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     document.querySelectorAll('.shell-nav .nav-item').forEach(function (b) { b.classList.remove('on'); });
     if (btn) btn.classList.add('on');
   }
-  function activeOrderId() {
-    try {
-      var id = (new URLSearchParams(window.location.search).get('order') || '').trim().toUpperCase();
-      if (id) return id;
-    } catch (e) {}
-    try {
-      return (sessionStorage.getItem('tower_app_active_inspect_order') || '').trim().toUpperCase();
-    } catch (e2) {}
-    return 'DD20260506001';
-  }
-
-  function withOrderParam(src) {
-    var oid = activeOrderId();
-    if (!oid || /\border=/.test(src)) return src;
-    return src + (src.indexOf('?') >= 0 ? '&' : '?') + 'order=' + encodeURIComponent(oid);
-  }
-
   function applyOrder(o) {
     towerEl.textContent = o.tower;
     noEl.textContent = o.id;
-    try { sessionStorage.setItem('tower_app_active_inspect_order', o.id); } catch (e) {}
     try {
       var u = new URL(window.location.href);
       u.searchParams.set('order', o.id);
@@ -238,14 +218,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     setFrame('../任务/备忘录/ipad_task_memo.html');
     markActive(null);
   });
-  document.getElementById('actOcr').addEventListener('click', function () {
-    if (!tryClickIframeBtn('btnOcrGlobal')) {
-      alert('拍照：拍摄或选择照片 → OCR 映射到可填字段 → 人工确认后落库。');
-    }
-  });
   document.getElementById('actExport').addEventListener('click', function () {
     if (!tryClickIframeBtn('btnExportVoice')) {
-      alert('请切换到「填报主页」后，点击「导出」并选择：导出语音备忘录 / 导出检测任务数据。');
+      alert('请切换到「填报主页」后，点击「分享」选择分享渠道。');
     }
   });
   document.getElementById('actSave').addEventListener('click', function () {

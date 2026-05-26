@@ -594,6 +594,29 @@ body.inspect-app-layout.ipad-adapt [data-app-flow-footer] .inspect-mod-btn--foot
   padding: 6px 10px !important;
 }
 
+/* 录入子页底栏仅主操作：下一步 / 完成检测 全宽 */
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) .inspect-flow-footer-main,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) {
+  display: block !important;
+  width: 100% !important;
+}
+
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) .inspect-flow-footer-main > a,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) .inspect-flow-footer-main > button,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) .inspect-flow-footer-main > .btn-primary,
+body.inspect-app-layout.ipad-adapt [data-app-flow-footer].inspect-app-flow-footer:not(:has(.inspect-flow-footer-side)) .inspect-flow-footer-main > .btn-next {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  flex: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 48px !important;
+  line-height: 1 !important;
+}
+
 /* 单列表单页（垂直度等）：卡片纵向堆叠 */
 body.inspect-app-layout.ipad-adapt #appEmbedContent.inspect-form-stack {
   display: grid;

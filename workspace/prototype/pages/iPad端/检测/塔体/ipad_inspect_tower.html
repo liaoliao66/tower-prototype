@@ -15,11 +15,64 @@
 <link rel="stylesheet" href="../../../../assets/ipad-layout.css">
 <link rel="stylesheet" href="../../../../assets/ipad-visual.css">
 <link rel="stylesheet" href="../../../../assets/ipad-inspect-layout.css">
-<link rel="stylesheet" href="../../../../assets/ipad-inspect-basic.css">
 <link rel="stylesheet" href="../../../../assets/ipad-embed.css">
 <script src="../../../../assets/ipad-adapt.js" defer></script>
 <script src="../../../../assets/app-embed.js" defer></script>
 <script src="../../../../assets/app-inspect-back.js" defer></script>
+<style>
+.form-label { font-size:13px; color:#86909C; margin-bottom:6px; display:block; }
+.form-input { width:100%; height:44px; border:1px solid #E5E6EB; border-radius:12px; padding:0 14px; font-size:15px; outline:none; box-sizing:border-box; background:#fff; }
+.form-input:focus { border-color:#165DFF; }
+
+/* 基础信息单页（无 Tab） */
+.basic-hint {
+  font-size: 12px; color: #86909C; line-height: 1.55; margin: 0 0 12px;
+}
+.basic-card {
+  background: #fff; border-radius: 12px; padding: 14px 16px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06); border: 1px solid rgba(229, 230, 235, 0.9);
+  margin-bottom: 12px;
+}
+.basic-card-title {
+  font-size: 15px; font-weight: 600; color: #1D2129; margin: 0 0 4px;
+}
+.basic-card-sub {
+  font-size: 12px; color: #86909C; margin: 0 0 14px; line-height: 1.45;
+}
+.basic-field { margin-bottom: 14px; }
+.basic-field:last-child { margin-bottom: 0; }
+.basic-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: #4E5969; font-weight: 500; margin-bottom: 8px;
+}
+.basic-label i {
+  width: 16px; text-align: center; color: #165DFF; font-size: 14px; flex-shrink: 0;
+}
+.basic-grid-2 {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.basic-addr-3 {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+}
+.basic-check-row {
+  display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+  font-size: 13px; color: #1D2129;
+}
+.basic-check-row label {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.basic-check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #165DFF; flex-shrink: 0; }
+.form-textarea {
+  width: 100%; min-height: 76px; border: 1px solid #E5E6EB; border-radius: 12px;
+  padding: 10px 14px; font-size: 15px; outline: none; box-sizing: border-box;
+  background: #fff; resize: vertical; font-family: inherit;
+}
+.form-textarea:focus { border-color: #165DFF; }
+@media (max-width: 380px) {
+  .basic-grid-2 { grid-template-columns: 1fr; }
+  .basic-addr-3 { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body class="inspect-app-layout ipad-adapt">
 <div id="appStatusBar">
@@ -92,6 +145,11 @@
           <label><input type="checkbox" name="lightning">增高架避雷针</label>
         </div>
       </div>
+    </div>
+</div>
+
+<div class="ipad-flow-footer" data-app-flow-footer style="position:fixed; bottom:0; left:0; right:0; padding:12px 16px; background:#fff; border-top:1px solid #E5E6EB;">
+  <a href="../../检测/地基/ipad_inspect_foundation.html" style="display:block; width:100%; height:44px; background:#165DFF; color:#fff; border-radius:8px; font-size:16px; font-weight:600; text-decoration:none; text-align:center; line-height:44px; box-sizing:border-box;">下一步</a>
 </div>
 
 </body>

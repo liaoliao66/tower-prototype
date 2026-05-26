@@ -77,8 +77,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     <div class="shell-title" style="flex:1; min-width:0; text-align:center; font-size:15px; font-weight:600;">滨江基站01 · 单管</div>
     <div class="shell-actions">
       <button type="button" id="actMemo" title="任务备忘录（语音实时转写）"><i class="fa-solid fa-microphone"></i> 备忘录</button>
-      <button type="button" id="actOcr" title="拍照"><i class="fa-solid fa-camera"></i> 拍照</button>
-      <button type="button" id="actExport" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
+      <button type="button" id="actExport" title="分享检测任务数据"><i class="fa-solid fa-share-nodes"></i> 分享</button>
       <button type="button" id="actSave" title="保存"><i class="fa-solid fa-floppy-disk"></i> 保存</button>
       <button type="button" id="actHub" title="检测填报主页（大模块）"><i class="fa-solid fa-table-cells-large"></i> 主页</button>
       <button type="button" id="actSync" title="同步数据"><i class="fa-solid fa-rotate"></i> 同步</button>
@@ -218,14 +217,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
     setFrame('../任务/备忘录/app_task_memo.html');
     markActive(null);
   });
-  document.getElementById('actOcr').addEventListener('click', function () {
-    if (!tryClickIframeBtn('btnOcrGlobal')) {
-      alert('拍照：拍摄或选择照片 → OCR 映射到可填字段 → 人工确认后落库。');
-    }
-  });
   document.getElementById('actExport').addEventListener('click', function () {
     if (!tryClickIframeBtn('btnExportVoice')) {
-      alert('请切换到「填报主页」后，点击「导出」并选择：导出语音备忘录 / 导出检测任务数据。');
+      alert('请切换到「填报主页」后，点击「分享」选择分享渠道。');
     }
   });
   document.getElementById('actSave').addEventListener('click', function () {

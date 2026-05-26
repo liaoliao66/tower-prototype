@@ -100,7 +100,7 @@ body{
 .mod .s{font-size:11px;color:#86909C;margin-top:4px;line-height:1.35}
 .mod .ic{width:36px;height:36px;border-radius:10px;background:#F5F9FF;color:#165DFF;display:flex;align-items:center;justify-content:center;margin-bottom:8px;font-size:15px}
 .sec-title{font-size:12px;font-weight:600;color:#86909C;margin:14px 0 8px;padding-left:2px}
-/* 导出：底部 action sheet */
+/* 分享：底部 action sheet */
 .export-sheet-mask{
   display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);
   align-items:flex-end;justify-content:center;-webkit-tap-highlight-color:transparent;
@@ -111,14 +111,27 @@ body{
   padding:12px 16px calc(20px + env(safe-area-inset-bottom,0px));box-sizing:border-box;
   box-shadow:0 -8px 32px rgba(0,0,0,.12);
 }
-.export-sheet-h{margin:4px 0 14px;text-align:center;font-size:13px;font-weight:600;color:#1D2129}
-.export-sheet-sub{margin:-8px 0 14px;text-align:center;font-size:11px;color:#86909C;line-height:1.4}
-.export-sheet-btn{
-  display:block;width:100%;padding:14px 16px;margin:0 0 10px;border:none;border-radius:12px;
-  background:#F7F8FA;color:#1D2129;font-size:15px;font-weight:600;text-align:center;cursor:pointer;font-family:inherit;
+.export-sheet-h{margin:4px 0 12px;text-align:center;font-size:13px;font-weight:600;color:#1D2129}
+.share-channels{
+  display:flex;justify-content:space-around;align-items:flex-start;gap:8px;
+  padding:4px 8px 18px;
 }
-.export-sheet-btn:active{opacity:.92;background:#EEF0F3}
-.export-sheet-btn i{margin-right:8px;color:#165DFF;font-size:14px}
+.share-channel{
+  border:none;background:transparent;padding:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;
+  -webkit-tap-highlight-color:transparent;font-family:inherit;
+}
+.share-channel:active{opacity:.88}
+.share-channel-ic{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:26px;line-height:1;
+}
+.share-channel-ic svg{width:28px;height:28px;display:block}
+.share-channel-ic--wechat{background:#07C160}
+.share-channel-ic--wxwork{background:#2F7DEB}
+.share-channel-ic--dingtalk{background:#0089FF}
+.share-channel-ic--link{background:#F2F3F5;color:#4E5969;border:1px solid #E5E6EB;font-size:22px}
 .export-sheet-cancel{
   display:block;width:100%;padding:12px;margin:4px 0 0;border:none;background:transparent;
   color:#86909C;font-size:15px;cursor:pointer;font-family:inherit;
@@ -152,7 +165,6 @@ body.app-memo-fab-dragging .app-memo-fab{
   cursor:grabbing;
   box-shadow:0 6px 18px rgba(247,165,0,.55);
 }
-.top-actions .top-act-photo{background:rgba(255,255,255,.32)}
 </style>
 </head>
 <body>
@@ -174,8 +186,7 @@ body.app-memo-fab-dragging .app-memo-fab{
     </div>
     <div class="top-actions top-actions-narrow" role="toolbar" aria-label="任务操作">
       <div class="top-actions-left">
-        <button type="button" class="top-act top-act-export" id="btnExportVoice" title="导出语音备忘或检测任务数据"><i class="fa-solid fa-file-export"></i> 导出</button>
-        <button type="button" class="top-act top-act-photo" id="btnOcrGlobal" title="拍照识别"><i class="fa-solid fa-camera" aria-hidden="true"></i> 拍照识别</button>
+        <button type="button" class="top-act top-act-export" id="btnExportVoice" title="分享检测任务数据"><i class="fa-solid fa-share-nodes"></i> 分享</button>
       </div>
       <div class="top-actions-right">
         <button type="button" class="top-act top-act-save" id="btnSave">保存</button>
@@ -265,11 +276,6 @@ body.app-memo-fab-dragging .app-memo-fab{
 
   <div class="sec-title">便捷与校验</div>
   <div class="grid2">
-    <a class="mod" href="../../检测/备注/app_inspect_note.html">
-      <div class="ic"><i class="fa-solid fa-note-sticky"></i></div>
-      <div class="t">模块语音备忘</div>
-      <div class="s">各模块内也可进入录制</div>
-    </a>
     <a class="mod" href="../../检测/校验/app_inspect_validate.html">
       <div class="ic"><i class="fa-solid fa-check-double"></i></div>
       <div class="t">校验与提交</div>
@@ -293,10 +299,25 @@ body.app-memo-fab-dragging .app-memo-fab{
 
 <div class="export-sheet-mask" id="exportSheetMask" role="dialog" aria-modal="true" aria-labelledby="exportSheetTitle">
   <div class="export-sheet" id="exportSheetPanel" role="document">
-    <div class="export-sheet-h" id="exportSheetTitle">导出</div>
-    <p class="export-sheet-sub">请选择要导出的内容</p>
-    <button type="button" class="export-sheet-btn" id="exportOptVoice"><i class="fa-solid fa-microphone"></i> 导出语音备忘录</button>
-    <button type="button" class="export-sheet-btn" id="exportOptTask"><i class="fa-solid fa-table-list"></i> 导出检测任务数据</button>
+    <div class="export-sheet-h" id="exportSheetTitle">分享</div>
+    <div class="share-channels" role="list">
+      <button type="button" class="share-channel" id="shareWechat" role="listitem" aria-label="分享到微信">
+        <span class="share-channel-ic share-channel-ic--wechat"><i class="fa-brands fa-weixin" aria-hidden="true"></i></span>
+      </button>
+      <button type="button" class="share-channel" id="shareWxwork" role="listitem" aria-label="分享到企业微信">
+        <span class="share-channel-ic share-channel-ic--wxwork" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M8.2 4.5C4.9 5.8 3 8.6 3 11.4c0 2.1 1.1 4 2.9 5.3-.2.7-.7 2.4-.7 2.5 0 .1.1.2.2.2.1 0 2.1-1.1 2.6-1.4.7.2 1.5.3 2.3.3 4.2 0 7.6-2.8 7.6-6.3 0-3.2-3-6.1-7.1-7.5-1-.3-2.1-.5-3-.5z"/><path fill="currentColor" opacity=".9" d="M15.8 7.2c3.8 1.2 6.2 4 6.2 7.1 0 3.1-2.9 5.7-6.6 6.5-.6.1-1.2.2-1.8.2-2.9 0-5.4-1.4-6.7-3.5 2.5-.9 4.2-2.8 4.2-5 0-2.4-1.8-4.4-4.3-5.3.9-.2 1.9-.3 2.9-.3 2.2 0 4.2.6 6.1 1.8z"/></svg>
+        </span>
+      </button>
+      <button type="button" class="share-channel" id="shareDingtalk" role="listitem" aria-label="分享到钉钉">
+        <span class="share-channel-ic share-channel-ic--dingtalk" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M19.35 3.65 9.55 20.35l-2.25-7.2L3.5 10.1l15.85-6.45z"/></svg>
+        </span>
+      </button>
+      <button type="button" class="share-channel" id="shareCopyLink" role="listitem" aria-label="复制链接">
+        <span class="share-channel-ic share-channel-ic--link"><i class="fa-solid fa-link" aria-hidden="true"></i></span>
+      </button>
+    </div>
     <button type="button" class="export-sheet-cancel" id="exportSheetCancel">取消</button>
   </div>
 </div>
@@ -344,16 +365,16 @@ body.app-memo-fab-dragging .app-memo-fab{
     if (e.target === exportMask) closeExportSheet();
   });
   document.getElementById('exportSheetCancel').addEventListener('click', closeExportSheet);
-  document.getElementById('exportOptVoice').addEventListener('click', function () {
+  function shareDemo(channel) {
     closeExportSheet();
-    alert('正在导出语音备忘录：已合并任务整体备忘与各检测大模块语音备份录及转写，生成 Word 并唤起系统分享。');
-  });
-  document.getElementById('exportOptTask').addEventListener('click', function () {
+    alert('正在通过「' + channel + '」分享检测任务数据（原型演示）。');
+  }
+  document.getElementById('shareWechat').addEventListener('click', function () { shareDemo('微信'); });
+  document.getElementById('shareWxwork').addEventListener('click', function () { shareDemo('企业微信'); });
+  document.getElementById('shareDingtalk').addEventListener('click', function () { shareDemo('钉钉'); });
+  document.getElementById('shareCopyLink').addEventListener('click', function () {
     closeExportSheet();
-    alert('正在导出检测任务数据：将打包当前任务各模块已填字段、附件清单与校验状态，生成 Excel（多工作表）并唤起系统分享。');
-  });
-  document.getElementById('btnOcrGlobal').addEventListener('click', function () {
-    alert('拍照：上传或拍摄照片 → OCR 映射到可填字段草稿 → 须人工确认后落库。');
+    alert('检测任务分享链接已复制到剪贴板（原型演示）。');
   });
   document.getElementById('btnSave').addEventListener('click', function () {
     alert('已保存');

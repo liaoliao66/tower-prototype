@@ -95,27 +95,7 @@
   gap: 8px;
 }
 .fd-top-title .fd-meta { font-size: 12px; font-weight: 400; color: var(--text-3); }
-.fd-top-tabs {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  gap: 28px;
-}
-.fd-top-tabs button {
-  border: none;
-  background: none;
-  padding: 14px 4px;
-  font-size: 14px;
-  color: var(--text-2);
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
-.fd-top-tabs button.active {
-  color: var(--primary);
-  font-weight: 500;
-  border-bottom-color: var(--primary);
-}
+#fdBtnSave { margin-left: auto; }
 .fd-body { flex: 1; display: flex; min-height: 0; overflow: hidden; }
 .fd-palette {
   width: 260px;
@@ -313,12 +293,6 @@
         <span id="fdTitle">模块配置</span>
         <span class="fd-meta" id="fdMeta"></span>
       </div>
-      <nav class="fd-top-tabs" aria-label="设计步骤">
-        <button type="button" class="fd-tab" data-tab="basic">基础信息</button>
-        <button type="button" class="fd-tab active" data-tab="form">表单样式</button>
-        <button type="button" class="fd-tab" data-tab="flow">审批流程</button>
-        <button type="button" class="fd-tab" data-tab="ext">扩展设置</button>
-      </nav>
       <button type="button" class="btn btn-primary" id="fdBtnSave">保存</button>
     </header>
     <div class="fd-body">
@@ -349,7 +323,6 @@
             <button type="button" class="active">电脑</button>
             <button type="button">手机</button>
           </div>
-          <button type="button" class="btn-text"><i class="fa-regular fa-eye"></i> 预览</button>
         </div>
         <div class="fd-canvas">
           <div class="fd-field">
@@ -452,7 +425,6 @@ window.__prototypePageInit = function initInspectTemplateTaskPage() {
         '<td class="col-action">' +
         '<button type="button" class="btn-text btn-mod-edit">编辑</button> ' +
         '<button type="button" class="btn-text btn-mod-config">配置</button> ' +
-        '<button type="button" class="btn-text btn-mod-preview">预览</button> ' +
         '<button type="button" class="btn-text btn-mod-delete" style="color:var(--danger)">删除</button>' +
         '</td></tr>';
     }).join('');
@@ -607,13 +579,6 @@ window.__prototypePageInit = function initInspectTemplateTaskPage() {
         closeDesigner();
       });
     }
-    document.querySelectorAll('.fd-tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        document.querySelectorAll('.fd-tab').forEach(function (x) { x.classList.remove('active'); });
-        tab.classList.add('active');
-      });
-    });
-
     if (tbody) {
       tbody.addEventListener('click', function (e) {
         var t = e.target;
@@ -627,7 +592,6 @@ window.__prototypePageInit = function initInspectTemplateTaskPage() {
           if (row) openDesigner(row.code, row.name);
           return;
         }
-        if (t.closest('.btn-mod-preview')) alert('模块预览（原型）');
         if (t.closest('.btn-mod-delete')) {
           var row = modules.find(function (m) { return m.id === id; });
           if (!row) return;

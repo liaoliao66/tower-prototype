@@ -199,7 +199,7 @@
               <a class="inspect-tower-item" data-tower="法兰单管塔" href="#">法兰单管塔</a>
               <a class="inspect-tower-item" data-tower="格构塔" href="#">格构塔</a>
               <a class="inspect-tower-item" data-tower="角钢塔" href="#">角钢塔</a>
-              <a class="inspect-tower-item" data-tower="支柱灯" href="#">支柱灯</a>
+              <a class="inspect-tower-item" data-tower="支柱塔" href="#">支柱塔</a>
               <a class="inspect-tower-item" data-tower="拉线塔杆" href="#">拉线塔杆</a>
             </nav>
           </aside>
@@ -323,11 +323,25 @@ window.__prototypePageInit = function initInspectTemplateListPage() {
 
   normalizeSingleActive();
 
-  function subCol(kind, mode, code, ver) {
+  var RECORD_TEMPLATE_CONFIG_URL = 'https://www.kdocs.cn/l/coZBoK9xbMAA';
+
+  function subCol(kind, mode, code, ver, rowStatus) {
+    if (rowStatus === '已禁用') {
+      return '<div class="tpl-sub-links"><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
     var taskHref = 'pc_inspect_template_task.html?tpl=' + encodeURIComponent(code) + '&ver=' + encodeURIComponent(ver);
+    var reportHref = 'pc_inspect_template_report_edit.html?tpl=' + encodeURIComponent(code) + '&ver=' + encodeURIComponent(ver);
     if (kind === 'task' && (mode === 'configured' || mode === 'configure')) {
       var label = mode === 'configured' ? '配置 (已配)' : '配置 (待配)';
       return '<div class="tpl-sub-links"><a href="' + taskHref + '" class="btn-text">' + label + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button></div>';
+    }
+    if (kind === 'record' && (mode === 'configured' || mode === 'configure' || mode === 'pending')) {
+      var recordLabel = (mode === 'pending' || mode === 'configure') ? '配置 (待配)' : '配置 (已配)';
+      return '<div class="tpl-sub-links"><a href="' + RECORD_TEMPLATE_CONFIG_URL + '" class="btn-text" target="_blank" rel="noopener noreferrer">' + recordLabel + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button><span class="sep">|</span><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
+    if (kind === 'report' && (mode === 'configured' || mode === 'configure' || mode === 'pending')) {
+      var reportLabel = (mode === 'pending' || mode === 'configure') ? '配置 (待配)' : '配置 (已配)';
+      return '<div class="tpl-sub-links"><a href="' + reportHref + '" class="btn-text">' + reportLabel + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button><span class="sep">|</span><button type="button" class="btn-text btn-view">查看</button></div>';
     }
     if (mode === 'view') {
       return '<div class="tpl-sub-links"><button type="button" class="btn-text btn-view">查看</button></div>';
@@ -348,10 +362,10 @@ window.__prototypePageInit = function initInspectTemplateListPage() {
         '<td>' + r.no + '</td>' +
         '<td>' + r.code + '</td>' +
         '<td>' + r.ver + '</td>' +
-        '<td>' + subCol('task', r.task, r.code, r.ver) + '</td>' +
-        '<td>' + subCol('record', r.record, r.code, r.ver) + '</td>' +
-        '<td>' + subCol('report', r.report, r.code, r.ver) + '</td>' +
-        '<td>' + subCol('grade', r.grade, r.code, r.ver) + '</td>' +
+        '<td>' + subCol('task', r.task, r.code, r.ver, r.status) + '</td>' +
+        '<td>' + subCol('record', r.record, r.code, r.ver, r.status) + '</td>' +
+        '<td>' + subCol('report', r.report, r.code, r.ver, r.status) + '</td>' +
+        '<td>' + subCol('grade', r.grade, r.code, r.ver, r.status) + '</td>' +
         '<td><span class="tag ' + r.statusClass + '">' + r.status + '</span></td>' +
         '<td style="font-size:12px;white-space:nowrap">' + r.enableAt + '</td>' +
         '<td style="font-size:12px;white-space:nowrap">' + r.createdAt + '</td>' +
@@ -378,7 +392,26 @@ window.__prototypePageInit = function initInspectTemplateListPage() {
       if (!(t instanceof Element)) return;
       if (t.closest('.btn-preview')) return alert('模板预览（原型）');
       if (t.closest('.btn-view')) return alert('查看模板（原型）');
-      if (t.closest('.btn-sub-config')) return alert('子模板配置（原型）');
+      if (t.closest('.btn-sub-config')) {
+        var cfgBtn = t.closest('.btn-sub-config');
+        var kind = cfgBtn && cfgBtn.getAttribute('data-kind');
+        if (kind === 'record') {
+          window.open(RECORD_TEMPLATE_CONFIG_URL, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        if (kind === 'report') {
+          var tr = cfgBtn.closest('tr');
+          if (tr) {
+            var code = tr.getAttribute('data-code') || '';
+            var row = rows.find(function (r) { return r.code === code; });
+            if (row) {
+              location.href = 'pc_inspect_template_report_edit.html?tpl=' + encodeURIComponent(row.code) + '&ver=' + encodeURIComponent(row.ver);
+              return;
+            }
+          }
+        }
+        return alert('子模板配置（原型）');
+      }
       var enableBtn = t.closest('.btn-enable');
       if (enableBtn) {
         var tr = enableBtn.closest('tr');

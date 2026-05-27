@@ -219,7 +219,6 @@
                     <th>任务模板</th>
                     <th>记录模板</th>
                     <th>报告模板</th>
-                    <th>评定等级</th>
                     <th style="width:88px">状态</th>
                     <th style="width:150px">启用时间</th>
                     <th style="width:150px">创建时间</th>
@@ -257,12 +256,12 @@ window.__layoutConfig = { active: 'inspect_template_list', breadcrumb: ['模板�
 
 window.__prototypePageInit = function initInspectTemplateListPage() {
   var rows = [
-    { no: 1, code: 'GD001001-001', ver: 'V9', task: 'configured', record: 'configured', report: 'pending', grade: 'pending', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
-    { no: 2, code: 'GD001001-002', ver: 'V8', task: 'view', record: 'view', report: 'view', grade: 'view', status: '启用中', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
-    { no: 3, code: 'GD001001-003', ver: 'V7', task: 'configure', record: 'configure', report: 'pending', grade: 'pending', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
-    { no: 4, code: 'GD001001-004', ver: 'V6', task: 'view', record: 'view', report: 'view', grade: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
-    { no: 5, code: 'GD001001-005', ver: 'V5', task: 'configure', record: 'configure', report: 'configure', grade: 'configure', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
-    { no: 6, code: 'GD001001-006', ver: 'V4', task: 'view', record: 'view', report: 'view', grade: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' }
+    { no: 1, code: 'GD001001-001', ver: 'V9', task: 'configured', record: 'configured', report: 'pending', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 2, code: 'GD001001-002', ver: 'V8', task: 'view', record: 'view', report: 'view', status: '启用中', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 3, code: 'GD001001-003', ver: 'V7', task: 'configure', record: 'configure', report: 'pending', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 4, code: 'GD001001-004', ver: 'V6', task: 'view', record: 'view', report: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 5, code: 'GD001001-005', ver: 'V5', task: 'configure', record: 'configure', report: 'configure', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 6, code: 'GD001001-006', ver: 'V4', task: 'view', record: 'view', report: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' }
   ];
 
   function statusClassFor(status) {
@@ -365,7 +364,6 @@ window.__prototypePageInit = function initInspectTemplateListPage() {
         '<td>' + subCol('task', r.task, r.code, r.ver, r.status) + '</td>' +
         '<td>' + subCol('record', r.record, r.code, r.ver, r.status) + '</td>' +
         '<td>' + subCol('report', r.report, r.code, r.ver, r.status) + '</td>' +
-        '<td>' + subCol('grade', r.grade, r.code, r.ver, r.status) + '</td>' +
         '<td><span class="tag ' + r.statusClass + '">' + r.status + '</span></td>' +
         '<td style="font-size:12px;white-space:nowrap">' + r.enableAt + '</td>' +
         '<td style="font-size:12px;white-space:nowrap">' + r.createdAt + '</td>' +

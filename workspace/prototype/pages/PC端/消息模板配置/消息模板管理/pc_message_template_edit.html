@@ -137,22 +137,6 @@ var SCENES = {
     ],
     hint: '到期后按提醒行时间触发；仅「消息接收人员」可收到；写入消息中心，类型「合同提醒」；不进待办。'
   },
-  CONTRACT_UP_PAYMENT_REMIND: {
-    label: '对上合同-付款提醒', msgType: '合同提醒', notifyPersonnel: true,
-    recipients: ['u_wangmin', 'u_liuyang', 'u_zhangwei'],
-    name: '对上付款提醒-默认',
-    title: '【付款提醒】{contractName} · {stageName}',
-    body: '合同 {contractCode} 已累计付款 {cumulativePaymentAmount}，请关注 {stageName} 阶段付款安排。',
-    vars: [
-      { cn: '合同名称', key: '{contractName}', desc: '合同主档' },
-      { cn: '合同编号', key: '{contractCode}', desc: '合同主档' },
-      { cn: '阶段名称', key: '{stageName}', desc: '提醒行' },
-      { cn: '提醒时间', key: '{remindTime}', desc: '提醒行' },
-      { cn: '合同金额（含税）', key: '{contractAmountTax}', desc: '合同主档' },
-      { cn: '当前累计付款金额', key: '{cumulativePaymentAmount}', desc: '已登记付款' }
-    ],
-    hint: '到期后按提醒行时间触发；仅「消息接收人员」可收到；写入消息中心，类型「合同提醒」；不进待办。'
-  },
   CONTRACT_DOWN_PAYMENT_REMIND: {
     label: '对下合同-付款提醒', msgType: '合同提醒', notifyPersonnel: true,
     recipients: ['u_liuyang', 'u_lina', 'u_zhangwei'],

@@ -90,6 +90,18 @@ body {
   color: #fff; background: var(--sidebar-active);
   border-right: 3px solid var(--primary); font-weight: 500;
 }
+.menu-submenu { margin: 2px 0 4px; }
+.menu-submenu-title {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 20px 8px 50px; cursor: pointer; color: rgba(255,255,255,0.5);
+  font-size: 13px; transition: all 0.15s; user-select: none;
+}
+.menu-submenu-title:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+.menu-submenu-title .chevron { font-size: 11px; transition: transform 0.2s; }
+.menu-submenu.open .menu-submenu-title .chevron { transform: rotate(90deg); }
+.menu-submenu-items { display: none; }
+.menu-submenu.open .menu-submenu-items { display: block; }
+.menu-item-nested { padding-left: 66px; font-size: 12px; }
 /* Content */
 .page-content { padding: 20px 24px; flex: 1; }
 /* 嵌入模式（父页 iframe 内）：去掉框架，仅显示 #page-content；并压缩内边距 */

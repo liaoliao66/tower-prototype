@@ -15,11 +15,6 @@
 .sub-table input.form-input{width:100%;min-width:0;box-sizing:border-box}
 .sub-table .cell-readonly{background:#F7F8FA;color:var(--text-2);font-size:12px}
 .btn-row-del{color:var(--danger);border:none;background:transparent;cursor:pointer;font-size:12px}
-.contract-top-box{margin-bottom:16px;border:1px solid var(--border);border-radius:6px;overflow:hidden}
-.contract-top-box .biz-hint{font-size:12px;color:var(--text-2);margin:0;line-height:1.6;padding:10px 14px;background:#fff;border-bottom:1px solid var(--border)}
-.contract-top-box .biz-hint.warn{background:#FFF7E8;color:#92400E}
-.contract-top-box .audit-bar{display:flex;flex-wrap:wrap;gap:16px 24px;font-size:13px;padding:12px 14px;background:#F7F8FA}
-.contract-top-box .audit-bar span{color:var(--text-3)}
 .fund-bar{display:flex;flex-wrap:wrap;gap:20px 32px;padding:12px 14px;background:#FFFBF5;border:1px solid #FFE4BA;border-radius:6px;margin-bottom:16px;font-size:13px}
 .fund-bar strong{color:var(--text-1)}
 .detail-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
@@ -47,16 +42,10 @@
 
   <div class="card">
     <div class="card-body">
-      <div class="contract-top-box">
-        <p class="biz-hint" id="bizHint"></p>
-        <div class="audit-bar" id="auditBar"></div>
-      </div>
-      <p style="font-size:12px;color:var(--text-3);margin:-8px 0 12px"><i class="fa-solid fa-circle-info"></i> 审批在<strong>基础平台</strong>办理；本页仅展示审批状态。收付款提醒到期后仅发<strong>消息中心</strong>，不进待办。</p>
-
       <div class="detail-tabs" id="tabBar">
         <button type="button" class="tab on" data-tab="basic">基础信息</button>
         <button type="button" class="tab" data-tab="price">单价明细</button>
-        <button type="button" class="tab" data-tab="remind">收付款提醒</button>
+        <button type="button" class="tab" data-tab="remind">收款提醒</button>
         <button type="button" class="tab" data-tab="flow">收付款流水</button>
         <button type="button" class="tab" data-tab="attach">附件与备注</button>
         <button type="button" class="tab" data-tab="relate">关联</button>
@@ -84,11 +73,8 @@
 
       <div class="tab-panel" id="panel-remind">
         <p class="contract-sec" style="margin-top:0">收款提醒 · 到期发送消息（模板：对上合同-收款提醒）</p>
-        <table class="sub-table"><thead><tr><th style="width:44px" class="edit-only">操作</th><th>阶段</th><th>提醒时间</th><th>消息状态</th><th>发送时间</th></tr></thead><tbody id="recvRemRows"></tbody></table>
+        <table class="sub-table"><thead><tr><th style="width:44px" class="edit-only">操作</th><th>阶段</th><th>提醒时间</th></tr></thead><tbody id="recvRemRows"></tbody></table>
         <button type="button" class="btn btn-default btn-sm edit-only" id="btnAddRecvRem" style="margin-bottom:14px">+ 收款提醒行</button>
-        <p class="contract-sec">付款提醒 · 到期发送消息（模板：对上合同-付款提醒）</p>
-        <table class="sub-table"><thead><tr><th style="width:44px" class="edit-only">操作</th><th>阶段</th><th>提醒时间</th><th>消息状态</th><th>发送时间</th></tr></thead><tbody id="payRemRows"></tbody></table>
-        <button type="button" class="btn btn-default btn-sm edit-only" id="btnAddPayRem">+ 付款提醒行</button>
       </div>
 
       <div class="tab-panel" id="panel-flow">

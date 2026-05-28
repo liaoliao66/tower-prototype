@@ -30,17 +30,6 @@
   </div>
 
   <div class="card" style="margin-bottom:16px">
-    <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <div class="card-title">审核信息</div>
-      <button type="button" class="btn btn-primary btn-sm" id="odAuditBtn" style="display:none"><i class="fa-solid fa-clipboard-check"></i> 审批</button>
-    </div>
-    <div class="card-body">
-      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px">汇总关联检测任务的技术审核进度；详细复核与记录版本请至 <strong>检测管理 → 检测任务</strong>。</p>
-      <dl class="od-dl" id="odAudit"></dl>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:16px">
     <div class="card-header"><div class="card-title">催办记录</div></div>
     <div class="card-body">
       <div id="odUrgeWrap"></div>
@@ -182,44 +171,6 @@ function renderBase(code, d) {
   }).join('');
 }
 
-function renderAudit(code, d) {
-  var el = document.getElementById('odAudit');
-  var auditBtn = document.getElementById('odAuditAuditBtn') || document.getElementById('odAuditBtn');
-  var linked = d.linkedTask || '—';
-  var linkedHtml = esc(linked);
-  if (linked && linked.indexOf('RW') === 0) {
-    var taskId = linked.split('（')[0];
-    linkedHtml = '<a href="../../铁塔检测业务/检测任务/pc_task_detail.html?id=' + encodeURIComponent(taskId) + '" class="btn-text" style="padding:0">' + esc(linked) + '</a>';
-  }
-  var rows = [
-    ['审核状态', d.auditStatus || '—'],
-    ['审核节点', d.auditNode || '—'],
-    ['审核人', d.auditor || '—'],
-    ['审核时间', d.auditAt || '—'],
-    ['关联检测任务', linkedHtml]
-  ];
-  el.innerHTML = rows.map(function (r, i) {
-    var val = i === 4 ? r[1] : esc(r[1]);
-    return '<dt>' + esc(r[0]) + '</dt><dd' + (i < 4 ? ' data-audit-col' : '') + '>' + val + '</dd>';
-  }).join('');
-
-  if (auditBtn) {
-    var pending = d.auditStatus === '待审核' || d.auditStatus === '审核中';
-    auditBtn.style.display = pending ? 'inline-flex' : 'none';
-    auditBtn.className = 'btn btn-primary btn-sm btn-pc-audit';
-    auditBtn.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> 审批';
-    auditBtn.setAttribute('data-title', (d.orderName || '') + ' · ' + code);
-    auditBtn.setAttribute('data-node', d.auditNode || '—');
-    auditBtn.setAttribute('data-auditor-default', '周敏');
-    var taskHref = '';
-    if (linked && linked.indexOf('RW') === 0) {
-      taskHref = '../../铁塔检测业务/检测任务/pc_task_detail.html?id=' + encodeURIComponent(linked.split('（')[0]);
-    }
-    if (taskHref) auditBtn.setAttribute('data-href', taskHref);
-    else auditBtn.removeAttribute('data-href');
-  }
-}
-
 function renderUrges(list) {
   var wrap = document.getElementById('odUrgeWrap');
   if (!list || !list.length) {
@@ -230,12 +181,10 @@ function renderUrges(list) {
   var body = list.map(function (u) {
     return '<tr><td>' + esc(u.time) + '</td><td>' + esc(u.operator) + '</td><td>' + esc(u.channel) + '</td><td>' + esc(u.target) + '</td><td>' + esc(u.content) + '</td></tr>';
   }).join('');
-  wrap.innerHTML = '
-      <div class="pc-table-actions">
-        <a href="pc_order_list.html" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> 返回列表</a>
-      </div>
-
-      <table class="data-table">' + thead + '<tbody>' + body + '</tbody></table>';
+  wrap.innerHTML = '<div class="pc-table-actions">' +
+      '<a href="pc_order_list.html" class="btn btn-default"><i class="fa-solid fa-arrow-left"></i> 返回列表</a>' +
+    '</div>' +
+    '<table class="data-table">' + thead + '<tbody>' + body + '</tbody></table>';
 }
 
 function renderRejects(list) {
@@ -256,15 +205,37 @@ window.addEventListener('DOMContentLoaded', function () {
   try {
     code = (new URLSearchParams(location.search).get('code') || '').trim();
   } catch (e) {}
-  if (!code || !ORDER_MOCK[code]) {
-    code = 'ZJHC20260505001';
-  }
   var d = ORDER_MOCK[code];
+  if (!code) code = 'ZJHC20260505001';
+  if (!d) {
+    d = {
+      orderName: '订单数据加载中（占位）',
+      contract: '—',
+      siteAddrCode: '—',
+      project: '—',
+      unit: '—',
+      inspectType: '—',
+      status: '已派',
+      urgeStatus: '未催办',
+      dispatchAt: '—',
+      deadline: '—',
+      overdue: '正常',
+      inspector: '—',
+      creator: '合同部',
+      contact: '—',
+      remark: '该订单暂无详情档案，已展示占位信息。',
+      auditStatus: '未提交',
+      auditNode: '—',
+      auditor: '—',
+      auditAt: '—',
+      linkedTask: '—',
+      urges: [],
+      rejects: []
+    };
+  }
   document.getElementById('odPageTitle').textContent = '订单详情 · ' + code;
   renderBase(code, d);
-  renderAudit(code, d);
   renderUrges(d.urges);
-  if (window.initPcAuditModal) window.initPcAuditModal();
   renderRejects(d.rejects);
 });
 </script>

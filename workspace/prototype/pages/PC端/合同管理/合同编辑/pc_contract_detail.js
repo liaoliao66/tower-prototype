@@ -8,7 +8,6 @@ var CONTRACT_MOCK = {
     dateStart: '2026-01-01', dateEnd: '2026-12-31',
     attachments: ['杭州移动2026框架合同.pdf'], remark: '年度框架协议，按站结算。',
     prices: [{ name: '单站安全性鉴定', tax: '8500', noTax: '7547', qty: '1' }],
-    payRem: [{ name: '进度款', time: '2026-06-01T09:00', msgStatus: '待发送', msgSentAt: '—' }],
     recvRem: [
       { name: '首付款', time: '2026-02-01T09:00', msgStatus: '已发送', msgSentAt: '2026-02-01 09:00' },
       { name: '尾款', time: '2026-11-01T09:00', msgStatus: '待发送', msgSentAt: '—' }
@@ -31,7 +30,6 @@ var CONTRACT_MOCK = {
     dateStart: '2026-04-01', dateEnd: '2026-09-30',
     attachments: ['城西改造专项合同.pdf'], remark: '分包合同。',
     prices: [{ name: '专项检测包干', tax: '480000', noTax: '424778.76', qty: '1' }],
-    payRem: [{ name: '签约款', time: '2026-04-15T10:00', msgStatus: '待发送', msgSentAt: '—' }],
     recvRem: [{ name: '首款', time: '2026-05-01T10:00', msgStatus: '待发送', msgSentAt: '—' }],
     receipts: [{ no: 'SK20260410001', date: '2026-04-10', amt: '160,000', method: '银行转账', stage: '首款' }],
     payments: [{ no: 'FK-202604-0021', downCode: 'DX2026-0102', downName: '塔身焊缝抽检协作', unit: '外协协作单位', date: '2026-04-22', amt: '45,000', method: '银行转账' }],
@@ -43,7 +41,6 @@ var CONTRACT_MOCK = {
 var current = null;
 var isEdit = false;
 var priceRows = document.getElementById('priceRows');
-var payRemRows = document.getElementById('payRemRows');
 var recvRemRows = document.getElementById('recvRemRows');
 
 function fmtMoney(n) {
@@ -84,15 +81,19 @@ function syncBizUi() {
   var hint = document.getElementById('bizHint');
   var actions = document.getElementById('bizActions');
   if (canBizOperate(d)) {
-    hint.className = 'biz-hint';
-    hint.textContent = '合同状态为「履行中」且审核「已通过」：可登记对上收款，并在此合同下新建工程（工程审核通过可创建订单）。';
+    if (hint) {
+      hint.className = 'biz-hint';
+      hint.textContent = '合同状态为「履行中」且审核「已通过」：可登记对上收款，并在此合同下新建工程（工程审核通过可创建订单）。';
+    }
     actions.innerHTML =
       '<a href="../合同收款/pc_contract_receipt.html?contractCode=' + encodeURIComponent(d.code) + '" class="btn btn-primary btn-sm">对上收款</a>' +
       '<a href="../合同付款/pc_contract_payment.html?upContractCode=' + encodeURIComponent(d.code) + '" class="btn btn-default btn-sm">对下付款</a>' +
       '<a href="../../营销管理/工程管理/pc_project_create.html?contractCode=' + encodeURIComponent(d.code) + '" class="btn btn-default btn-sm">新建工程</a>';
   } else {
-    hint.className = 'biz-hint warn';
-    hint.textContent = d.status !== '履行中' ? '合同状态为「' + d.status + '」：业务操作已限制。' : '审核未通过：须基础平台审批通过后方可收付款与新建工程。';
+    if (hint) {
+      hint.className = 'biz-hint warn';
+      hint.textContent = d.status !== '履行中' ? '合同状态为「' + d.status + '」：业务操作已限制。' : '审核未通过：须基础平台审批通过后方可收付款与新建工程。';
+    }
     actions.innerHTML = '';
   }
   var rc = document.getElementById('btnAddReceipt');
@@ -111,7 +112,9 @@ function renderFundBar(d) {
 }
 
 function renderAuditBar(d) {
-  document.getElementById('auditBar').innerHTML =
+  var auditBar = document.getElementById('auditBar');
+  if (!auditBar) return;
+  auditBar.innerHTML =
     '<div><span>审核状态 </span><strong>' + d.workflowStatus + '</strong></div>' +
     '<div><span>审核节点 </span><strong>' + (d.auditNode || '—') + '</strong></div>' +
     '<div><span>审核人 </span><strong>' + (d.auditor || '—') + '</strong></div>' +
@@ -125,11 +128,10 @@ function renderRemindTable(tbody, list, editable) {
     if (editable) {
       tr.innerHTML = '<td class="edit-only"><button type="button" class="btn-row-del js-del-rem">删</button></td>' +
         '<td><input class="form-input js-rem-name" value="' + (r.name || '') + '"></td>' +
-        '<td><input type="datetime-local" class="form-input js-rem-time" value="' + (r.time || '') + '"></td>' +
-        '<td><span class="tag tag-gray">' + (r.msgStatus || '待发送') + '</span></td><td>' + (r.msgSentAt || '—') + '</td>';
+        '<td><input type="datetime-local" class="form-input js-rem-time" value="' + (r.time || '') + '"></td>';
       tr.querySelector('.js-del-rem').onclick = function () { tr.remove(); };
     } else {
-      tr.innerHTML = '<td>' + r.name + '</td><td>' + r.time + '</td><td><span class="tag ' + (r.msgStatus === '已发送' ? 'tag-green' : 'tag-orange') + '">' + r.msgStatus + '</span></td><td>' + (r.msgSentAt || '—') + '</td>';
+      tr.innerHTML = '<td>' + r.name + '</td><td>' + r.time + '</td>';
     }
     tbody.appendChild(tr);
   });
@@ -190,7 +192,6 @@ function loadContract(d) {
   renderAuditBar(d);
   renderPrices(d.prices);
   renderRemindTable(recvRemRows, d.recvRem, isEdit);
-  renderRemindTable(payRemRows, d.payRem, isEdit);
   document.getElementById('receiptTbody').innerHTML = (d.receipts || []).map(function (r) {
     return '<tr><td>' + r.no + '</td><td>' + r.date + '</td><td>¥ ' + r.amt + '</td><td>' + r.method + '</td><td>' + r.stage + '</td></tr>';
   }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-3)">暂无</td></tr>';
@@ -239,8 +240,6 @@ function initFormHandlers() {
   }
   var btnPrice = document.getElementById('btnAddPriceRow');
   if (btnPrice) btnPrice.onclick = function () { addPriceRow(); };
-  var btnPay = document.getElementById('btnAddPayRem');
-  if (btnPay) btnPay.onclick = function () { addRemindRow(payRemRows); };
   var btnRecv = document.getElementById('btnAddRecvRem');
   if (btnRecv) btnRecv.onclick = function () { addRemindRow(recvRemRows); };
   var btnSave = document.getElementById('btnSave');
@@ -259,8 +258,7 @@ function addRemindRow(tbody) {
   tr.innerHTML =
     '<td class="edit-only"><button type="button" class="btn-row-del js-del-rem">删</button></td>' +
     '<td><input class="form-input js-rem-name" placeholder="阶段名称"></td>' +
-    '<td><input type="datetime-local" class="form-input js-rem-time"></td>' +
-    '<td><span class="tag tag-gray">待发送</span></td><td>—</td>';
+    '<td><input type="datetime-local" class="form-input js-rem-time"></td>';
   tbody.appendChild(tr);
   tr.querySelector('.js-del-rem').onclick = function () { tr.remove(); };
 }
@@ -285,7 +283,6 @@ function bootContractDetailPage() {
       amtTax: 0, amtNoTax: 0, cumReceipt: 0, cumPayment: 0, dateStart: '', dateEnd: '',
       attachments: [], remark: '',
       prices: [{ name: '', tax: '', noTax: '', qty: '1' }],
-      payRem: [{ name: '', time: '', msgStatus: '待发送', msgSentAt: '—' }],
       recvRem: [{ name: '', time: '', msgStatus: '待发送', msgSentAt: '—' }],
       receipts: [], payments: [], downstream: [], projects: []
     });

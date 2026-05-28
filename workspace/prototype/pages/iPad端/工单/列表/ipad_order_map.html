@@ -309,10 +309,8 @@ body.app-order-map-page {
               <span class="map-order-id">DD20260506001</span>
               <span class="tag-f" style="background:#E8F7FF; color:#165DFF;">待检测</span>
             </div>
-            <h3 class="map-order-title">滨江区铁塔年度检测订单</h3>
+            <h3 class="map-order-title" style="font-family:ui-monospace,monospace;">ZZ-HZ-BJ01</h3>
             <div class="card-meta">
-              <div><i class="fa-solid fa-location-dot" style="color:#165DFF;"></i> 站点 滨江基站01</div>
-              <div><i class="fa-solid fa-user" style="color:#C9CDD4;"></i> 王某某 138****5678</div>
               <div><i class="fa-regular fa-calendar" style="color:#C9CDD4;"></i> 截止日期 <span class="deadline-date">2026-05-15</span></div>
             </div>
           </a>
@@ -330,10 +328,8 @@ body.app-order-map-page {
               <span class="map-order-id">DD20260507002</span>
               <span class="tag-f" style="background:#FFF7E8; color:#FF7D00;">检测中</span>
             </div>
-            <h3 class="map-order-title">城西区铁塔专项安全检测</h3>
+            <h3 class="map-order-title" style="font-family:ui-monospace,monospace;">ZZ-HZ-CX03</h3>
             <div class="card-meta">
-              <div><i class="fa-solid fa-location-dot" style="color:#165DFF;"></i> 站点 城西枢纽站</div>
-              <div><i class="fa-solid fa-user" style="color:#C9CDD4;"></i> 李某某 139****1234</div>
               <div><i class="fa-regular fa-calendar" style="color:#C9CDD4;"></i> 截止日期 <span class="deadline-date">2026-05-18</span></div>
             </div>
           </a>
@@ -351,10 +347,8 @@ body.app-order-map-page {
               <span class="map-order-id">DD20260508003</span>
               <span class="tag-f" style="background:#E8FFEA; color:#00B42A;">已检测</span>
             </div>
-            <h3 class="map-order-title">萧山区园区铁塔巡检订单</h3>
+            <h3 class="map-order-title" style="font-family:ui-monospace,monospace;">ZZ-HZ-XS02</h3>
             <div class="card-meta">
-              <div><i class="fa-solid fa-location-dot" style="color:#165DFF;"></i> 站点 萧山园区站</div>
-              <div><i class="fa-solid fa-user" style="color:#C9CDD4;"></i> 孙某某 136****2211</div>
               <div><i class="fa-regular fa-calendar" style="color:#C9CDD4;"></i> 截止日期 <span class="deadline-date">2026-05-12</span></div>
             </div>
           </a>
@@ -387,9 +381,9 @@ body.app-order-map-page {
 <script>
 (function () {
   var TOWER_POINTS = [
-    { lat: 30.2084, lng: 120.2126, name: '滨江区01#单管塔', towerType: '单管塔', status: '待检测', order: 'DD20260506001', orderTitle: '滨江区铁塔年度检测订单', site: '滨江基站01', contact: '王某某 138****5678', deadline: '2026-05-15', color: '#165DFF', icon: 'fa-clipboard-list' },
-    { lat: 30.2955, lng: 120.0891, name: '城西区03#角钢塔', towerType: '角钢塔', status: '检测中', order: 'DD20260507002', orderTitle: '城西区铁塔专项安全检测', site: '城西枢纽站', contact: '李某某 139****1234', deadline: '2026-05-18', color: '#FF7D00', icon: 'fa-screwdriver-wrench' },
-    { lat: 30.2318, lng: 120.1812, name: '萧山区05#三管塔', towerType: '三管塔', status: '已检测', order: 'DD20260508003', orderTitle: '萧山区园区铁塔巡检订单', site: '萧山园区站', contact: '孙某某 136****2211', deadline: '2026-05-12', color: '#00B42A', icon: 'fa-circle-check' }
+    { lat: 30.2084, lng: 120.2126, name: '滨江区01#单管塔', towerType: '单管塔', status: '待检测', order: 'DD20260506001', siteCode: 'ZZ-HZ-BJ01', deadline: '2026-05-15', color: '#165DFF', icon: 'fa-clipboard-list' },
+    { lat: 30.2955, lng: 120.0891, name: '城西区03#角钢塔', towerType: '角钢塔', status: '检测中', order: 'DD20260507002', siteCode: 'ZZ-HZ-CX03', deadline: '2026-05-18', color: '#FF7D00', icon: 'fa-screwdriver-wrench' },
+    { lat: 30.2318, lng: 120.1812, name: '萧山区05#三管塔', towerType: '三管塔', status: '已检测', order: 'DD20260508003', siteCode: 'ZZ-HZ-XS02', deadline: '2026-05-12', color: '#00B42A', icon: 'fa-circle-check' }
   ];
 
   var DEMO_USER = { lat: 30.2741, lng: 120.1551 };
@@ -421,12 +415,12 @@ body.app-order-map-page {
   var markers = [];
   var layers = [];
   TOWER_POINTS.forEach(function (p, i) {
-    var m = L.marker([p.lat, p.lng], { title: p.orderTitle + ' · ' + p.status, icon: makeDivIcon(p) });
+    var m = L.marker([p.lat, p.lng], { title: p.siteCode + ' · ' + p.status, icon: makeDivIcon(p) });
     m.bindPopup(
-      '<strong style="display:block;margin-bottom:4px;">' + p.orderTitle + '</strong>' +
+      '<strong style="display:block;margin-bottom:4px;font-family:ui-monospace,monospace;">' + p.siteCode + '</strong>' +
       '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:' + p.color + '22;color:' + p.color + ';margin-bottom:6px;">' + p.status + '</span><br>' +
       '<span style="color:#86909C;font-size:12px;">' + p.name + ' · ' + p.towerType + '</span><br>' +
-      '订单 ' + p.order + '<br>' + p.site + '<br>' +
+      '订单 ' + p.order + '<br>站址编码 ' + p.siteCode + '<br>' +
       '截止 ' + p.deadline + '<br>' +
       '<a style="font-size:12px;color:#165DFF;margin-top:4px;display:inline-block;" href="https://uri.amap.com/navigation?to=' + p.lng + ',' + p.lat + '&amp;mode=car&amp;src=tower-app&amp;callnative=1" target="_blank" rel="noopener noreferrer">导航：' + p.lng.toFixed(4) + ' ，' + p.lat.toFixed(4) + '</a>'
     );

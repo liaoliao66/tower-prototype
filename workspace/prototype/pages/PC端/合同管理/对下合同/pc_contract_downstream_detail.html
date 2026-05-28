@@ -84,8 +84,6 @@ body.is-editing #btnPickUpstream{display:inline-flex;align-items:center;gap:4px}
             <th class="col-edit edit-only-rem" style="width:56px">操作</th>
             <th>阶段名称</th>
             <th style="width:220px">提醒时间</th>
-            <th style="width:96px">消息状态</th>
-            <th style="width:160px">发送时间</th>
           </tr>
         </thead>
         <tbody id="remindBody"></tbody>
@@ -302,7 +300,7 @@ window.addEventListener('DOMContentLoaded', function () {
     tbody.innerHTML = '';
     var rows = list && list.length ? list : (isEdit ? [{ name: '', time: '', st: '待发送', at: '—' }] : []);
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="' + (isEdit ? 5 : 4) + '" style="text-align:center;color:var(--text-3)">暂无，可点击下方「增加一行」</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="' + (isEdit ? 3 : 2) + '" style="text-align:center;color:var(--text-3)">暂无，可点击下方「增加一行」</td></tr>';
       return;
     }
     rows.forEach(function (r) {
@@ -311,15 +309,13 @@ window.addEventListener('DOMContentLoaded', function () {
         tr.innerHTML =
           '<td class="col-edit edit-only-rem"><button type="button" class="btn-row-del js-del-rem">删除</button></td>' +
           '<td><input type="text" class="form-input js-rem-name" style="width:100%" placeholder="如：首付款、进度款" value="' + (r.name || '').replace(/"/g, '&quot;') + '"></td>' +
-          '<td><input type="datetime-local" class="form-input js-rem-time" style="width:100%" value="' + (r.time || '') + '"></td>' +
-          '<td><span class="tag tag-gray">' + (r.st || '待发送') + '</span></td>' +
-          '<td>' + (r.at || '—') + '</td>';
+          '<td><input type="datetime-local" class="form-input js-rem-time" style="width:100%" value="' + (r.time || '') + '"></td>';
         tr.querySelector('.js-del-rem').onclick = function () {
           if (tbody.querySelectorAll('tr').length <= 1) { alert('至少保留一行'); return; }
           tr.remove();
         };
       } else {
-        tr.innerHTML = '<td>' + r.name + '</td><td>' + r.time + '</td><td><span class="tag tag-orange">' + r.st + '</span></td><td>' + r.at + '</td>';
+        tr.innerHTML = '<td>' + r.name + '</td><td>' + r.time + '</td>';
       }
       tbody.appendChild(tr);
     });
@@ -344,8 +340,7 @@ window.addEventListener('DOMContentLoaded', function () {
       tr.innerHTML =
         '<td class="col-edit edit-only-rem"><button type="button" class="btn-row-del js-del-rem">删除</button></td>' +
         '<td><input type="text" class="form-input js-rem-name" style="width:100%" placeholder="如：首付款、进度款"></td>' +
-        '<td><input type="datetime-local" class="form-input js-rem-time" style="width:100%"></td>' +
-        '<td><span class="tag tag-gray">待发送</span></td><td>—</td>';
+        '<td><input type="datetime-local" class="form-input js-rem-time" style="width:100%"></td>';
       tr.querySelector('.js-del-rem').onclick = function () {
         if (tbody.querySelectorAll('tr').length <= 1) { alert('至少保留一行'); return; }
         tr.remove();

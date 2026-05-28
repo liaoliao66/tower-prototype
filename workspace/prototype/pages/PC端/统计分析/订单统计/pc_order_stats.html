@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>订单统计 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+.stat-cards { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+.stat-card {
+  background:#F7F8FA; border:1px solid var(--border); border-radius:6px; padding:14px 16px;
+}
+.stat-card .label { font-size:13px; font-weight:600; color:var(--text-1); margin-bottom:12px; }
+.stat-dual { display:flex; gap:12px; }
+.stat-metric { flex:1; min-width:0; }
+.stat-metric-key { display:block; font-size:12px; color:var(--text-3); margin-bottom:4px; }
+.stat-metric-val { display:block; font-size:22px; font-weight:600; color:var(--text-1); line-height:1.2; }
+.stat-card.stat-done .stat-metric-val { color:#00B42A; }
+.stat-card.stat-progress .stat-metric-val { color:#165DFF; }
+.stat-card.stat-pending-inv .stat-metric-val { color:#FF7D00; }
+.stat-card.stat-invoiced .stat-metric-val { color:#722ED1; }
+.contract-link {
+  border:none; background:none; padding:0; cursor:pointer; text-align:left; color:inherit; font:inherit;
+}
+.contract-link:hover .contract-name { color:var(--primary); }
+.contract-link:hover .contract-code { color:#4080FF; }
+.os-modal-mask {
+  position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000;
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.os-modal-mask.open { display:flex; }
+.os-modal-dialog {
+  background:#fff; border-radius:8px; width:min(1120px,96vw); max-height:90vh;
+  display:flex; flex-direction:column; box-shadow:0 12px 48px rgba(0,0,0,.18);
+}
+.os-modal-head {
+  padding:14px 18px; border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-shrink:0;
+}
+.os-modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+.os-modal-meta { font-size:12px; color:var(--text-3); margin-top:6px; line-height:1.5; }
+.os-modal-close { border:none; background:transparent; cursor:pointer; color:var(--text-3); padding:4px 8px; font-size:16px; line-height:1; flex-shrink:0; }
+.os-modal-body { padding:16px 18px; overflow:auto; flex:1; }
+.os-modal-foot {
+  padding:12px 18px; border-top:1px solid var(--border);
+  display:flex; justify-content:flex-end; gap:8px; flex-shrink:0;
+}
+.os-table-scroll { overflow-x:auto; border:1px solid var(--border); border-radius:6px; }
+.os-table-scroll .data-table { margin:0; min-width:1000px; }
+@media (max-width:1280px) { .stat-cards { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:768px) { .stat-cards { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="card">
+    <div class="card-body">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="date" class="form-input" value="2026-01-01" style="width:150px">
+          <span style="color:var(--text-3);font-size:13px">至</span>
+          <input type="date" class="form-input" value="2026-05-28" style="width:150px">
+          <select class="form-select" style="width:220px">
+            <option value="">全部对上合同</option>
+            <option>HT2026-0512 · 杭州移动 2026 年度铁塔检测框架</option>
+            <option>HT2026-0428 · 城西改造专项检测分包</option>
+          </select>
+          <select class="form-select">
+            <option value="">全部检测类型</option>
+            <option>安全性鉴定</option>
+            <option>可靠性鉴定</option>
+            <option>抗震鉴定</option>
+          </select>
+          <button type="button" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+          <button type="button" class="btn btn-default"><i class="fa-solid fa-rotate-right"></i> 重置</button>
+        </div>
+        <div class="toolbar-right">
+          <button type="button" class="btn btn-default"><i class="fa-solid fa-file-export"></i> 导出</button>
+        </div>
+      </div>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="label">总数</div>
+          <div class="stat-dual">
+            <div class="stat-metric"><span class="stat-metric-key">订单</span><span class="stat-metric-val">186</span></div>
+            <div class="stat-metric"><span class="stat-metric-key">站址</span><span class="stat-metric-val">428</span></div>
+          </div>
+        </div>
+        <div class="stat-card stat-progress">
+          <div class="label">进行中</div>
+          <div class="stat-dual">
+            <div class="stat-metric"><span class="stat-metric-key">订单</span><span class="stat-metric-val">58</span></div>
+            <div class="stat-metric"><span class="stat-metric-key">站址</span><span class="stat-metric-val">136</span></div>
+          </div>
+        </div>
+        <div class="stat-card stat-done">
+          <div class="label">已完成</div>
+          <div class="stat-dual">
+            <div class="stat-metric"><span class="stat-metric-key">订单</span><span class="stat-metric-val">92</span></div>
+            <div class="stat-metric"><span class="stat-metric-key">站址</span><span class="stat-metric-val">218</span></div>
+          </div>
+        </div>
+        <div class="stat-card stat-pending-inv">
+          <div class="label">待开票</div>
+          <div class="stat-dual">
+            <div class="stat-metric"><span class="stat-metric-key">订单</span><span class="stat-metric-val">24</span></div>
+            <div class="stat-metric"><span class="stat-metric-key">站址</span><span class="stat-metric-val">52</span></div>
+          </div>
+        </div>
+        <div class="stat-card stat-invoiced">
+          <div class="label">已开票</div>
+          <div class="stat-dual">
+            <div class="stat-metric"><span class="stat-metric-key">订单</span><span class="stat-metric-val">68</span></div>
+            <div class="stat-metric"><span class="stat-metric-key">站址</span><span class="stat-metric-val">166</span></div>
+          </div>
+        </div>
+      </div>
+
+      <table class="data-table" id="statsTable">
+        <thead>
+          <tr>
+            <th rowspan="2" style="min-width:200px">对上合同</th>
+            <th rowspan="2" style="min-width:160px">关联客户</th>
+            <th colspan="2" style="text-align:center">总数</th>
+            <th colspan="2" style="text-align:center">进行中</th>
+            <th colspan="2" style="text-align:center">已完成</th>
+            <th colspan="2" style="text-align:center">待开票</th>
+            <th colspan="2" style="text-align:center">已开票</th>
+            <th rowspan="2" class="col-action" style="width:88px">操作</th>
+          </tr>
+          <tr>
+            <th style="width:72px;text-align:center">订单</th>
+            <th style="width:72px;text-align:center">站址</th>
+            <th style="width:72px;text-align:center">订单</th>
+            <th style="width:72px;text-align:center">站址</th>
+            <th style="width:72px;text-align:center">订单</th>
+            <th style="width:72px;text-align:center">站址</th>
+            <th style="width:72px;text-align:center">订单</th>
+            <th style="width:72px;text-align:center">站址</th>
+            <th style="width:72px;text-align:center">订单</th>
+            <th style="width:72px;text-align:center">站址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-contract="HT2026-0512">
+            <td>
+              <button type="button" class="contract-link js-open-detail" data-contract="HT2026-0512" title="点击查看订单站址明细">
+                <div class="contract-code" style="font-size:12px;color:var(--text-3)">HT2026-0512</div>
+                <div class="contract-name">杭州移动 2026 年度铁塔检测框架</div>
+              </button>
+            </td>
+            <td>中国移动通信集团浙江有限公司</td>
+            <td style="text-align:center">128</td><td style="text-align:center">296</td>
+            <td style="text-align:center">42</td><td style="text-align:center">98</td>
+            <td style="text-align:center">64</td><td style="text-align:center">148</td>
+            <td style="text-align:center">16</td><td style="text-align:center">34</td>
+            <td style="text-align:center">48</td><td style="text-align:center">112</td>
+            <td class="col-action"><button type="button" class="btn-text js-open-detail" data-contract="HT2026-0512">查看详情</button></td>
+          </tr>
+          <tr data-contract="HT2026-0428">
+            <td>
+              <button type="button" class="contract-link js-open-detail" data-contract="HT2026-0428" title="点击查看订单站址明细">
+                <div class="contract-code" style="font-size:12px;color:var(--text-3)">HT2026-0428</div>
+                <div class="contract-name">城西改造专项检测分包</div>
+              </button>
+            </td>
+            <td>浙江某建设集团有限公司</td>
+            <td style="text-align:center">58</td><td style="text-align:center">132</td>
+            <td style="text-align:center">16</td><td style="text-align:center">38</td>
+            <td style="text-align:center">28</td><td style="text-align:center">70</td>
+            <td style="text-align:center">8</td><td style="text-align:center">18</td>
+            <td style="text-align:center">20</td><td style="text-align:center">54</td>
+            <td class="col-action"><button type="button" class="btn-text js-open-detail" data-contract="HT2026-0428">查看详情</button></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p style="font-size:12px;color:var(--text-3);margin:12px 0 0;line-height:1.5">
+        <i class="fa-solid fa-circle-info"></i> 按<strong>对上合同</strong>维度分别统计订单与站址；点击合同名称或「查看详情」可查看订单/站址明细。站址按订单下站点去重汇总。
+      </p>
+    </div>
+  </div>
+
+  <div class="os-modal-mask" id="detailModal" aria-hidden="true">
+  <div class="os-modal-dialog" role="dialog" aria-labelledby="detailModalTitle">
+    <div class="os-modal-head">
+      <div>
+        <h3 id="detailModalTitle">订单站址明细</h3>
+        <div class="os-modal-meta" id="detailModalMeta"></div>
+      </div>
+      <button type="button" class="os-modal-close" id="detailModalClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="os-modal-body">
+      <div class="os-table-scroll">
+        <table class="data-table" id="detailTable">
+          <thead>
+            <tr>
+              <th style="width:130px">订单编码</th>
+              <th style="min-width:140px">订单名称</th>
+              <th style="width:110px">站址编码</th>
+              <th style="min-width:120px">关联工程</th>
+              <th style="min-width:110px">检测单位</th>
+              <th style="width:96px">任务状态</th>
+              <th style="width:88px">开票状态</th>
+              <th style="width:88px">收款状态</th>
+            </tr>
+          </thead>
+          <tbody id="detailTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="os-modal-foot">
+      <button type="button" class="btn btn-default" id="detailModalOk">关闭</button>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'order_stats', breadcrumb: ['统计分析', '订单统计'] };
+
+var CONTRACT_DETAILS = {
+  'HT2026-0512': {
+    code: 'HT2026-0512',
+    name: '杭州移动 2026 年度铁塔检测框架',
+    customer: '中国移动通信集团浙江有限公司',
+    items: [
+      { orderCode: 'DD202605003', orderName: '拱墅05#三管塔检测', siteCode: 'ZZ-HZ-GS05', project: '拱墅区域改造项目', unit: '浙江中能检测', taskStatus: '检测中', invoiceStatus: '待开', receiptStatus: '待收' },
+      { orderCode: 'DD202605003', orderName: '拱墅05#三管塔检测', siteCode: 'ZZ-HZ-GS05-02', project: '拱墅区域改造项目', unit: '浙江中能检测', taskStatus: '检测中', invoiceStatus: '待开', receiptStatus: '待收' },
+      { orderCode: 'DD202605002', orderName: '城西03#角钢塔检测', siteCode: 'ZZ-HZ-CX03', project: '城西区域改造项目', unit: '杭州铁塔检测中心', taskStatus: '已完成', invoiceStatus: '已开', receiptStatus: '已收' },
+      { orderCode: 'DD202605006', orderName: '下沙02#三管塔检测', siteCode: 'ZZ-HZ-XS02', project: '下沙专项工程', unit: '浙江中能检测', taskStatus: '待派单', invoiceStatus: '待开', receiptStatus: '待收' },
+      { orderCode: 'DD202605001', orderName: '滨江基站安全性鉴定', siteCode: 'ZZ-HZ-BJ01', project: '滨江通信保障工程', unit: '浙江中能检测', taskStatus: '已完成', invoiceStatus: '已开', receiptStatus: '待收' }
+    ]
+  },
+  'HT2026-0428': {
+    code: 'HT2026-0428',
+    name: '城西改造专项检测分包',
+    customer: '浙江某建设集团有限公司',
+    items: [
+      { orderCode: 'ZJHC20260505001', orderName: '城西改造项目检测', siteCode: 'ZZ-HZ-CX03', project: '城西区域改造项目', unit: '华东某外协检测', taskStatus: '已派单', invoiceStatus: '待开', receiptStatus: '待收' },
+      { orderCode: 'ZJHC20260505001', orderName: '城西改造项目检测', siteCode: 'ZZ-HZ-CX04', project: '城西区域改造项目', unit: '华东某外协检测', taskStatus: '检测中', invoiceStatus: '待开', receiptStatus: '待收' },
+      { orderCode: 'DD202605009', orderName: '余杭站点角钢塔巡检', siteCode: 'ZZ-HZ-YH09', project: '余杭维护专项', unit: '杭州铁塔检测中心', taskStatus: '已完成', invoiceStatus: '已开', receiptStatus: '已收' }
+    ]
+  }
+};
+
+function tagHtml(text, type) {
+  var map = {
+    '检测中': 'tag-blue', '已完成': 'tag-green', '待派单': 'tag-orange', '已派单': 'tag-blue',
+    '待开': 'tag-orange', '已开': 'tag-green',
+    '待收': 'tag-orange', '已收': 'tag-green'
+  };
+  return '<span class="tag ' + (map[text] || 'tag-gray') + '">' + text + '</span>';
+}
+
+function renderDetailRows(items) {
+  return items.map(function (r) {
+    return (
+      '<tr>' +
+      '<td>' + r.orderCode + '</td>' +
+      '<td>' + r.orderName + '</td>' +
+      '<td>' + r.siteCode + '</td>' +
+      '<td>' + r.project + '</td>' +
+      '<td>' + r.unit + '</td>' +
+      '<td>' + tagHtml(r.taskStatus) + '</td>' +
+      '<td>' + tagHtml(r.invoiceStatus) + '</td>' +
+      '<td>' + tagHtml(r.receiptStatus) + '</td>' +
+      '</tr>'
+    );
+  }).join('');
+}
+
+function openDetailModal(contractCode) {
+  var data = CONTRACT_DETAILS[contractCode];
+  if (!data) return;
+  document.getElementById('detailModalTitle').textContent = '订单站址明细 · ' + data.code;
+  document.getElementById('detailModalMeta').innerHTML =
+    '<strong>' + data.name + '</strong><br>关联客户：' + data.customer +
+    ' · 共 ' + data.items.length + ' 条站址记录';
+  document.getElementById('detailTableBody').innerHTML = renderDetailRows(data.items);
+  document.getElementById('detailModal').classList.add('open');
+  document.getElementById('detailModal').setAttribute('aria-hidden', 'false');
+}
+
+function closeDetailModal() {
+  document.getElementById('detailModal').classList.remove('open');
+  document.getElementById('detailModal').setAttribute('aria-hidden', 'true');
+}
+
+window.__prototypePageInit = function () {
+  document.querySelectorAll('.js-open-detail').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openDetailModal(btn.getAttribute('data-contract'));
+    });
+  });
+  document.getElementById('detailModalClose').addEventListener('click', closeDetailModal);
+  document.getElementById('detailModalOk').addEventListener('click', closeDetailModal);
+  document.getElementById('detailModal').addEventListener('click', function (e) {
+    if (e.target === document.getElementById('detailModal')) closeDetailModal();
+  });
+};
+</script>
+</body>
+</html>

@@ -328,7 +328,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
   <div style="padding:12px 16px 8px; background:#fff;">
     <div style="position:relative;">
       <i class="fa-solid fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#C9CDD4; font-size:14px;"></i>
-      <input id="searchInput" type="text" placeholder="搜索：订单号/站点/联系人/坐标/日期" style="width:100%; height:36px; border:1px solid #E5E6EB; border-radius:18px; padding:0 12px 0 36px; font-size:14px; outline:none; box-sizing:border-box; background:#F7F8FA;">
+      <input id="searchInput" type="text" placeholder="搜索：订单号/站址编码/坐标/日期" style="width:100%; height:36px; border:1px solid #E5E6EB; border-radius:18px; padding:0 12px 0 36px; font-size:14px; outline:none; box-sizing:border-box; background:#F7F8FA;">
     </div>
   </div>
   <div style="padding:10px 16px; background:#fff; border-bottom:1px solid #F2F3F5;" class="toolbar-row">
@@ -344,7 +344,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
   </div>
   <div id="listArea" style="padding:8px 16px 24px; overflow-y:auto; height:calc(100vh - 44px - 90px - 42px - 72px - 45px);">
 
-    <div class="order-card" data-scope="todo" data-status="待检测" data-urged="1" data-deadline="2026-05-15" data-dispatch="2026-05-06" data-lat="30.2084" data-lng="120.2126" data-search="dd20260506001 滨江 滨江基站01 年检 单管 tt-bj 年度常规 王某某 120.2126 30.2084 2026-05-15 催办 催">
+    <div class="order-card" data-scope="todo" data-status="待检测" data-urged="1" data-deadline="2026-05-15" data-dispatch="2026-05-06" data-lat="30.2084" data-lng="120.2126" data-search="dd20260506001 zz-hz-bj01 滨江 年检 单管 tt-bj 年度常规 120.2126 30.2084 2026-05-15 催办 催">
       <div class="order-card-inner">
         <a class="order-card-body" href="../../工单/详情/ipad_order_detail.html?order=DD20260506001">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -354,11 +354,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
               <span class="tag-f" style="background:#E8F7FF; color:#165DFF;">待检测</span>
             </span>
           </div>
-          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35;">滨江区铁塔年度检测订单</div>
-          <div style="font-size:11px;color:#86909C;margin-top:-4px">进入<strong>订单详情</strong> → <strong>开始检测</strong> → 塔型 / 塔段 / 模板 → 填报</div>
+          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35; font-family:ui-monospace,monospace;">ZZ-HZ-BJ01</div>
           <div class="card-meta">
-            <div><i class="fa-solid fa-location-dot" style="width:14px;color:#165DFF;flex-shrink:0;"></i> 站点 滨江基站01</div>
-            <div><i class="fa-solid fa-user" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 王某某 138****5678</div>
             <div><i class="fa-regular fa-calendar" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 截止日期 <span class="deadline-date">2026-05-15</span></div>
             <div><i class="fa-solid fa-crosshairs" style="width:14px;color:#165DFF;flex-shrink:0;" aria-hidden="true"></i><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;">120.2126，30.2084</span></div>
           </div>
@@ -370,25 +367,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
             </a>
           </div>
           <div class="card-act-actions">
-            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260506001" data-task="RW202606006" data-title="滨江区铁塔年度检测订单"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
-            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260506001" data-task="RW202606006" data-title="滨江区铁塔年度检测订单"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
+            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260506001" data-task="RW202606006" data-title="ZZ-HZ-BJ01"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
+            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260506001" data-task="RW202606006" data-title="ZZ-HZ-BJ01"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="order-card" data-scope="todo" data-status="检测中" data-deadline="2026-05-18" data-dispatch="2026-05-07" data-lat="30.2955" data-lng="120.0891" data-search="dd20260507002 城西 城西枢纽 专项 角钢 tt-cx 李某某 120.0891 30.2955 2026-05-18">
+    <div class="order-card" data-scope="todo" data-status="检测中" data-deadline="2026-05-18" data-dispatch="2026-05-07" data-lat="30.2955" data-lng="120.0891" data-search="dd20260507002 zz-hz-cx03 城西 专项 角钢 tt-cx 120.0891 30.2955 2026-05-18">
       <div class="order-card-inner">
         <a class="order-card-body" href="../../工单/详情/ipad_order_detail.html?order=DD20260507002">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-size:12px; color:#86909C; font-family:ui-monospace,monospace;">DD20260507002</span>
             <span class="tag-f" style="background:#FFF7E8; color:#FF7D00;">检测中</span>
           </div>
-          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35;">城西区铁塔专项安全检测</div>
-          <div style="font-size:11px;color:#86909C;margin-top:-4px">订单详情 → <strong>继续填报</strong>；底部「检测」将定位本任务</div>
+          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35; font-family:ui-monospace,monospace;">ZZ-HZ-CX03</div>
           <div class="card-meta">
-            <div><i class="fa-solid fa-location-dot" style="width:14px;color:#165DFF;flex-shrink:0;"></i> 站点 城西枢纽站</div>
-            <div><i class="fa-solid fa-user" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 李某某 139****1234</div>
             <div><i class="fa-regular fa-calendar" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 截止日期 <span class="deadline-date">2026-05-18</span></div>
             <div><i class="fa-solid fa-crosshairs" style="width:14px;color:#165DFF;flex-shrink:0;" aria-hidden="true"></i><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;">120.0891，30.2955</span></div>
           </div>
@@ -400,24 +394,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
             </a>
           </div>
           <div class="card-act-actions">
-            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260507002" data-task="RW202606007" data-title="城西区铁塔专项安全检测"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
-            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260507002" data-task="RW202606007" data-title="城西区铁塔专项安全检测"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
+            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260507002" data-task="RW202606007" data-title="ZZ-HZ-CX03"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
+            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260507002" data-task="RW202606007" data-title="ZZ-HZ-CX03"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="order-card" data-scope="todo" data-status="待检测" data-deadline="2026-05-22" data-dispatch="2026-05-08" data-lat="30.4211" data-lng="119.9780" data-search="dd20260508004 余杭 季度 四管 周某某 119.9780 30.4211 2026-05-22">
+    <div class="order-card" data-scope="todo" data-status="待检测" data-deadline="2026-05-22" data-dispatch="2026-05-08" data-lat="30.4211" data-lng="119.9780" data-search="dd20260508004 zz-hz-yh09 余杭 季度 四管 119.9780 30.4211 2026-05-22">
       <div class="order-card-inner">
         <a class="order-card-body" href="../../工单/详情/ipad_order_detail.html?order=DD20260508004">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-size:12px; color:#86909C; font-family:ui-monospace,monospace;">DD20260508004</span>
             <span class="tag-f" style="background:#E8F7FF; color:#165DFF;">待检测</span>
           </div>
-          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35;">余杭区铁塔季度巡检</div>
+          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35; font-family:ui-monospace,monospace;">ZZ-HZ-YH09</div>
           <div class="card-meta">
-            <div><i class="fa-solid fa-location-dot" style="width:14px;color:#165DFF;flex-shrink:0;"></i> 站点 余杭南枢纽</div>
-            <div><i class="fa-solid fa-user" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 周某某 137****8899</div>
             <div><i class="fa-regular fa-calendar" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 截止日期 <span class="deadline-date">2026-05-22</span></div>
             <div><i class="fa-solid fa-crosshairs" style="width:14px;color:#165DFF;flex-shrink:0;" aria-hidden="true"></i><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;">119.9780，30.4211</span></div>
           </div>
@@ -429,24 +421,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
             </a>
           </div>
           <div class="card-act-actions">
-            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260508004" data-task="RW202606008" data-title="余杭区铁塔季度巡检"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
-            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260508004" data-task="RW202606008" data-title="余杭区铁塔季度巡检"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
+            <button type="button" class="card-act-btn card-act-reject" data-order="DD20260508004" data-task="RW202606008" data-title="ZZ-HZ-YH09"><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>拒绝</span></button>
+            <button type="button" class="card-act-btn card-act-transfer" data-order="DD20260508004" data-task="RW202606008" data-title="ZZ-HZ-YH09"><i class="fa-solid fa-right-left" aria-hidden="true"></i><span>转派</span></button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="order-card" data-scope="done" data-status="已完成" data-deadline="2026-05-10" data-dispatch="2026-05-05" data-lat="30.3320" data-lng="120.1412" data-search="dd20260505003 拱墅 复检 三管 陈某某 120.1412 30.3320 2026-05-10">
+    <div class="order-card" data-scope="done" data-status="已完成" data-deadline="2026-05-10" data-dispatch="2026-05-05" data-lat="30.3320" data-lng="120.1412" data-search="dd20260505003 zz-hz-gs05 拱墅 复检 三管 120.1412 30.3320 2026-05-10">
       <div class="order-card-inner">
         <a class="order-card-body" href="../../工单/详情/ipad_order_detail.html?order=DD20260505003">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-size:12px; color:#86909C; font-family:ui-monospace,monospace;">DD20260505003</span>
             <span class="tag-f" style="background:#E8FFEA; color:#00B42A;">已完成</span>
           </div>
-          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35;">拱墅区铁塔加固复检</div>
+          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35; font-family:ui-monospace,monospace;">ZZ-HZ-GS05</div>
           <div class="card-meta">
-            <div><i class="fa-solid fa-location-dot" style="width:14px;color:#165DFF;flex-shrink:0;"></i> 站点 拱墅北环站</div>
-            <div><i class="fa-solid fa-user" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 陈某某 136****0001</div>
             <div><i class="fa-regular fa-calendar" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 截止日期 <span class="deadline-date">2026-05-10</span></div>
             <div><i class="fa-solid fa-crosshairs" style="width:14px;color:#165DFF;flex-shrink:0;" aria-hidden="true"></i><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;">120.1412，30.3320</span></div>
           </div>
@@ -461,17 +451,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif
       </div>
     </div>
 
-    <div class="order-card" data-scope="done" data-status="已完成" data-deadline="2026-05-03" data-dispatch="2026-05-04" data-lat="30.2455" data-lng="120.1188" data-search="dd20260504005 西湖 验收 单管 赵某某 120.1188 30.2455 2026-05-03">
+    <div class="order-card" data-scope="done" data-status="已完成" data-deadline="2026-05-03" data-dispatch="2026-05-04" data-lat="30.2455" data-lng="120.1188" data-search="dd20260504005 zz-hz-xh02 西湖 验收 单管 120.1188 30.2455 2026-05-03">
       <div class="order-card-inner">
         <a class="order-card-body" href="../../工单/详情/ipad_order_detail.html?order=DD20260504005">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <span style="font-size:12px; color:#86909C; font-family:ui-monospace,monospace;">DD20260504005</span>
             <span class="tag-f" style="background:#E8FFEA; color:#00B42A;">已完成</span>
           </div>
-          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35;">西湖区铁塔新建验收</div>
+          <div style="font-size:15px; font-weight:600; color:#1D2129; margin-bottom:10px; line-height:1.35; font-family:ui-monospace,monospace;">ZZ-HZ-XH02</div>
           <div class="card-meta">
-            <div><i class="fa-solid fa-location-dot" style="width:14px;color:#165DFF;flex-shrink:0;"></i> 站点 西湖景区东</div>
-            <div><i class="fa-solid fa-user" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 赵某某 135****7788</div>
             <div><i class="fa-regular fa-calendar" style="width:14px;color:#C9CDD4;flex-shrink:0;"></i> 截止日期 <span class="deadline-date">2026-05-03</span></div>
             <div><i class="fa-solid fa-crosshairs" style="width:14px;color:#165DFF;flex-shrink:0;" aria-hidden="true"></i><span style="font-family:ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;">120.1188，30.2455</span></div>
           </div>

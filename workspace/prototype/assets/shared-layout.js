@@ -13,16 +13,20 @@ const MENU = [
     {id:'contract_downstream', label:'对下合同', href:'../../合同管理/对下合同/pc_contract_downstream_list.html'},
     {id:'contract_receipt', label:'对上收款', href:'../../合同管理/合同收款/pc_contract_receipt.html'},
     {id:'contract_payment', label:'对下付款', href:'../../合同管理/合同付款/pc_contract_payment.html'},
+    {id:'invoice_manage', label:'开票管理', href:'../../合同管理/开票管理/pc_invoice_manage.html'},
   ]},
   { id:'yxgl', label:'营销管理', icon:'fa-handshake', items:[
     {id:'customer_list', label:'客户管理', href:'../../营销管理/客户管理/pc_customer_list.html'},
     {id:'project_list', label:'工程管理', href:'../../营销管理/工程管理/pc_project_list.html'},
     {id:'order_list', label:'订单管理', href:'../../合同部管理/订单管理/pc_order_list.html'},
-    {id:'order_reports', label:'报告查询', href:'../../合同部管理/报告查阅/pc_order_reports.html'},
   ]},
   { id:'jcyw', label:'检测管理', icon:'fa-tower-broadcast', items:[
     {id:'task_list', label:'检测任务', href:'../../铁塔检测业务/检测任务/pc_task_list.html'},
     {id:'report_generate', label:'报告编制', href:'../../铁塔检测业务/报告编制/report-list.html'},
+  ]},
+  { id:'tjfx', label:'统计分析', icon:'fa-chart-column', items:[
+    {id:'order_stats', label:'订单统计', href:'../../统计分析/订单统计/pc_order_stats.html'},
+    {id:'order_reports', label:'报告查询', href:'../../合同部管理/报告查阅/pc_order_reports.html'},
   ]},
   { id:'ttjcpz', label:'模板配置', icon:'fa-sliders', items:[
     {id:'inspect_template_list', label:'检测模板', href:'../../模板配置/检测模板/pc_inspect_template_list.html'},
@@ -46,6 +50,19 @@ const MENU = [
   ]},
 ];
 
+function flattenMenuItems(items) {
+  const out = [];
+  for (const item of items) {
+    if (item.children) out.push.apply(out, item.children);
+    else out.push(item);
+  }
+  return out;
+}
+
+function menuGroupHasActive(group, activeId) {
+  return flattenMenuItems(group.items).some(function (i) { return i.id === activeId; });
+}
+
 function buildSidebar(activeId) {
   let html = `<div class="layout-sidebar" id="sidebar">
   <div class="sidebar-logo">
@@ -54,7 +71,7 @@ function buildSidebar(activeId) {
   </div>
   <nav class="sidebar-nav">`;
   for (const g of MENU) {
-    const hasActive = g.items.some(i => i.id === activeId);
+    const hasActive = menuGroupHasActive(g, activeId);
     html += `<div class="menu-group${hasActive ? ' open' : ''}">
       <div class="menu-group-title" onclick="this.parentElement.classList.toggle('open')">
         <span><i class="fa-solid ${g.icon} group-icon"></i>${g.label}</span>
@@ -62,7 +79,21 @@ function buildSidebar(activeId) {
       </div>
       <div class="menu-group-items">`;
     for (const item of g.items) {
-      html += `<a class="menu-item${item.id === activeId ? ' active' : ''}" href="${item.href}">${item.label}</a>`;
+      if (item.children) {
+        const subActive = item.children.some(function (c) { return c.id === activeId; });
+        html += `<div class="menu-submenu${subActive ? ' open' : ''}">
+          <div class="menu-submenu-title" onclick="event.stopPropagation();this.parentElement.classList.toggle('open')">
+            <span>${item.label}</span>
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </div>
+          <div class="menu-submenu-items">`;
+        for (const child of item.children) {
+          html += `<a class="menu-item menu-item-nested${child.id === activeId ? ' active' : ''}" href="${child.href}">${child.label}</a>`;
+        }
+        html += `</div></div>`;
+      } else {
+        html += `<a class="menu-item${item.id === activeId ? ' active' : ''}" href="${item.href}">${item.label}</a>`;
+      }
     }
     html += `</div></div>`;
   }

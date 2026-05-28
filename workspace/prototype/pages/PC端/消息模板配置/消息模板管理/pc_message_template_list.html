@@ -15,7 +15,7 @@
     <div class="card-body">
       <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5">
         <i class="fa-solid fa-circle-info"></i>
-        「对上合同-收款/付款提醒」「对下合同-付款提醒」需在编辑页配置<strong>消息接收人员</strong>，到期后仅向已配置人员推送至消息中心（不进待办）。
+        「对上合同-收款提醒」「对下合同-付款提醒」需在编辑页配置<strong>消息接收人员</strong>，到期后仅向已配置人员推送至消息中心（不进待办）。
       </p>
       <div class="toolbar">
         <div class="toolbar-left">
@@ -23,7 +23,6 @@
           <select class="form-select">
             <option value="">全部场景</option>
             <option>对上合同-收款提醒</option>
-            <option>对上合同-付款提醒</option>
             <option>对下合同-付款提醒</option>
             <option>任务催办</option>
             <option>任务转派</option>
@@ -63,19 +62,6 @@
             <td class="col-action">
               <a href="pc_message_template_edit.html?scene=CONTRACT_UP_RECEIPT_REMIND" class="btn-text">编辑</a>
               <button type="button" class="btn-text js-preview" data-key="CONTRACT_UP_RECEIPT_REMIND">预览</button>
-            </td>
-          </tr>
-          <tr>
-            <td><span class="tag tag-orange">对上合同-付款提醒</span></td>
-            <td>对上付款提醒-默认</td>
-            <td>按提醒行时间</td>
-            <td><span class="tag tag-blue" title="仅以下人员可收到">王敏、刘洋、张伟</span></td>
-            <td><span class="tag tag-green">启用</span></td>
-            <td>王敏</td>
-            <td>2026-05-08 11:22</td>
-            <td class="col-action">
-              <a href="pc_message_template_edit.html?scene=CONTRACT_UP_PAYMENT_REMIND" class="btn-text">编辑</a>
-              <button type="button" class="btn-text js-preview" data-key="CONTRACT_UP_PAYMENT_REMIND">预览</button>
             </td>
           </tr>
           <tr>
@@ -140,7 +126,6 @@
 window.__layoutConfig = { active: 'message_template_list', breadcrumb: ['模板配置', '消息模板'] };
 var PREVIEW = {
   CONTRACT_UP_RECEIPT_REMIND: '【收款提醒】杭州移动2026框架 · 首付款 将于 2026-02-01 到期',
-  CONTRACT_UP_PAYMENT_REMIND: '【付款提醒】杭州移动2026框架 · 进度款',
   CONTRACT_DOWN_PAYMENT_REMIND: '【对下付款提醒】单站检测外协服务包',
   TASK_URGE: '【任务催办】任务 RW-2026-0521 · 余杭站点角钢塔巡检\n\n任务编号 RW-2026-0521，任务名称「余杭站点角钢塔巡检」，请尽快处理。',
   TASK_REASSIGN: '【任务转派】RW-2026-0521 · 余杭站点角钢塔巡检\n\n任务已转派给您。前检测人员：张三。',

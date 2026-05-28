@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开票管理 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+  .modal-mask.open { display:flex; }
+  .modal-dialog { background:#fff; border-radius:8px; width:min(760px,96vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
+  .modal-body { padding:16px 18px; }
+  .modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+  .modal-close { border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:18px; line-height:1; padding:4px; }
+  .search-select-wrap { position:relative; }
+  .search-select-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:30; background:#fff; border:1px solid var(--border); border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.08); max-height:220px; overflow:auto; display:none; }
+  .search-select-dropdown.open { display:block; }
+  .search-select-item { padding:8px 10px; font-size:13px; cursor:pointer; line-height:1.5; }
+  .search-select-item:hover { background:#F2F6FF; }
+  .search-select-empty { padding:8px 10px; font-size:12px; color:var(--text-3); }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="page-header">
+    <div class="page-title">开票管理</div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input type="text" class="form-input" id="kwInput" placeholder="开票编码/合同编号/客户" style="width:260px">
+          <select class="form-select" id="statusFilter" style="width:140px">
+            <option value="">全部状态</option>
+            <option value="待收款">待收款</option>
+            <option value="已收款">已收款</option>
+          </select>
+          <button type="button" class="btn btn-primary" id="btnSearch"><i class="fa-solid fa-magnifying-glass"></i> 查询</button>
+          <button type="button" class="btn btn-default" id="btnReset"><i class="fa-solid fa-rotate-right"></i> 重置</button>
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:var(--text-3);margin:0 0 12px;line-height:1.5">
+        <i class="fa-solid fa-circle-info"></i> 收款在对上合同「收款登记」中关联开票单后自动回写；本页仅维护开票信息，不提供收款操作。
+      </p>
+
+      <div class="pc-table-actions">
+        <button type="button" class="btn btn-primary" id="btnOpenAdd"><i class="fa-solid fa-plus"></i> 新增开票</button>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>关联客户</th>
+            <th>关联合同</th>
+            <th>开票编码</th>
+            <th>开票金额</th>
+            <th>开票时间</th>
+            <th>收款状态</th>
+            <th>收款时间</th>
+            <th class="col-action" style="width:140px">操作</th>
+          </tr>
+        </thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="editMask" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <h3 id="editTitle">新增开票</h3>
+        <button type="button" class="modal-close" id="btnEditX" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid form-grid-2">
+          <div class="form-group">
+            <label class="form-label">关联客户 <span class="required">*</span></label>
+            <div class="search-select-wrap">
+              <input class="form-input" id="mCustomerText" placeholder="搜索客户并选择" style="width:100%">
+              <div class="search-select-dropdown" id="mCustomerDropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">关联合同 <span class="required">*</span></label>
+            <div class="search-select-wrap">
+              <input class="form-input" id="mContractText" placeholder="搜索合同并选择" style="width:100%">
+              <div class="search-select-dropdown" id="mContractDropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">开票编码 <span class="required">*</span></label>
+            <input type="text" class="form-input" id="mInvoiceCode" style="width:100%" placeholder="如：KP-202605-001">
+          </div>
+          <div class="form-group">
+            <label class="form-label">开票金额(元) <span class="required">*</span></label>
+            <input type="number" class="form-input" id="mInvoiceAmount" style="width:100%" min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">开票时间 <span class="required">*</span></label>
+            <input type="date" class="form-input" id="mInvoiceTime" style="width:100%">
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-default" id="btnEditCancel">取消</button>
+        <button type="button" class="btn btn-primary" id="btnEditSave"><i class="fa-solid fa-check"></i> 确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'invoice_manage', breadcrumb: ['合同管理', '开票管理'] };
+
+window.addEventListener('DOMContentLoaded', function () {
+  var CUSTOMER_OPTIONS = [
+    '中国移动通信集团浙江有限公司',
+    '浙江某建设集团有限公司',
+    '中国铁塔股份有限公司嘉兴市分公司'
+  ];
+  var CONTRACT_OPTIONS = [
+    { code: 'DX2026-0101', name: '单站检测外协服务包', customer: '中国移动通信集团浙江有限公司' },
+    { code: 'DX2026-0102', name: '塔身焊缝抽检协作', customer: '浙江某建设集团有限公司' },
+    { code: 'DX2026-0108', name: '嘉兴站点专项检测', customer: '中国铁塔股份有限公司嘉兴市分公司' }
+  ];
+  var rows = [
+    { id: '1', customer: '中国移动通信集团浙江有限公司', contract: 'DX2026-0101', invoiceCode: 'KP-202605-001', amount: 120000, invoiceTime: '2026-05-08', status: '待收款', receiveTime: '—' },
+    { id: '2', customer: '浙江某建设集团有限公司', contract: 'DX2026-0102', invoiceCode: 'KP-202605-002', amount: 45000, invoiceTime: '2026-05-10', status: '已收款', receiveTime: '2026-05-18' }
+  ];
+  var editingId = '';
+  var listBody = document.getElementById('listBody');
+  var editMask = document.getElementById('editMask');
+  var kwInput = document.getElementById('kwInput');
+  var statusFilter = document.getElementById('statusFilter');
+
+  function fmtMoney(n) {
+    var x = Number(n || 0);
+    return '¥ ' + x.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/"/g, '&quot;');
+  }
+  function todayText() {
+    var d = new Date();
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+  function contractName(code) {
+    var c = CONTRACT_OPTIONS.find(function (x) { return x.code === code; });
+    return c ? (c.code + ' · ' + c.name) : code;
+  }
+
+  function filterRows() {
+    var kw = (kwInput.value || '').trim().toLowerCase();
+    var st = statusFilter.value || '';
+    return rows.filter(function (r) {
+      if (st && r.status !== st) return false;
+      if (!kw) return true;
+      return r.customer.toLowerCase().indexOf(kw) >= 0 ||
+        r.contract.toLowerCase().indexOf(kw) >= 0 ||
+        r.invoiceCode.toLowerCase().indexOf(kw) >= 0;
+    });
+  }
+
+  function renderTable() {
+    var data = filterRows();
+    if (!data.length) {
+      listBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-3)">暂无数据</td></tr>';
+      return;
+    }
+    listBody.innerHTML = data.map(function (r) {
+      var tagCls = r.status === '已收款' ? 'tag-green' : 'tag-orange';
+      var received = r.status === '已收款';
+      var editBtn = received
+        ? '<button type="button" class="btn-text" disabled style="color:#bfbfbf;cursor:not-allowed" title="已收款，不可编辑">编辑</button>'
+        : '<button type="button" class="btn-text js-edit">编辑</button>';
+      var delBtn = received
+        ? '<button type="button" class="btn-text" disabled style="color:#bfbfbf;cursor:not-allowed" title="已收款，不可删除">删除</button>'
+        : '<button type="button" class="btn-text js-del" style="color:var(--danger)">删除</button>';
+      return '<tr data-id="' + esc(r.id) + '">' +
+        '<td>' + esc(r.customer) + '</td>' +
+        '<td>' + esc(contractName(r.contract)) + '</td>' +
+        '<td>' + esc(r.invoiceCode) + '</td>' +
+        '<td>' + esc(fmtMoney(r.amount)) + '</td>' +
+        '<td>' + esc(r.invoiceTime) + '</td>' +
+        '<td><span class="tag ' + tagCls + '">' + esc(r.status) + '</span></td>' +
+        '<td>' + esc(r.receiveTime || '—') + '</td>' +
+        '<td class="col-action">' +
+          '<button type="button" class="btn-text js-view">查看</button> ' +
+          editBtn + ' ' + delBtn +
+        '</td></tr>';
+    }).join('');
+  }
+
+  function openEditModal(isEdit) {
+    document.getElementById('editTitle').textContent = isEdit ? '编辑开票' : '新增开票';
+    editMask.classList.add('open');
+  }
+  function closeEditModal() { editMask.classList.remove('open'); }
+
+  function initSearchSelect(inputId, dropdownId, getItems, onPick) {
+    var input = document.getElementById(inputId);
+    var dropdown = document.getElementById(dropdownId);
+    if (!input || !dropdown) return;
+    function render(filterText) {
+      var f = String(filterText || '').trim().toLowerCase();
+      var items = getItems().filter(function (it) {
+        return !f || it.label.toLowerCase().indexOf(f) >= 0;
+      });
+      if (!items.length) {
+        dropdown.innerHTML = '<div class="search-select-empty">无匹配项</div>';
+        return;
+      }
+      dropdown.innerHTML = items.map(function (it) {
+        return '<div class="search-select-item" data-value="' + esc(it.value) + '">' + esc(it.label) + '</div>';
+      }).join('');
+    }
+    input.addEventListener('focus', function () { render(input.value); dropdown.classList.add('open'); });
+    input.addEventListener('input', function () { render(input.value); dropdown.classList.add('open'); });
+    input.addEventListener('blur', function () { setTimeout(function () { dropdown.classList.remove('open'); }, 120); });
+    dropdown.addEventListener('mousedown', function (e) {
+      var t = e.target;
+      if (!(t instanceof Element)) return;
+      var item = t.closest('.search-select-item');
+      if (!item) return;
+      var val = item.getAttribute('data-value') || '';
+      var label = item.textContent || '';
+      input.value = label;
+      onPick(val, label);
+      dropdown.classList.remove('open');
+    });
+  }
+
+  var mCustomerText = document.getElementById('mCustomerText');
+  var mContractText = document.getElementById('mContractText');
+  var mInvoiceCode = document.getElementById('mInvoiceCode');
+  var mInvoiceAmount = document.getElementById('mInvoiceAmount');
+  var mInvoiceTime = document.getElementById('mInvoiceTime');
+  var selectedCustomer = '';
+  var selectedContract = '';
+
+  initSearchSelect('mCustomerText', 'mCustomerDropdown', function () {
+    return CUSTOMER_OPTIONS.map(function (c) { return { value: c, label: c }; });
+  }, function (value) {
+    selectedCustomer = value;
+    if (selectedContract) {
+      var c = CONTRACT_OPTIONS.find(function (x) { return x.code === selectedContract; });
+      if (c && c.customer !== selectedCustomer) {
+        selectedContract = '';
+        mContractText.value = '';
+      }
+    }
+  });
+  initSearchSelect('mContractText', 'mContractDropdown', function () {
+    return CONTRACT_OPTIONS
+      .filter(function (c) { return !selectedCustomer || c.customer === selectedCustomer; })
+      .map(function (c) { return { value: c.code, label: c.code + ' · ' + c.name }; });
+  }, function (value) {
+    selectedContract = value;
+    var c = CONTRACT_OPTIONS.find(function (x) { return x.code === value; });
+    if (c) {
+      selectedCustomer = c.customer;
+      mCustomerText.value = c.customer;
+    }
+  });
+
+  function loadModalData(row) {
+    selectedCustomer = row ? row.customer : '';
+    selectedContract = row ? row.contract : '';
+    mCustomerText.value = row ? row.customer : '';
+    mContractText.value = row ? contractName(row.contract) : '';
+    mInvoiceCode.value = row ? row.invoiceCode : '';
+    mInvoiceAmount.value = row ? row.amount : '';
+    mInvoiceTime.value = row ? row.invoiceTime : todayText();
+  }
+
+  function saveModal() {
+    if (!selectedCustomer) return alert('请选择关联客户');
+    if (!selectedContract) return alert('请选择关联合同');
+    if (!mInvoiceCode.value.trim()) return alert('请输入开票编码');
+    if (!mInvoiceAmount.value || Number(mInvoiceAmount.value) <= 0) return alert('请输入有效开票金额');
+    if (!mInvoiceTime.value) return alert('请选择开票时间');
+    if (editingId) {
+      var r = rows.find(function (x) { return x.id === editingId; });
+      if (!r) return;
+      if (r.status === '已收款') return alert('该开票单已收款，不可编辑');
+      r.customer = selectedCustomer;
+      r.contract = selectedContract;
+      r.invoiceCode = mInvoiceCode.value.trim();
+      r.amount = Number(mInvoiceAmount.value);
+      r.invoiceTime = mInvoiceTime.value;
+    } else {
+      rows.unshift({
+        id: String(Date.now()),
+        customer: selectedCustomer,
+        contract: selectedContract,
+        invoiceCode: mInvoiceCode.value.trim(),
+        amount: Number(mInvoiceAmount.value),
+        invoiceTime: mInvoiceTime.value,
+        status: '待收款',
+        receiveTime: '—'
+      });
+    }
+    closeEditModal();
+    renderTable();
+  }
+
+  document.getElementById('btnOpenAdd').addEventListener('click', function () {
+    editingId = '';
+    loadModalData(null);
+    openEditModal(false);
+  });
+  document.getElementById('btnEditX').addEventListener('click', closeEditModal);
+  document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
+  document.getElementById('btnEditSave').addEventListener('click', saveModal);
+  editMask.addEventListener('click', function (e) { if (e.target === editMask) closeEditModal(); });
+
+  document.getElementById('btnSearch').addEventListener('click', renderTable);
+  document.getElementById('btnReset').addEventListener('click', function () {
+    kwInput.value = '';
+    statusFilter.value = '';
+    renderTable();
+  });
+  listBody.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!(t instanceof Element)) return;
+    var tr = t.closest('tr');
+    if (!tr) return;
+    var id = tr.getAttribute('data-id');
+    var row = rows.find(function (x) { return x.id === id; });
+    if (!row) return;
+    if (t.closest('.js-view')) {
+      alert('查看开票：' + row.invoiceCode + '（原型）');
+      return;
+    }
+    if (t.closest('.js-edit')) {
+      if (row.status === '已收款') {
+        alert('该开票单已收款，不可编辑');
+        return;
+      }
+      editingId = row.id;
+      loadModalData(row);
+      openEditModal(true);
+      return;
+    }
+    if (t.closest('.js-del')) {
+      if (row.status === '已收款') {
+        alert('该开票单已收款，不可删除');
+        return;
+      }
+      if (!confirm('确认删除该开票记录吗？')) return;
+      rows = rows.filter(function (x) { return x.id !== row.id; });
+      renderTable();
+    }
+  });
+
+  renderTable();
+});
+</script>
+</body>
+</html>

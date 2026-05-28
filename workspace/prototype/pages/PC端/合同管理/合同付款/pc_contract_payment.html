@@ -11,12 +11,17 @@
   .modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
   .modal-mask.open { display:flex; }
   .modal-dialog { background:#fff; border-radius:8px; width:min(720px,96vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+  .modal-dialog.order-modal { width:min(1260px,98vw); }
   .modal-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
   .modal-head h3 { margin:0; font-size:16px; font-weight:600; color:var(--text-1); }
   .modal-body { padding:16px 18px; }
   .modal-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
   .modal-close { border:none; background:transparent; color:var(--text-3); cursor:pointer; font-size:18px; line-height:1; padding:4px; }
   .modal-close:hover { color:var(--text-1); }
+  .order-picker-toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .order-summary { font-size:12px; color:var(--text-2); margin-top:8px; min-height:18px; }
+  .order-echo { margin-top:8px; font-size:12px; color:var(--text-2); line-height:1.6; max-height:72px; overflow:auto; border:1px solid var(--border); border-radius:4px; padding:6px 8px; background:#fafafa; }
+  .sr-only-select { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 </style>
 </head>
 <body>
@@ -101,11 +106,19 @@
       <div class="form-grid form-grid-3">
         <div class="form-group full">
           <label class="form-label">关联对下合同 <span class="required">*</span></label>
-          <select class="form-select" style="width:100%" id="mContract">
+          <input class="form-input" style="width:100%" id="mContractSearch" list="mContractList" placeholder="搜索合同编号/名称并选择">
+          <datalist id="mContractList"></datalist>
+          <select class="form-select sr-only-select" style="width:100%" id="mContract">
             <option value="">请选择对下合同</option>
             <option value="DX2026-0101" data-name="单站检测外协服务包" data-amt="120000" data-paid="45000">DX2026-0101 · 单站检测外协服务包</option>
             <option value="DX2026-0102" data-name="塔身焊缝抽检协作" data-amt="96000" data-paid="22000">DX2026-0102 · 塔身焊缝抽检协作</option>
           </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">关联订单</label>
+          <button type="button" class="btn btn-default btn-sm" id="btnPickOrders"><i class="fa-solid fa-link"></i> 关联订单</button>
+          <div class="order-summary" id="mOrderSummary">未关联订单</div>
+          <div class="order-echo" id="mOrderEcho">—</div>
         </div>
         <div class="form-group">
           <label class="form-label">合同金额(含税，只读)</label>
@@ -144,6 +157,48 @@
     </div>
   </div>
 </div>
+
+<div class="modal-mask" id="orderPickMask" role="dialog" aria-modal="true" aria-labelledby="orderPickTitle">
+  <div class="modal-dialog order-modal">
+    <div class="modal-head">
+      <h3 id="orderPickTitle">关联订单</h3>
+      <button type="button" class="modal-close" id="btnOrderPickX" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="order-picker-toolbar">
+        <input type="text" class="form-input" id="orderFilterKeyword" placeholder="筛选订单编码/名称/站址编码" style="width:300px">
+        <select class="form-select" id="orderFilterStatus" style="width:140px">
+          <option value="未完结" selected>未完结</option>
+          <option value="全部">全部</option>
+          <option value="已完结">已完结</option>
+        </select>
+        <button type="button" class="btn btn-primary btn-sm" id="btnOrderFilterSearch"><i class="fa-solid fa-magnifying-glass"></i> 筛选</button>
+        <button type="button" class="btn btn-default btn-sm" id="btnOrderFilterReset"><i class="fa-solid fa-rotate-right"></i> 重置</button>
+      </div>
+      <p class="toolbar-note" id="orderDefaultHint" style="margin:0 0 10px"></p>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:50px">选择</th>
+            <th>订单编码</th>
+            <th>订单名称</th>
+            <th>站址编码</th>
+            <th>关联工程</th>
+            <th>关联对上合同</th>
+            <th>关联对下合同</th>
+            <th>关联检测单位</th>
+            <th style="width:100px">订单状态</th>
+          </tr>
+        </thead>
+        <tbody id="orderPickBody"></tbody>
+      </table>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-default" id="btnOrderPickCancel">取消</button>
+      <button type="button" class="btn btn-primary" id="btnOrderPickOk"><i class="fa-solid fa-check"></i> 确定</button>
+    </div>
+  </div>
+</div>
 </div>
 
 <script src="../../../../assets/shared-layout.js"></script>
@@ -151,14 +206,32 @@
 window.__layoutConfig = { active: 'contract_payment', breadcrumb: ['合同管理', '对下付款'] };
 
 window.addEventListener('DOMContentLoaded', function () {
+  var ORDER_MOCK = [
+    { id: 'DD2026-2001', code: 'DD2026-2001', name: '余杭站点外协复测', siteCode: 'ZJ-HZ-YH-011', project: 'GC2026-0088 杭州移动余杭站点包', upContract: 'HT2026-0512', downContract: 'DX2026-0101', unit: '杭州某某检测技术有限公司', status: '执行中' },
+    { id: 'DD2026-2002', code: 'DD2026-2002', name: '临安站点焊缝抽检', siteCode: 'ZJ-HZ-LA-016', project: 'GC2026-0091 临安整治项目', upContract: 'HT2026-0512', downContract: 'DX2026-0101', unit: '杭州某某检测技术有限公司', status: '待执行' },
+    { id: 'DD2026-2003', code: 'DD2026-2003', name: '城西改造专项巡检', siteCode: 'ZJ-HZ-XH-021', project: 'GC2026-0066 城西改造专项', upContract: 'HT2026-0428', downContract: 'DX2026-0102', unit: '外协协作单位', status: '执行中' },
+    { id: 'DD2026-2004', code: 'DD2026-2004', name: '城西改造阶段验收', siteCode: 'ZJ-HZ-XH-029', project: 'GC2026-0066 城西改造专项', upContract: 'HT2026-0428', downContract: 'DX2026-0102', unit: '外协协作单位', status: '已完结' }
+  ];
   var mask = document.getElementById('modalMask');
   var btnOpen = document.getElementById('btnOpenAdd');
   if (!mask || !btnOpen) return;
 
   var mContract = document.getElementById('mContract');
+  var mContractSearch = document.getElementById('mContractSearch');
+  var mContractList = document.getElementById('mContractList');
   var mAmt = document.getElementById('mContractAmt');
   var mPaid = document.getElementById('mPaidSum');
   var listBody = document.getElementById('listBody');
+  var mOrderSummary = document.getElementById('mOrderSummary');
+  var mOrderEcho = document.getElementById('mOrderEcho');
+  var orderPickMask = document.getElementById('orderPickMask');
+  var orderPickBody = document.getElementById('orderPickBody');
+  var btnPickOrders = document.getElementById('btnPickOrders');
+  var orderFilterKeyword = document.getElementById('orderFilterKeyword');
+  var orderFilterStatus = document.getElementById('orderFilterStatus');
+  var orderDefaultHint = document.getElementById('orderDefaultHint');
+  var selectedOrderIds = [];
+  var draftOrderIds = [];
 
   function fmtMoney(n) {
     if (n == null || n === '') return '';
@@ -167,11 +240,45 @@ window.addEventListener('DOMContentLoaded', function () {
     return '¥ ' + x.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  function setSearchValueFromSelect() {
+    var opt = mContract.options[mContract.selectedIndex];
+    mContractSearch.value = opt && opt.value ? (opt.value + ' · ' + (opt.dataset.name || '')) : '';
+  }
+
+  function buildContractDatalist() {
+    if (!mContractList) return;
+    var html = '';
+    for (var i = 0; i < mContract.options.length; i++) {
+      var opt = mContract.options[i];
+      if (!opt.value) continue;
+      html += '<option value="' + opt.value + ' · ' + (opt.dataset.name || '') + '"></option>';
+    }
+    mContractList.innerHTML = html;
+  }
+
+  function matchContractFromSearch(text) {
+    var input = String(text || '').trim().toLowerCase();
+    if (!input) return '';
+    for (var i = 0; i < mContract.options.length; i++) {
+      var opt = mContract.options[i];
+      if (!opt.value) continue;
+      var full = (opt.value + ' · ' + (opt.dataset.name || '')).toLowerCase();
+      var byCode = opt.value.toLowerCase();
+      if (full === input || byCode === input || full.indexOf(input) >= 0) return opt.value;
+    }
+    return '';
+  }
+
   function openModal() {
     mask.classList.add('open');
     mContract.value = '';
+    mContractSearch.value = '';
     mAmt.value = '';
     mPaid.value = '';
+    selectedOrderIds = [];
+    draftOrderIds = [];
+    if (mOrderSummary) mOrderSummary.textContent = '未关联订单';
+    if (mOrderEcho) mOrderEcho.textContent = '—';
     document.getElementById('mAmount').value = '';
     document.getElementById('mRemark').value = '';
     var d = document.getElementById('mDate');
@@ -181,18 +288,152 @@ window.addEventListener('DOMContentLoaded', function () {
     mask.classList.remove('open');
   }
 
+  function isUnfinishedStatus(status) {
+    return status !== '已完结';
+  }
+
+  function getCurrentDownstreamContract() {
+    return (mContract.value || '').trim();
+  }
+
+  function renderOrderSummary() {
+    if (!mOrderSummary) return;
+    if (!selectedOrderIds.length) {
+      mOrderSummary.textContent = '未关联订单';
+      if (mOrderEcho) mOrderEcho.textContent = '—';
+      return;
+    }
+    var selectedOrders = ORDER_MOCK.filter(function (o) { return selectedOrderIds.indexOf(o.id) >= 0; });
+    var codes = selectedOrders.map(function (o) { return o.code; }).join('，');
+    mOrderSummary.textContent = '已关联 ' + selectedOrders.length + ' 个订单：' + codes;
+    if (mOrderEcho) {
+      mOrderEcho.innerHTML = selectedOrders.map(function (o) {
+        return o.code + ' · ' + o.name;
+      }).join('<br>');
+    }
+  }
+
+  function filterOrders() {
+    var downstreamContract = getCurrentDownstreamContract();
+    var kw = String(orderFilterKeyword.value || '').trim().toLowerCase();
+    var statusFilter = orderFilterStatus.value || '未完结';
+    return ORDER_MOCK.filter(function (o) {
+      if (o.downContract !== downstreamContract) return false;
+      if (statusFilter === '未完结' && !isUnfinishedStatus(o.status)) return false;
+      if (statusFilter === '已完结' && isUnfinishedStatus(o.status)) return false;
+      if (!kw) return true;
+      return o.code.toLowerCase().indexOf(kw) >= 0 ||
+        o.name.toLowerCase().indexOf(kw) >= 0 ||
+        o.siteCode.toLowerCase().indexOf(kw) >= 0;
+    });
+  }
+
+  function renderOrderPickRows() {
+    if (!orderPickBody) return;
+    var rows = filterOrders();
+    if (!rows.length) {
+      orderPickBody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-3)">无匹配订单</td></tr>';
+      return;
+    }
+    orderPickBody.innerHTML = rows.map(function (o) {
+      var checked = draftOrderIds.indexOf(o.id) >= 0 ? ' checked' : '';
+      return '<tr data-order-id="' + o.id + '">' +
+        '<td><input type="checkbox" class="js-order-check"' + checked + '></td>' +
+        '<td>' + o.code + '</td>' +
+        '<td>' + o.name + '</td>' +
+        '<td>' + o.siteCode + '</td>' +
+        '<td>' + o.project + '</td>' +
+        '<td>' + o.upContract + '</td>' +
+        '<td>' + o.downContract + '</td>' +
+        '<td>' + o.unit + '</td>' +
+        '<td>' + o.status + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function openOrderPickModal() {
+    var downstreamContract = getCurrentDownstreamContract();
+    if (!downstreamContract) {
+      alert('请先选择对下合同');
+      return;
+    }
+    draftOrderIds = selectedOrderIds.slice();
+    orderFilterKeyword.value = '';
+    orderFilterStatus.value = '未完结';
+    if (orderDefaultHint) {
+      orderDefaultHint.textContent = '默认展示：与当前对下合同「' + downstreamContract + '」关联且订单状态为「未完结」的数据。';
+    }
+    renderOrderPickRows();
+    orderPickMask.classList.add('open');
+  }
+
+  function closeOrderPickModal() {
+    orderPickMask.classList.remove('open');
+  }
+
   mContract.addEventListener('change', function () {
     var opt = mContract.options[mContract.selectedIndex];
     if (!opt || !opt.dataset.amt) {
       mAmt.value = '';
       mPaid.value = '';
+      selectedOrderIds = [];
+      draftOrderIds = [];
+      renderOrderSummary();
       return;
     }
     mAmt.value = fmtMoney(opt.dataset.amt);
     mPaid.value = fmtMoney(opt.dataset.paid);
+    setSearchValueFromSelect();
+    selectedOrderIds = [];
+    draftOrderIds = [];
+    renderOrderSummary();
+  });
+
+  buildContractDatalist();
+  mContractSearch.addEventListener('change', function () {
+    var matched = matchContractFromSearch(mContractSearch.value);
+    if (!matched) return;
+    mContract.value = matched;
+    mContract.dispatchEvent(new Event('change'));
+  });
+  mContractSearch.addEventListener('blur', function () {
+    var matched = matchContractFromSearch(mContractSearch.value);
+    if (!matched) return;
+    mContract.value = matched;
+    mContract.dispatchEvent(new Event('change'));
   });
 
   btnOpen.addEventListener('click', openModal);
+  if (btnPickOrders) btnPickOrders.addEventListener('click', openOrderPickModal);
+  document.getElementById('btnOrderPickX').addEventListener('click', closeOrderPickModal);
+  document.getElementById('btnOrderPickCancel').addEventListener('click', closeOrderPickModal);
+  document.getElementById('btnOrderFilterSearch').addEventListener('click', renderOrderPickRows);
+  document.getElementById('btnOrderFilterReset').addEventListener('click', function () {
+    orderFilterKeyword.value = '';
+    orderFilterStatus.value = '未完结';
+    renderOrderPickRows();
+  });
+  orderPickBody.addEventListener('change', function (e) {
+    var target = e.target;
+    if (!(target instanceof HTMLInputElement) || !target.classList.contains('js-order-check')) return;
+    var tr = target.closest('tr');
+    if (!tr) return;
+    var id = tr.getAttribute('data-order-id');
+    if (!id) return;
+    if (target.checked) {
+      if (draftOrderIds.indexOf(id) < 0) draftOrderIds.push(id);
+    } else {
+      draftOrderIds = draftOrderIds.filter(function (x) { return x !== id; });
+    }
+  });
+  document.getElementById('btnOrderPickOk').addEventListener('click', function () {
+    selectedOrderIds = draftOrderIds.slice();
+    renderOrderSummary();
+    closeOrderPickModal();
+  });
+  orderPickMask.addEventListener('click', function (e) {
+    if (e.target === orderPickMask) closeOrderPickModal();
+  });
   document.getElementById('btnModalX').addEventListener('click', closeModal);
   document.getElementById('btnModalCancel').addEventListener('click', closeModal);
   mask.addEventListener('click', function (e) {
@@ -243,6 +484,7 @@ window.addEventListener('DOMContentLoaded', function () {
       if (mContract.options[i].value === preCode) {
         mContract.selectedIndex = i;
         mContract.dispatchEvent(new Event('change'));
+        setSearchValueFromSelect();
         break;
       }
     }

@@ -101,7 +101,7 @@
             <option>已通过</option>
             <option>已驳回</option>
           </select>
-          <input type="text" class="form-input" placeholder="任务编号/名称/订单编码" style="width:200px">
+          <input type="text" class="form-input" placeholder="任务编号/订单名称/订单编码/站址编码" style="width:240px">
           <select class="form-select">
             <option value="">全部检测类型</option>
             <option>安全性鉴定</option>
@@ -127,11 +127,12 @@
             <tr>
               <th style="width:36px"><input type="checkbox" id="checkAllTasks" aria-label="全选"></th>
               <th style="width:118px">任务编号</th>
-              <th>任务名称</th>
-              <th style="width:118px">来源订单</th>
+              <th style="width:110px">站址编码</th>
+              <th style="min-width:120px">站点名称</th>
+              <th>订单名称</th>
+              <th style="width:118px">订单编码</th>
               <th style="width:72px">省</th>
               <th style="width:72px">市</th>
-              <th>站点/铁塔</th>
               <th style="width:100px">检测类型</th>
               <th style="width:140px">检测单位</th>
               <th style="width:88px">检测人员</th>
@@ -148,11 +149,12 @@
             <tr data-task-id="RW202606001" data-task-status="待指派" data-audit-status="" data-version="" data-submit-time="">
               <td><input type="checkbox" class="row-check-task" aria-label="选择"></td>
               <td>RW202606001</td>
+              <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-BJ01</td>
+              <td>滨江枢纽站</td>
               <td>滨江01#塔安全鉴定</td>
               <td>ZJHBJ20260506001</td>
               <td>浙江</td>
               <td>杭州</td>
-              <td>滨江枢纽站 / TT-BJ-001</td>
               <td>安全性鉴定</td>
               <td>浙江中能</td>
               <td>—</td>
@@ -173,11 +175,12 @@
             <tr data-task-id="RW202606002" data-task-status="待检测" data-audit-status="未提交" data-version="" data-submit-time="">
               <td><input type="checkbox" class="row-check-task" aria-label="选择"></td>
               <td>RW202606002</td>
+              <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-YH09</td>
+              <td>余杭12#站点</td>
               <td>余杭12#塔抗震鉴定</td>
               <td>ZJHYH20260503001</td>
               <td>浙江</td>
               <td>杭州</td>
-              <td>余杭12#站点 / TT-YH-001</td>
               <td>抗震鉴定</td>
               <td>浙江中能</td>
               <td>李明</td>
@@ -199,11 +202,12 @@
             <tr data-task-id="RW202606003" data-task-status="检测中" data-audit-status="未提交" data-version="" data-submit-time="">
               <td><input type="checkbox" class="row-check-task" aria-label="选择"></td>
               <td>RW202606003</td>
+              <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-XH02</td>
+              <td>西湖文化广场</td>
               <td>西湖角钢塔复检</td>
               <td>ZJHXH20260502001</td>
               <td>浙江</td>
               <td>杭州</td>
-              <td>西湖文化广场 / TT-XH-002</td>
               <td>可靠性鉴定</td>
               <td>浙江中能</td>
               <td>王强</td>
@@ -224,11 +228,12 @@
             <tr data-task-id="RW202606004" data-task-status="已检测" data-audit-status="待审核" data-version="V1" data-submit-time="2026-05-08 18:20">
               <td><input type="checkbox" class="row-check-task" aria-label="选择"></td>
               <td>RW202606004</td>
+              <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-XS08</td>
+              <td>萧山08#站点</td>
               <td>萧山单管塔常规检</td>
               <td>ZJHXS20260502001</td>
               <td>浙江</td>
               <td>杭州</td>
-              <td>萧山08#站点 / TT-XS-001</td>
               <td>常规检测</td>
               <td>浙江中能</td>
               <td>张华</td>
@@ -248,11 +253,12 @@
             <tr data-task-id="RW202606005" data-task-status="检毕" data-audit-status="已通过" data-version="V3" data-submit-time="2026-04-28 10:05">
               <td><input type="checkbox" class="row-check-task" aria-label="选择"></td>
               <td>RW202606005</td>
+              <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-JD08</td>
+              <td>建德08#站点</td>
               <td>建德山区塔检</td>
               <td>ZJJD20260508001</td>
               <td>浙江</td>
               <td>杭州</td>
-              <td>建德08#站点</td>
               <td>安全性鉴定</td>
               <td>华东外协</td>
               <td>赵六</td>
@@ -290,8 +296,9 @@
             <thead>
               <tr>
                 <th style="width:118px">任务编号</th>
-                <th>任务名称</th>
-                <th>站点/铁塔</th>
+                <th style="width:110px">站址编码</th>
+                <th style="min-width:120px">站点名称</th>
+                <th>订单名称</th>
                 <th style="width:88px">检测人员</th>
                 <th style="width:110px">提交时间</th>
                 <th style="width:72px">当前版本</th>
@@ -303,8 +310,9 @@
             <tbody id="tbody-audit">
               <tr data-task-id="RW202606004" data-task-status="已检测" data-audit-status="待审核" data-version="V1" data-submit-time="2026-05-08 18:20">
                 <td>RW202606004</td>
+                <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-XS08</td>
+                <td>萧山08#站点</td>
                 <td>萧山单管塔常规检</td>
-                <td>萧山08#站点 / TT-XS-001</td>
                 <td>张华</td>
                 <td>2026-05-08 18:20</td>
                 <td><strong>V1</strong></td>
@@ -319,8 +327,9 @@
               </tr>
               <tr data-task-id="RW202606006" data-task-status="已检测" data-audit-status="审核中" data-version="V2" data-submit-time="2026-05-09 10:05">
                 <td>RW202606006</td>
+                <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-LA03</td>
+                <td>临安03#站点</td>
                 <td>临安铁塔定期检</td>
-                <td>临安03#站点 / TT-LA-003</td>
                 <td>李明</td>
                 <td>2026-05-09 10:05</td>
                 <td><strong>V2</strong></td>
@@ -352,7 +361,9 @@
             <thead>
               <tr>
                 <th style="width:118px">任务编号</th>
-                <th>任务名称</th>
+                <th style="width:110px">站址编码</th>
+                <th style="min-width:120px">站点名称</th>
+                <th>订单名称</th>
                 <th style="width:88px">任务状态</th>
                 <th style="width:96px">审核结果</th>
                 <th style="width:88px">审核人</th>
@@ -363,6 +374,8 @@
             <tbody>
               <tr data-task-id="RW202605901">
                 <td>RW202605901</td>
+                <td style="font-family:ui-monospace,monospace;font-size:12px">ZZ-HZ-FY02</td>
+                <td>富阳02#站点</td>
                 <td>富阳02#塔安全性鉴定</td>
                 <td><span class="tag tag-green">检毕</span></td>
                 <td><span class="tag tag-green">已通过</span></td>
@@ -705,7 +718,7 @@ window.addEventListener('DOMContentLoaded', function () {
     rows.forEach(function (tr) {
       var id = tr.getAttribute('data-task-id') || '';
       var no = tr.cells[1] ? tr.cells[1].textContent.trim() : '';
-      var name = tr.cells[2] ? tr.cells[2].textContent.trim() : '';
+      var name = tr.cells[4] ? tr.cells[4].textContent.trim() : '';
       var li = document.createElement('li');
       li.setAttribute('data-task-id', id);
       li.textContent = no + ' · ' + name;

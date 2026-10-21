@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>通信铁塔检测系统 · v1.1.0 · APP 订单入口</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", Roboto, sans-serif; }
+.phone-shell {
+  width:390px; height:844px; border-radius:48px; border:8px solid #1D2129;
+  box-shadow:0 0 0 2px #86909C, 0 20px 60px rgba(0,0,0,0.15); overflow:hidden; background:#000;
+  position:relative; flex-shrink:0;
+}
+.phone-shell::before {
+  content:''; position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  width:120px; height:32px; background:#1D2129; border-radius:20px; z-index:10;
+}
+.phone-shell iframe { width:100%; height:100%; border:0; border-radius:40px; }
+.nav-link { display:block; padding:8px 14px; border-radius:8px; font-size:13px; color:#1D2129; text-decoration:none; transition:all 0.15s; cursor:pointer; }
+.nav-link:hover { background:#E8F3FF; color:#165DFF; }
+.nav-link.active { background:#165DFF; color:#fff; }
+.nav-group-title { font-size:11px; font-weight:600; color:#86909C; letter-spacing:0.05em; padding:12px 14px 4px; }
+</style>
+</head>
+<body style="background:#F2F3F5; min-height:100vh;">
+<div style="background:#0f172a;color:#e2e8f0;font-size:12px;line-height:1.6;padding:8px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+  <span>版本 v1.1.0 · APP 订单入口 · 新增订单为两步，检测任务可多条</span>
+  <span><a href="../../../docs/versions/v1.1.0/prd.html" style="color:#e2e8f0;">查看 PRD</a> · <a href="index.html" style="color:#e2e8f0;">版本门户</a> · <a href="../../index.html" style="color:#e2e8f0;">返回总入口</a></span>
+</div>
+
+<div style="max-width:1200px; margin:0 auto; padding:40px 24px;">
+  <header style="margin-bottom:32px;">
+    <h1 style="font-size:22px; font-weight:700; color:#1D2129; margin:0;">通信铁塔检测系统 · v1.1.0</h1>
+    <p style="font-size:13px; color:#86909C; margin:6px 0 0;">APP 端 · 订单入口。从「我的」进入订单列表，可新增订单。</p>
+  </header>
+
+  <div style="display:flex; gap:32px; align-items:flex-start;">
+    <div class="phone-shell">
+      <iframe id="phoneFrame" src="pages/APP端/个人中心/首页/app_profile_index.html" title="订单入口预览"></iframe>
+    </div>
+    <div style="flex:1; min-width:0; background:#fff; border-radius:16px; border:1px solid #E5E6EB; box-shadow:0 1px 4px rgba(0,0,0,0.04); max-height:844px; overflow-y:auto;">
+      <div style="padding:16px 14px 8px; border-bottom:1px solid #F2F3F5;">
+        <div style="font-size:15px; font-weight:600; color:#1D2129;">页面导航</div>
+        <div style="font-size:12px; color:#86909C;">订单入口，以及检测任务中的塔段页</div>
+      </div>
+      <div class="nav-group-title">订单入口</div>
+      <div style="padding:0 8px 16px;">
+        <a class="nav-link active" onclick="loadPage('个人中心/首页/app_profile_index.html', this)"><i class="fa-solid fa-user" style="width:20px;"></i> 我的（入口所在页）</a>
+        <a class="nav-link" onclick="loadPage('个人中心/app_profile_orders.html', this)"><i class="fa-solid fa-file-invoice" style="width:20px;"></i> 订单入口 · 订单列表</a>
+        <a class="nav-link" onclick="loadPage('个人中心/app_profile_order_create.html', this)"><i class="fa-solid fa-plus" style="width:20px;"></i> 新增订单</a>
+      </div>
+      <div class="nav-group-title">检测任务</div>
+      <div style="padding:0 8px 16px;">
+        <a class="nav-link" onclick="loadPage('检测/分段/app_inspect_segment.html', this)"><i class="fa-solid fa-layer-group" style="width:20px;"></i> 塔段检测</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function loadPage(page, el) {
+  document.getElementById('phoneFrame').src = 'pages/APP端/' + page;
+  document.querySelectorAll('.nav-link').forEach(function(a) { a.classList.remove('active'); });
+  if (el) el.classList.add('active');
+}
+</script>
+</body>
+</html>

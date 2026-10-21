@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>新增订单</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../assets/app-frame.css">
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; background: #F2F3F5; margin: 0; padding-bottom: 108px; }
+.nav-bar { height: 44px; display: flex; align-items: center; padding: 0 12px; background: #fff; border-bottom: 1px solid #E5E6EB; position: sticky; top: 0; z-index: 10; }
+.steps { display: flex; gap: 8px; margin: 12px 16px 0; }
+.step-pill { flex: 1; background: #fff; border: 1px solid #E5E6EB; border-radius: 10px; padding: 8px 10px; font-size: 13px; color: #86909C; }
+.step-pill.on { border-color: #165DFF; color: #165DFF; font-weight: 600; background: #F5F8FF; }
+.step-pill b { display: block; font-size: 11px; font-weight: 500; }
+.sec { background: #fff; margin: 12px 16px; border-radius: 12px; padding: 14px; border: 1px solid #E5E6EB; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+.sec h3 { margin: 0 0 12px; font-size: 15px; font-weight: 600; color: #1D2129; }
+.lbl { font-size: 13px; color: #86909C; margin-bottom: 6px; display: block; }
+.req { color: #F53F3F; }
+.inp, .sel { width: 100%; height: 44px; border: 1px solid #E5E6EB; border-radius: 10px; padding: 0 12px; font-size: 15px; box-sizing: border-box; background: #fff; font-family: inherit; }
+.ta { width: 100%; min-height: 72px; border: 1px solid #E5E6EB; border-radius: 10px; padding: 10px 12px; font-size: 15px; box-sizing: border-box; resize: vertical; font-family: inherit; }
+.ro { background: #F7F8FA; color: #1D2129; }
+.hint { font-size: 11px; color: #86909C; margin-top: 6px; line-height: 1.45; }
+.gap { margin-top: 12px; }
+.fixb { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom,0)); background: #fff; border-top: 1px solid #E5E6EB; display: flex; gap: 10px; z-index: 20; }
+.fixb a, .fixb button { flex: 1; text-align: center; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: inherit; text-decoration: none; border: none; cursor: pointer; }
+.btn-d { background: #fff; color: #4E5969; border: 1px solid #E5E6EB !important; }
+.btn-p { background: #165DFF; color: #fff; }
+.mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: flex-end; justify-content: center; }
+.mask.on { display: flex; }
+.sheet { width: 100%; max-height: 74vh; background: #fff; border-radius: 16px 16px 0 0; padding: 16px; box-sizing: border-box; overflow-y: auto; }
+.pick { display: block; width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; border: 1px solid #E5E6EB; border-radius: 10px; background: #fff; font-size: 14px; cursor: pointer; font-family: inherit; }
+.pick:active { background: #F7F8FA; }
+.task-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.task-head strong { font-size: 15px; color: #1D2129; }
+.link-btn { border: none; background: none; color: #F53F3F; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; padding: 0; }
+.task-actions { display: flex; gap: 8px; margin: 0 16px 8px; }
+.add-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; border: 1px dashed #165DFF; border-radius: 10px; background: #fff; color: #165DFF; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; }
+.std-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F2F3F5; font-size: 13px; color: #1D2129; }
+.std-row button { border: none; background: none; color: #165DFF; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; padding: 0; }
+.detail-line { display: flex; gap: 8px; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #F2F3F5; }
+.detail-line span { width: 72px; flex-shrink: 0; color: #86909C; }
+</style>
+</head>
+<body>
+<div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#165DFF;">
+  <span style="font-size:14px;font-weight:600;color:#fff;">9:41</span>
+  <span style="font-size:12px;color:#fff;"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+</div>
+<div class="nav-bar">
+  <a href="app_profile_orders.html" id="navBack" style="color:#165DFF;text-decoration:none;font-size:14px;min-width:40px;"><i class="fa-solid fa-chevron-left"></i></a>
+  <span style="flex:1;text-align:center;font-size:16px;font-weight:600;" id="navTitle">新增订单</span>
+  <button type="button" id="btnImport" hidden style="border:none;background:none;color:#165DFF;font-size:14px;font-weight:600;padding:0;min-width:40px;text-align:right;font-family:inherit;">导入</button>
+</div>
+
+<div class="steps">
+  <div class="step-pill on" id="pill1"><b>第一步</b>基础信息</div>
+  <div class="step-pill" id="pill2"><b>第二步</b>检测任务</div>
+</div>
+
+<div id="panel1">
+  <div class="sec">
+    <h3>1.1 基础信息</h3>
+    <label class="lbl">订单名称 <span class="req">*</span></label>
+    <input type="text" class="inp" id="orderName" placeholder="请输入订单名称">
+    <label class="lbl gap">订单编码（系统自动生成）</label>
+    <input type="text" class="inp ro" id="orderCode" readonly placeholder="选择工程并填写派单日期后预览">
+    <p class="hint">有工程时用工程编码前缀 + 派单日期 + 3 位流水。</p>
+    <label class="lbl gap">派单日期 <span class="req">*</span></label>
+    <input type="date" class="inp" id="dispatchDate" value="2026-05-14">
+    <label class="lbl gap">截止日期 <span class="req">*</span></label>
+    <input type="date" class="inp" id="dueDate" value="2026-06-14">
+  </div>
+
+  <div class="sec">
+    <h3>1.2 选择工程</h3>
+    <label class="lbl">所属工程 <span class="req">*</span></label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="projDisp" class="inp ro" style="flex:1;" readonly placeholder="请点击选择工程">
+      <button type="button" id="btnPick" style="flex-shrink:0;height:44px;padding:0 14px;background:#165DFF;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;">选择</button>
+    </div>
+    <p class="hint">选定工程后，下列字段只读回显，不可手改。</p>
+    <label class="lbl gap">工程编码</label>
+    <input type="text" id="echoProjectCode" class="inp ro" readonly placeholder="选择工程后回显">
+    <label class="lbl gap">关联合同</label>
+    <input type="text" id="echoContractCode" class="inp ro" readonly placeholder="选择工程后回显">
+    <label class="lbl gap">合同名称</label>
+    <input type="text" id="echoContractName" class="inp ro" readonly placeholder="选择工程后回显">
+    <label class="lbl gap">客户名称</label>
+    <input type="text" id="echoCustomerName" class="inp ro" readonly placeholder="回显合同客户">
+    <p class="hint">取关联合同上的客户。</p>
+    <label class="lbl gap">工程客户</label>
+    <input type="text" id="echoProjectCustomer" class="inp ro" readonly placeholder="回显工程客户">
+    <p class="hint">取该工程上的客户，与合同客户分开。</p>
+  </div>
+</div>
+
+<div id="panel2" hidden>
+  <div id="taskList"></div>
+  <div class="task-actions">
+    <button type="button" class="add-btn" id="btnAddTask"><i class="fa-solid fa-plus"></i> 添加检测任务</button>
+  </div>
+  <p class="hint" style="margin:0 16px 12px;">可手工添加，也可导入后自动生成多条。每条先填站点编码，再填站点名称。必填仍是站点名称、检测类型。</p>
+</div>
+
+<div class="fixb" id="bar1">
+  <a href="app_profile_orders.html" class="btn-d">取消</a>
+  <button type="button" class="btn-p" id="btnNext">下一步</button>
+</div>
+<div class="fixb" id="bar2" hidden>
+  <button type="button" class="btn-d" id="btnPrev">上一步</button>
+  <button type="button" class="btn-p" id="btnSave">保存</button>
+</div>
+
+<div id="mask" class="mask" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:16px;font-weight:600;">选择工程</span>
+      <button type="button" id="mClose" style="border:none;background:none;font-size:20px;color:#86909C;">×</button>
+    </div>
+    <input type="text" id="projSearch" placeholder="工程名称 / 工程编码" style="width:100%;height:40px;border:1px solid #E5E6EB;border-radius:8px;padding:0 10px;margin-bottom:10px;box-sizing:border-box;">
+    <div id="projList"></div>
+  </div>
+</div>
+
+<div id="importMask" class="mask" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:16px;font-weight:600;">导入检测任务</span>
+      <button type="button" id="importClose" style="border:none;background:none;font-size:20px;color:#86909C;">×</button>
+    </div>
+    <p class="hint" style="margin-top:0;">按模板导入，每行一条任务，导入后自动追加。列顺序：站点编码、站点名称、所属省、所属市、经度、纬度、检测类型、检测规范组、检测需求说明。站点名称或检测类型为空的行会跳过。</p>
+    <input type="file" id="importFile" accept=".csv,text/csv,.txt" hidden>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button type="button" class="btn-d" id="btnTpl" style="flex:1;height:44px;border-radius:10px;font-weight:600;">下载模板</button>
+      <button type="button" class="btn-p" id="btnChooseFile" style="flex:1;height:44px;border-radius:10px;border:none;color:#fff;background:#165DFF;font-weight:600;">选择文件</button>
+    </div>
+    <button type="button" id="btnImportDemo" style="width:100%;margin-top:8px;height:44px;border-radius:10px;border:1px solid #E5E6EB;background:#fff;font-weight:600;color:#1D2129;">导入示例（2 条）</button>
+  </div>
+</div>
+
+<div id="stdMask" class="mask" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:16px;font-weight:600;">检测规范详情</span>
+      <button type="button" id="stdClose" style="border:none;background:none;font-size:20px;color:#86909C;">×</button>
+    </div>
+    <div class="detail-line"><span>规范编号</span><b id="stdCode">—</b></div>
+    <div class="detail-line"><span>规范名称</span><b id="stdName">—</b></div>
+    <div class="detail-line"><span>适用对象</span><b id="stdScope">—</b></div>
+    <div class="detail-line"><span>状态</span><b id="stdStatus">—</b></div>
+    <p class="hint">详情为原型演示，正式名称与条文以标准库为准。</p>
+  </div>
+</div>
+
+<template id="taskTpl">
+  <div class="sec task-card">
+    <div class="task-head">
+      <strong class="js-title">检测任务 1</strong>
+      <button type="button" class="link-btn js-del">删除</button>
+    </div>
+    <label class="lbl">站点编码</label>
+    <input type="text" class="inp js-site-code" placeholder="请先输入站点编码">
+    <label class="lbl gap">站点名称 <span class="req">*</span></label>
+    <input type="text" class="inp js-site-name" placeholder="请输入站点名称">
+    <label class="lbl gap">所属省</label>
+    <select class="sel js-province">
+      <option value="">请选择</option>
+      <option>浙江省</option>
+      <option>江苏省</option>
+    </select>
+    <label class="lbl gap">所属市</label>
+    <select class="sel js-city">
+      <option value="">请选择</option>
+      <option>杭州市</option>
+      <option>宁波市</option>
+    </select>
+    <label class="lbl gap">经度</label>
+    <input type="text" class="inp js-lng" placeholder="例 120.153576">
+    <label class="lbl gap">纬度</label>
+    <input type="text" class="inp js-lat" placeholder="例 30.287459">
+    <label class="lbl gap">检测类型 <span class="req">*</span></label>
+    <select class="sel js-type">
+      <option value="">请选择</option>
+      <option>安全性鉴定</option>
+      <option>可靠性鉴定</option>
+      <option>抗震鉴定</option>
+      <option>年度例行检测</option>
+      <option>专项检测</option>
+    </select>
+    <label class="lbl gap">检测规范组</label>
+    <select class="sel js-group">
+      <option value="">非必填</option>
+      <option value="g1">存量铁塔-单管类附表套件</option>
+      <option value="g2">存量铁塔-角钢格构附表套件</option>
+      <option value="g3">通用安全性鉴定规范组 A</option>
+    </select>
+    <label class="lbl gap">检测规范</label>
+    <input type="text" class="inp js-std" placeholder="由规范组带出，或手填编号，用逗号分隔">
+    <div class="js-std-rows"></div>
+    <label class="lbl gap">检测需求说明</label>
+    <textarea class="ta js-note" placeholder="选填：检测范围、现场条件、客户特殊要求等"></textarea>
+  </div>
+</template>
+
+<script>
+(function () {
+  var projects = [
+    { name: '2026年杭州铁塔年检工程', codePrefix: 'ZJHBJ', projectCode: 'GC-HZ-2026-001', contractCode: 'HT2026-0512', contractName: '杭州移动2026年度铁塔检测框架', customerName: '中国铁塔股份有限公司浙江省分公司', projectCustomer: '中国移动通信集团浙江有限公司杭州分公司' },
+    { name: '城西区域改造项目', codePrefix: 'ZJHCX', projectCode: 'GC-HZ-2026-018', contractCode: 'HT2026-0428', contractName: '城西改造专项检测分包合同', customerName: '中国铁塔股份有限公司浙江省分公司', projectCustomer: '中国移动通信集团浙江有限公司杭州分公司城西营销中心' },
+    { name: '余杭5G升级项目', codePrefix: 'ZJHYH', projectCode: 'GC-YH-2026-007', contractCode: 'HT2026-0601', contractName: '余杭5G基站检测服务合同', customerName: '中国铁塔股份有限公司杭州市分公司', projectCustomer: '中国电信股份有限公司杭州分公司' }
+  ];
+  var stdMap = {
+    g1: 'GB/T 51338-2018，YD/T 5132-2019，GB 50135-2019',
+    g2: 'GB/T 51338-2018，YD/T 5131-2020，JGJ 82-2011',
+    g3: 'GB/T 51338-2018，GB 50011-2010(2016版)，YD/T 5132-2019'
+  };
+  var groupLabel = {
+    g1: '存量铁塔-单管类附表套件',
+    g2: '存量铁塔-角钢格构附表套件',
+    g3: '通用安全性鉴定规范组 A'
+  };
+  var stdCatalog = {
+    'GB/T 51338-2018': { name: '通信铁塔检测引用规范（演示）', scope: '单管类、角钢类塔体现场检测', status: '现行' },
+    'YD/T 5132-2019': { name: '移动通信工程钢塔桅验收规范（演示）', scope: '钢塔桅结构验收', status: '现行' },
+    'YD/T 5131-2020': { name: '移动通信工程混凝土结构验收规范（演示）', scope: '混凝土基础与塔体', status: '现行' },
+    'GB 50135-2019': { name: '高耸结构设计标准', scope: '高耸结构承载与变形', status: '现行' },
+    'JGJ 82-2011': { name: '钢结构高强度螺栓连接技术规程', scope: '螺栓连接质量', status: '现行' },
+    'GB 50011-2010(2016版)': { name: '建筑抗震设计规范', scope: '抗震鉴定', status: '现行' }
+  };
+  var typeOptions = ['安全性鉴定', '可靠性鉴定', '抗震鉴定', '年度例行检测', '专项检测'];
+  var demoCsv = [
+    '站点编码,站点名称,所属省,所属市,经度,纬度,检测类型,检测规范组,检测需求说明',
+    'ZZ-HZ-BJ01,滨江江南大道站,浙江省,杭州市,120.2126,30.2084,年度例行检测,存量铁塔-单管类附表套件,年度例行',
+    'ZZ-HZ-CX03,城西03号站,浙江省,杭州市,120.0891,30.2955,安全性鉴定,存量铁塔-角钢格构附表套件,含基础复核'
+  ].join('\n');
+  var selected = null;
+  var mask = document.getElementById('mask');
+  var listEl = document.getElementById('projList');
+  var tpl = document.getElementById('taskTpl');
+
+  function padDate(v) {
+    if (!v) return '';
+    return String(v).replace(/-/g, '');
+  }
+  function refreshOrderCode() {
+    var el = document.getElementById('orderCode');
+    if (!selected) { el.value = ''; return; }
+    var day = padDate(document.getElementById('dispatchDate').value);
+    el.value = day ? (selected.codePrefix + day + '001') : '';
+  }
+  function fillEcho(p) {
+    selected = p;
+    document.getElementById('projDisp').value = p ? p.name : '';
+    document.getElementById('echoProjectCode').value = p ? p.projectCode : '';
+    document.getElementById('echoContractCode').value = p ? p.contractCode : '';
+    document.getElementById('echoContractName').value = p ? p.contractName : '';
+    document.getElementById('echoCustomerName').value = p ? p.customerName : '';
+    document.getElementById('echoProjectCustomer').value = p ? p.projectCustomer : '';
+    refreshOrderCode();
+  }
+  function renderProjects(q) {
+    var key = (q || '').trim();
+    listEl.innerHTML = '';
+    projects.filter(function (p) {
+      if (!key) return true;
+      return (p.name + p.projectCode + p.contractName).indexOf(key) >= 0;
+    }).forEach(function (p) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pick';
+      btn.innerHTML = p.name + '<br><span style="font-size:12px;color:#86909C;">工程编码：' + p.projectCode + ' · ' + p.contractName + '</span>';
+      btn.addEventListener('click', function () {
+        fillEcho(p);
+        mask.classList.remove('on');
+      });
+      listEl.appendChild(btn);
+    });
+    if (!listEl.children.length) {
+      listEl.innerHTML = '<p class="hint">没有匹配的工程</p>';
+    }
+  }
+  function renumber() {
+    var cards = document.querySelectorAll('#taskList .task-card');
+    cards.forEach(function (card, i) {
+      card.querySelector('.js-title').textContent = '检测任务 ' + (i + 1);
+    });
+  }
+  function stdCodes(card) {
+    return (card.querySelector('.js-std').value || '').split(/[,，、]/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  function renderStdRows(card) {
+    var box = card.querySelector('.js-std-rows');
+    var codes = stdCodes(card);
+    box.innerHTML = '';
+    if (!codes.length) {
+      box.innerHTML = '<p class="hint" style="margin:6px 0 0;">填写规范编号后，可逐条查看详情。</p>';
+      return;
+    }
+    codes.forEach(function (code) {
+      var row = document.createElement('div');
+      row.className = 'std-row';
+      var name = document.createElement('span');
+      name.textContent = code;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '查看详情';
+      btn.addEventListener('click', function () { openStd(code); });
+      row.appendChild(name);
+      row.appendChild(btn);
+      box.appendChild(row);
+    });
+  }
+  function openStd(code) {
+    var info = stdCatalog[code];
+    document.getElementById('stdCode').textContent = code;
+    document.getElementById('stdName').textContent = info ? info.name : '未在标准库中维护';
+    document.getElementById('stdScope').textContent = info ? info.scope : '—';
+    document.getElementById('stdStatus').textContent = info ? info.status : '—';
+    document.getElementById('stdMask').classList.add('on');
+  }
+  function fillCard(card, data) {
+    var d = data || {};
+    if (d.siteCode) card.querySelector('.js-site-code').value = d.siteCode;
+    if (d.siteName) card.querySelector('.js-site-name').value = d.siteName;
+    if (d.province) card.querySelector('.js-province').value = d.province;
+    if (d.city) card.querySelector('.js-city').value = d.city;
+    if (d.lng) card.querySelector('.js-lng').value = d.lng;
+    if (d.lat) card.querySelector('.js-lat').value = d.lat;
+    if (d.type) card.querySelector('.js-type').value = d.type;
+    if (d.note) card.querySelector('.js-note').value = d.note;
+    if (d.group) {
+      card.querySelector('.js-group').value = d.group;
+      if (stdMap[d.group]) card.querySelector('.js-std').value = stdMap[d.group];
+    }
+    if (d.std) card.querySelector('.js-std').value = d.std;
+    renderStdRows(card);
+  }
+  function cardBlank(card) {
+    return !card.querySelector('.js-site-code').value.trim()
+      && !card.querySelector('.js-site-name').value.trim()
+      && !card.querySelector('.js-type').value
+      && !card.querySelector('.js-std').value.trim();
+  }
+  function bindCard(card) {
+    card.querySelector('.js-del').addEventListener('click', function () {
+      var n = document.querySelectorAll('#taskList .task-card').length;
+      if (n <= 1) { alert('至少保留一条检测任务'); return; }
+      card.remove();
+      renumber();
+    });
+    card.querySelector('.js-group').addEventListener('change', function () {
+      var v = this.value;
+      if (stdMap[v]) card.querySelector('.js-std').value = stdMap[v];
+      renderStdRows(card);
+    });
+    card.querySelector('.js-std').addEventListener('input', function () { renderStdRows(card); });
+  }
+  function addTask(data) {
+    var node = tpl.content.firstElementChild.cloneNode(true);
+    document.getElementById('taskList').appendChild(node);
+    bindCard(node);
+    fillCard(node, data);
+    renumber();
+    return node;
+  }
+  function groupKey(label) {
+    var text = (label || '').trim();
+    if (stdMap[text]) return text;
+    var keys = Object.keys(groupLabel);
+    for (var i = 0; i < keys.length; i++) {
+      if (groupLabel[keys[i]] === text) return keys[i];
+    }
+    return '';
+  }
+  function splitCsvLine(line) {
+    var out = [];
+    var cur = '';
+    var quoted = false;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line.charAt(i);
+      if (ch === '"') {
+        if (quoted && line.charAt(i + 1) === '"') { cur += '"'; i++; }
+        else quoted = !quoted;
+      } else if (ch === ',' && !quoted) {
+        out.push(cur); cur = '';
+      } else cur += ch;
+    }
+    out.push(cur);
+    return out;
+  }
+  function parseCsv(text) {
+    var lines = String(text || '').replace(/^\uFEFF/, '').replace(/\r/g, '').split('\n').filter(function (l) { return l.trim(); });
+    if (lines.length < 2) return [];
+    var heads = splitCsvLine(lines[0]).map(function (h) { return h.trim(); });
+    return lines.slice(1).map(function (line) {
+      var cols = splitCsvLine(line);
+      var row = {};
+      heads.forEach(function (h, i) { row[h] = (cols[i] || '').trim(); });
+      return row;
+    });
+  }
+  function applyImport(text) {
+    var rows = parseCsv(text);
+    if (!rows.length) { alert('文件中没有检测任务数据'); return; }
+    var cards = document.querySelectorAll('#taskList .task-card');
+    if (cards.length === 1 && cardBlank(cards[0])) cards[0].remove();
+    var added = 0;
+    var skipped = 0;
+    rows.forEach(function (row) {
+      var siteName = row['站点名称'] || '';
+      var type = row['检测类型'] || '';
+      if (!siteName || typeOptions.indexOf(type) < 0) { skipped++; return; }
+      var gk = groupKey(row['检测规范组'] || '');
+      addTask({
+        siteCode: row['站点编码'] || row['站址编码'] || '',
+        siteName: siteName,
+        province: row['所属省'] || '',
+        city: row['所属市'] || '',
+        lng: row['经度'] || '',
+        lat: row['纬度'] || '',
+        type: type,
+        group: gk,
+        note: row['检测需求说明'] || ''
+      });
+      added++;
+    });
+    if (!document.querySelector('#taskList .task-card')) addTask();
+    document.getElementById('importMask').classList.remove('on');
+    alert('已导入 ' + added + ' 条检测任务' + (skipped ? '，跳过 ' + skipped + ' 条' : '') + '。');
+    var last = document.querySelector('#taskList .task-card:last-child');
+    if (last) last.scrollIntoView({ block: 'nearest' });
+  }
+  function showStep(n) {
+    var step2 = n === 2;
+    document.getElementById('panel1').hidden = step2;
+    document.getElementById('panel2').hidden = !step2;
+    document.getElementById('bar1').hidden = step2;
+    document.getElementById('bar2').hidden = !step2;
+    document.getElementById('pill1').classList.toggle('on', !step2);
+    document.getElementById('pill2').classList.toggle('on', step2);
+    document.getElementById('navTitle').textContent = step2 ? '检测任务' : '新增订单';
+    document.getElementById('btnImport').hidden = !step2;
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById('btnPick').addEventListener('click', function () {
+    document.getElementById('projSearch').value = '';
+    renderProjects('');
+    mask.classList.add('on');
+  });
+  document.getElementById('mClose').addEventListener('click', function () { mask.classList.remove('on'); });
+  mask.addEventListener('click', function (e) { if (e.target === mask) mask.classList.remove('on'); });
+  document.getElementById('projSearch').addEventListener('input', function () { renderProjects(this.value); });
+  document.getElementById('dispatchDate').addEventListener('change', refreshOrderCode);
+  document.getElementById('navBack').addEventListener('click', function (e) {
+    if (!document.getElementById('panel2').hidden) {
+      e.preventDefault();
+      showStep(1);
+    }
+  });
+  document.getElementById('btnNext').addEventListener('click', function () {
+    var name = document.getElementById('orderName').value.trim();
+    var d1 = document.getElementById('dispatchDate').value;
+    var d2 = document.getElementById('dueDate').value;
+    if (!name) { alert('请填写订单名称'); return; }
+    if (!d1 || !d2) { alert('请填写派单日期和截止日期'); return; }
+    if (d2 < d1) { alert('截止日期不能早于派单日期'); return; }
+    if (!selected) { alert('请选择工程'); return; }
+    if (!document.querySelector('#taskList .task-card')) addTask();
+    showStep(2);
+  });
+  document.getElementById('btnPrev').addEventListener('click', function () { showStep(1); });
+  document.getElementById('btnAddTask').addEventListener('click', function () {
+    var node = addTask();
+    node.scrollIntoView({ block: 'nearest' });
+  });
+  document.getElementById('btnImport').addEventListener('click', function () {
+    document.getElementById('importMask').classList.add('on');
+  });
+  document.getElementById('importClose').addEventListener('click', function () {
+    document.getElementById('importMask').classList.remove('on');
+  });
+  document.getElementById('importMask').addEventListener('click', function (e) {
+    if (e.target.id === 'importMask') document.getElementById('importMask').classList.remove('on');
+  });
+  document.getElementById('btnChooseFile').addEventListener('click', function () {
+    document.getElementById('importFile').click();
+  });
+  document.getElementById('importFile').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    this.value = '';
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () { applyImport(String(reader.result || '')); };
+    reader.readAsText(file, 'utf-8');
+  });
+  document.getElementById('btnTpl').addEventListener('click', function () {
+    var blob = new Blob(['\uFEFF' + demoCsv.split('\n')[0] + '\n'], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '检测任务导入模板.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  document.getElementById('btnImportDemo').addEventListener('click', function () { applyImport(demoCsv); });
+  document.getElementById('stdClose').addEventListener('click', function () {
+    document.getElementById('stdMask').classList.remove('on');
+  });
+  document.getElementById('stdMask').addEventListener('click', function (e) {
+    if (e.target.id === 'stdMask') document.getElementById('stdMask').classList.remove('on');
+  });
+  document.getElementById('btnSave').addEventListener('click', function () {
+    var cards = document.querySelectorAll('#taskList .task-card');
+    if (!cards.length) { alert('请至少添加一条检测任务'); return; }
+    for (var i = 0; i < cards.length; i++) {
+      var site = cards[i].querySelector('.js-site-name').value.trim();
+      var type = cards[i].querySelector('.js-type').value;
+      if (!site) { alert('第 ' + (i + 1) + ' 条检测任务请填写站点名称'); return; }
+      if (!type) { alert('第 ' + (i + 1) + ' 条检测任务请选择检测类型'); return; }
+    }
+    alert('已保存订单草稿，共 ' + cards.length + ' 条检测任务。');
+    location.href = 'app_profile_orders.html';
+  });
+})();
+</script>
+</body>
+</html>

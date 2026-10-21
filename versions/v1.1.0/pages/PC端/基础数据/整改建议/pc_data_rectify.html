@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>整改建议 - 通信铁塔检测系统</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+.level-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.level-tabs button { min-width:108px; }
+.level-tabs button.on { background:var(--primary); color:#fff; border-color:var(--primary); }
+.rectify-table td.cat-cell, .rectify-table td.advice-span { color:var(--text-1); background:#fff; vertical-align:middle; }
+.rectify-table td.cat-cell { width:120px; text-align:center; font-weight:600; }
+.rectify-table td.hazard { width:28%; color:var(--text-1); }
+.rectify-table td.advice { line-height:1.6; vertical-align:middle; }
+.mask { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:none; align-items:center; justify-content:center; padding:20px; }
+.mask.open { display:flex; }
+.dialog { background:#fff; border-radius:8px; width:min(640px,96vw); max-height:90vh; overflow:auto; box-shadow:0 12px 48px rgba(0,0,0,.18); }
+.dialog-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.dialog-head h3 { margin:0; font-size:16px; font-weight:600; }
+.dialog-body { padding:18px 20px; }
+.dialog-foot { padding:12px 18px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
+.dialog .form-input, .dialog .form-select, .dialog .form-textarea { width:100%; }
+</style>
+</head>
+<body>
+<div class="layout-wrap">
+  <div class="layout-sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fa-solid fa-tower-broadcast"></i>
+      <span class="logo-text">铁塔检测系统</span>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="menu-group open">
+          <div class="menu-group-title" onclick="this.parentElement.classList.toggle('open')">
+            <span><i class="fa-solid fa-tower-broadcast group-icon"></i>检测管理</span>
+            <i class="fa-solid fa-chevron-right chevron"></i>
+          </div>
+          <div class="menu-group-items">
+            <a class="menu-item" href="../../铁塔检测业务/报告编制/report-list.html">报告编制</a>
+          </div>
+        </div>
+        <div class="menu-group open">
+        <div class="menu-group-title" onclick="this.parentElement.classList.toggle('open')">
+          <span><i class="fa-solid fa-database group-icon"></i>基础数据</span>
+          <i class="fa-solid fa-chevron-right chevron"></i>
+        </div>
+        <div class="menu-group-items">
+          <a class="menu-item active" href="pc_data_rectify.html">整改建议</a>
+        </div>
+      </div>
+      <div class="menu-group">
+        <div class="menu-group-title" onclick="this.parentElement.classList.toggle('open')">
+          <span><i class="fa-solid fa-chart-column group-icon"></i>统计分析</span>
+          <i class="fa-solid fa-chevron-right chevron"></i>
+        </div>
+        <div class="menu-group-items">
+          <a class="menu-item" href="../../统计分析/问题汇总/pc_problem_summary.html">问题汇总</a>
+        </div>
+      </div>
+    </nav>
+    <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px">
+      <a href="../../../../../../index.html" style="color:rgba(255,255,255,0.75);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-house"></i>返回总入口</a>
+      <a href="../../../../../../../docs/versions/v1.1.0/prd.html" style="color:rgba(255,255,255,0.75);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-file-lines"></i>查看 PRD</a>
+    </div>
+  </div>
+  <div class="layout-main">
+    <div class="top-nav">
+      <div class="breadcrumb">
+        <a href="../../../../index.html"><i class="fa-solid fa-house" style="font-size:13px"></i></a>
+        <span class="bc-sep">/</span><span>基础数据</span>
+        <span class="bc-sep">/</span><span class="bc-current">整改建议</span>
+      </div>
+      <div class="top-nav-right">
+        <div class="user-info"><i class="fa-solid fa-user-circle" style="font-size:20px;color:var(--text-3)"></i> 张伟</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="card">
+        <div class="card-header"><div class="card-title">整改建议</div></div>
+        <div class="card-body">
+          <div class="level-tabs" id="levelTabs"></div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <select class="form-select" id="catFilter"><option value="">全部分类</option></select>
+              <select class="form-select" id="statusFilter">
+                <option value="">全部状态</option>
+                <option>上架</option>
+                <option>下架</option>
+              </select>
+              <input type="text" class="form-input" id="kwFilter" placeholder="分类 / 隐患描述 / 整改建议" style="width:260px">
+              <button type="button" class="btn btn-primary" id="btnQuery">查询</button>
+              <button type="button" class="btn btn-default" id="btnReset">重置</button>
+            </div>
+          </div>
+          <div class="pc-table-actions">
+            <button type="button" class="btn btn-default" id="btnAddCat"><i class="fa-solid fa-plus"></i> 新增分类</button>
+            <button type="button" class="btn btn-primary" id="btnAdd"><i class="fa-solid fa-plus"></i> 新增隐患</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-3);margin:-4px 0 12px;">分类从「新增分类」进入，可先建空分类。分类下仍有隐患时，不允许整类删除，需先逐条删除隐患。点「全部分类等级」可同时查看 A、B、C。上下架直接切换。删除为物理删除，不影响已产生的记录数据。</p>
+          <table class="data-table rectify-table">
+            <thead>
+              <tr>
+                <th id="levelHead" style="width:72px;display:none;">级别</th>
+                <th style="width:120px;text-align:center;">分类</th>
+                <th id="hazardHead">A级隐患</th>
+                <th>整改建议</th>
+                <th style="width:88px;">状态</th>
+                <th class="col-action" style="width:168px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="rectifyBody"></tbody>
+          </table>
+          <div class="pagination"><span id="rectifyCount">共 0 条记录</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="formMask">
+  <div class="dialog" role="dialog" aria-labelledby="formTitle">
+    <div class="dialog-head">
+      <h3 id="formTitle">新增整改建议</h3>
+      <button type="button" class="btn btn-text" id="formClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="dialog-body">
+      <div class="form-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="form-group">
+          <span class="form-label">级别<span class="required">*</span></span>
+          <select class="form-select" id="formLevel"><option>A级</option><option>B级</option><option>C级</option></select>
+        </div>
+        <div class="form-group">
+          <span class="form-label">状态<span class="required">*</span></span>
+          <select class="form-select" id="formStatus"><option>上架</option><option>下架</option></select>
+        </div>
+        <div class="form-group full">
+          <span class="form-label">分类<span class="required">*</span></span>
+          <select class="form-select" id="formCat"></select>
+        </div>
+        <div class="form-group full">
+          <span class="form-label">隐患描述<span class="required">*</span></span>
+          <textarea class="form-textarea" id="formHazard" placeholder="请输入隐患描述"></textarea>
+        </div>
+        <div class="form-group full">
+          <span class="form-label">整改建议</span>
+          <textarea class="form-textarea" id="formAdvice" placeholder="可空"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-default" id="formCancel">取消</button>
+      <button type="button" class="btn btn-primary" id="formSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="catMask">
+  <div class="dialog" role="dialog" aria-labelledby="catTitle" style="width:min(480px,96vw);">
+    <div class="dialog-head">
+      <h3 id="catTitle">新增分类</h3>
+      <button type="button" class="btn btn-text" id="catClose" aria-label="关闭"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="dialog-body">
+      <div class="form-grid" style="grid-template-columns:1fr;">
+        <div class="form-group">
+          <span class="form-label">级别<span class="required">*</span></span>
+          <select class="form-select" id="catLevel"><option>A级</option><option>B级</option><option>C级</option></select>
+        </div>
+        <div class="form-group">
+          <span class="form-label">分类名称<span class="required">*</span></span>
+          <input type="text" class="form-input" id="catName" placeholder="请输入分类名称">
+        </div>
+      </div>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-default" id="catCancel">取消</button>
+      <button type="button" class="btn btn-primary" id="catSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="mask" id="delMask">
+  <div class="dialog" role="dialog" style="width:min(420px,96vw);">
+    <div class="dialog-head"><h3>删除整改建议</h3></div>
+    <div class="dialog-body"><p id="delMsg" style="font-size:14px;color:var(--text-2);line-height:1.6;margin:0;">确定删除？</p></div>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-default" id="delCancel">取消</button>
+      <button type="button" class="btn btn-danger" id="delOk">删除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var rows = [{"level":"A级","cat":"构件质量","hazard":"塔体主材构件变形或辅材变形严重多处","advice":"立即更换变形构件，必要时对薄弱构件采用加大截面法进行加固或限制现有结构使用状态"},{"level":"A级","cat":"构件质量","hazard":"塔体主材构件开裂或辅材开裂严重多处","advice":"按原规格和尺寸加工构件，安装补齐"},{"level":"A级","cat":"构件质量","hazard":"塔体主材构件断裂","advice":"按原规格和尺寸加工构件，安装补齐"},{"level":"A级","cat":"构件质量","hazard":"塔体主材构件上有盲孔","advice":""},{"level":"A级","cat":"构件质量","hazard":"整塔构件或部分主材构件锈蚀严重","advice":"应去除母材锈蚀层后，用卡尺测量母材厚度，当构件截面平均锈蚀深度大于0.1t，构件应作为不适于承载的构件采取措施限制使用或更换。"},{"level":"A级","cat":"构件质量","hazard":"塔段主材连接处缺失内面节点板（主材包钢）","advice":"按同塔段节点板规格和尺寸，另行加工、安装补齐"},{"level":"A级","cat":"构件质量","hazard":"塔体整塔结构发生扭转变形","advice":""},{"level":"A级","cat":"构件质量","hazard":"辅材构件缺失","advice":"按该塔段同类构件规格和尺寸，另行加工、安装补齐"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓缺失或断裂过多","advice":"按原螺栓、螺母规格对缺失、断裂螺栓进行补回或更换并用扳手紧固"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓以小代大过多","advice":"按原螺栓、螺母规格对以小代大螺栓进行更换并用扳手紧固"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓松动过多","advice":"可用扳手对松动螺栓进行紧固维护"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓反穿过多","advice":"对反穿螺栓安装方向进行更正，螺栓穿入方向应朝向一致，由内向外、由下向上"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓锈蚀严重过多","advice":"螺栓生锈时应采用同规格的螺栓对生锈螺栓进行更换，并用扭矩扳手紧固"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓外露丝扣不足两扣过多","advice":"可采用长螺杆螺栓更换原有螺栓，螺栓拧紧后外露丝扣不应少于2扣"},{"level":"A级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓错孔过多","advice":"应按设计文件的规格和尺寸，更换错孔构件，重新补回连接螺栓并紧固"},{"level":"A级","cat":"拉线质量","hazard":"拉线锈蚀严重","advice":"按原规格对锈蚀严重/断裂拉线（拉锚）进行更换","adviceSpan":3},{"level":"A级","cat":"拉线质量","hazard":"拉锚（拉线UT型线夹或花篮螺栓）全部锈蚀严重","advice":"按原规格对锈蚀严重/断裂拉线（拉锚）进行更换","adviceSkip":true},{"level":"A级","cat":"拉线质量","hazard":"拉线断裂","advice":"按原规格对锈蚀严重/断裂拉线（拉锚）进行更换","adviceSkip":true},{"level":"A级","cat":"拉线质量","hazard":"拉线松动严重","advice":"重新紧固拉线"},{"level":"A级","cat":"拉线质量","hazard":"拉线布置不合理","advice":"拉线布置平面上宜为互交120°的三个对称方向，或互交90°的四个对称方向，拉线与水平面夹角宜为40°-60°"},{"level":"A级","cat":"拉线质量","hazard":"（楼面拉线塔）下拉锚与结构连接不可靠，拉线下拉锚点与结构构件通过少于4套预埋拉锚、穿墙螺栓的方式连接","advice":""},{"level":"A级","cat":"拉线质量","hazard":"下拉锚点处拉线通过钢绞线与拉锚连接（钢绞线穿过女儿墙），钢绞线锈蚀严重且存在断裂的隐患","advice":""},{"level":"A级","cat":"拉线质量","hazard":"三层拉线在同一方向上共用同一个下拉锚点","advice":""},{"level":"A级","cat":"拉线质量","hazard":"（非楼面拉线塔）拉线地拉锚连接不可靠，存在安全隐患","advice":""},{"level":"A级","cat":"拉线质量","hazard":"拉线下拉锚所在锚固处女儿墙等墙体开裂","advice":"拉线锚固点应设置在主体结构构件上，但布置锚栓时不应影响原有结构构件安全性"},{"level":"A级","cat":"焊缝质量","hazard":"加劲板焊缝与主材焊缝重叠","advice":""},{"level":"A级","cat":"焊缝质量","hazard":"焊缝锈蚀严重","advice":""},{"level":"A级","cat":"结构水平位移（垂直度检测）","hazard":"垂直度实测值超过H/500（H为塔高）","advice":""},{"level":"A级","cat":"结构水平位移（垂直度检测）","hazard":"楼顶塔无条件检测垂直度，由于拉线分布及松弛程度、基础问题或构件连接问题引起塔体有明显倾斜，不符合规范要求","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"基础周边散水破坏、起鼓严重","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"塔脚基础下沉明显","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"塔脚包封混凝土严重破损","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"地脚螺栓锈蚀或底法兰锈蚀严重","advice":"地脚锚栓生锈时应采用人工除锈的方法将地脚锚栓表面的氧化皮和铁锈清理干净，再用C20或以上等级混凝土将地脚锚栓全部包封且保护层厚度不应小于50mm"},{"level":"A级","cat":"基础情况质量","hazard":"塔基未固定，无地脚螺栓，塔脚与楼面无固定措施","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"地脚螺栓锈蚀严重，钢材起皮、掉渣、严重减厚，甚至造成丝扣失效","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"地脚螺栓无法满足双螺母锁紧甚至单螺母螺杆不露头等螺杆长度严重不足现象","advice":""},{"level":"A级","cat":"基础情况质量","hazard":"露出基础顶面的基础骨架未妥善保护，出现锈蚀与损伤","advice":"凿除疏松混凝土，清除钢筋外表的铁锈或重新植筋后重新浇筑混凝土"},{"level":"A级","cat":"基础情况质量","hazard":"基础周边有影响铁塔安全环境情况","advice":""},{"level":"A级","cat":"法兰盘、插接面、节点板质量","hazard":"法兰盘连接间隙过大","advice":""},{"level":"A级","cat":"法兰盘、插接面、节点板质量","hazard":"节点板连接间隙过大","advice":""},{"level":"A级","cat":"法兰盘、插接面、节点板质量","hazard":"主材插接面间隙过大（针对插接单管塔来说）","advice":""},{"level":"B级","cat":"构件质量","hazard":"塔体辅材构件轻微变形","advice":"按原规格、尺寸加工辅材构件，替换损伤辅材","adviceSpan":4},{"level":"B级","cat":"构件质量","hazard":"塔体辅材构件轻微开裂","advice":"按原规格、尺寸加工辅材构件，替换损伤辅材","adviceSkip":true},{"level":"B级","cat":"构件质量","hazard":"塔体辅材构件断裂","advice":"按原规格、尺寸加工辅材构件，替换损伤辅材","adviceSkip":true},{"level":"B级","cat":"构件质量","hazard":"塔体辅材构件上有盲孔","advice":"按原规格、尺寸加工辅材构件，替换损伤辅材","adviceSkip":true},{"level":"B级","cat":"构件质量","hazard":"主材或辅材构件锈蚀","advice":"构件母材表面生锈，可采用人工除锈的方法将锈斑清理干净，涂防锈底漆两遍后再涂面漆两遍"},{"level":"B级","cat":"防腐层质量","hazard":"构件热浸镀锌层厚度实测值不满足要求","advice":""},{"level":"B级","cat":"防腐层质量","hazard":"构件镀锌表面不平滑，有残留的溶剂渣，不符合规范要求","advice":""},{"level":"B级","cat":"防腐层质量","hazard":"构件防腐涂层脱落、掉渣严重","advice":""},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓缺失或断裂","advice":"按原螺栓、螺母规格对缺失、断裂螺栓进行补回或更换并用扳手紧固"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓以小代大","advice":"按原螺栓、螺母规格对以小代大螺栓进行更换并用扳手紧固"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓松动","advice":"可用扳手对松动螺栓进行紧固维护"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓反穿","advice":"对反穿螺栓安装方向进行更正，螺栓穿入方向应朝向一致，由内向外、由下向上"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓锈蚀","advice":"采用人工除锈的方法将锈蚀螺栓外表的铁锈和氧化层清除，涂刷防腐涂层"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓外露丝扣不足两扣","advice":"可采用长螺杆螺栓更换原有螺栓，螺栓拧紧后外露丝扣不应少于2扣"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体主材构件连接螺栓采用单螺母连接","advice":"塔体主材构件连接螺栓应采用双螺母或扣紧螺母等能防止螺母松动的有效措施"},{"level":"B级","cat":"螺栓连接质量","hazard":"塔体构件连接螺栓错孔","advice":""},{"level":"B级","cat":"拉线质量","hazard":"拉线锈蚀","advice":"清除拉线外表的铁锈和氧化层，涂刷防腐油漆"},{"level":"B级","cat":"拉线质量","hazard":"拉线卡子锈蚀","advice":"清除拉线夹外表的铁锈和氧化层，涂刷防腐油漆"},{"level":"B级","cat":"拉线质量","hazard":"拉锚（拉线UT型线夹或花篮螺栓）锈蚀","advice":""},{"level":"B级","cat":"拉线质量","hazard":"拉线松动","advice":""},{"level":"B级","cat":"拉线质量","hazard":"拉线下把固定方式不规范，用铁丝和少于3套卡子固定","advice":""},{"level":"B级","cat":"拉线质量","hazard":"拉线未采用拉环连接或拉耳缺失","advice":""},{"level":"B级","cat":"拉线质量","hazard":"拉线散股","advice":""},{"level":"B级","cat":"焊缝质量","hazard":"焊缝锈蚀","advice":""},{"level":"B级","cat":"焊缝质量","hazard":"焊缝开裂","advice":""},{"level":"B级","cat":"焊缝质量","hazard":"焊缝存在、焊瘤、咬边、未满焊、根部收缩的情况","advice":""},{"level":"B级","cat":"接地电阻质量","hazard":"接地扁铁未将塔靴和地网接通","advice":""},{"level":"B级","cat":"接地电阻质量","hazard":"接地电阻实测值不符合设计要求","advice":""},{"level":"B级","cat":"接地电阻质量","hazard":"接地扁铁缺失或接地扁铁未连接（接地扁铁搭接长度不足）","advice":""},{"level":"B级","cat":"接地电阻质量","hazard":"接地扁铁锈蚀","advice":""},{"level":"B级","cat":"基础情况质量","hazard":"基础周边回填土下沉，导致散水破坏","advice":""},{"level":"B级","cat":"基础情况质量","hazard":"柱脚空隙未用细石混凝土浇筑密实，不符合规范要求","advice":"可用C20或以上等级的细石混凝土填缝；对于塔脚底板与基础顶面基础不紧密的情况可用铁皮塞缝"},{"level":"B级","cat":"基础情况质量","hazard":"地脚螺栓有轻微锈蚀、单螺母等易整改隐患","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"馈线支架缺失","advice":"钢塔桅结构上应设置馈线走线架，馈线架的横撑间距为800mm-1500mm"},{"level":"C级","cat":"附属结构质量","hazard":"馈线固定卡缺失、馈线散乱","advice":"补回馈线固定夹，整理散乱馈线"},{"level":"C级","cat":"附属结构质量","hazard":"爬梯固定螺栓缺失","advice":"按同规格、尺寸螺栓补回固定螺栓，并用扳手紧固"},{"level":"C级","cat":"附属结构质量","hazard":"天线抱杆支撑杆连接螺栓缺失","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"天线抱杆锈蚀","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"平台构件、抱杆或其他附属构件变形","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"标识牌或广告牌构件锈蚀","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"平台护圈扁铁连接螺栓或设备固定卡缺失，用铁丝固定、连接螺栓缺失","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"安全绳拉钩、锁扣锈蚀或安全绳缺失","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"塔上有RRU或其他设备未固定或松动","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"避雷针变形","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"爬钉断裂","advice":"更换断裂爬钉"},{"level":"C级","cat":"附属结构质量","hazard":"平台倾斜","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"马蜂窝、鸟巢","advice":"清理塔身马蜂窝、鸟巢"},{"level":"C级","cat":"附属结构质量","hazard":"平台或塔体上有杂物","advice":""},{"level":"C级","cat":"附属结构质量","hazard":"美化罩的美化管缺失、断裂","advice":""},{"level":"C级","cat":"接地电阻质量","hazard":"接地扁铁缺失（但塔体本身可作为导体）","advice":"补装扁钢作为接地装置，扁铁可采用焊接连接，焊接长度不应少于其宽度的2倍"},{"level":"C级","cat":"基础情况质量","hazard":"塔脚已包封，基础情况不明","advice":""},{"level":"C级","cat":"基础情况质量","hazard":"塔脚未包封","advice":"可用C20或以上等级混凝土将地脚锚栓全部包封且保护层厚度不应小于50mm"},{"level":"C级","cat":"基础情况质量","hazard":"塔脚包封混凝土表面轻微开裂","advice":"清理裂缝及周围灰尘与杂物，可采用注浆或填补环氧浆液等方式进行修补"},{"level":"C级","cat":"基础情况质量","hazard":"塔脚内包封有积水，无排水措施","advice":"对塔基开槽埋设PVC排水管并定期清理疏通"},{"level":"C级","cat":"基础情况质量","hazard":"塔脚内长满木或杂草","advice":"清理塔脚处植被，可浇筑硬化地面"},{"level":"C级","cat":"基础情况质量","hazard":"机房或台阶破损或沉降","advice":"清除破损台阶后开挖地面，对地面填土夯实或换填处理，重新浇筑地面"},{"level":"C级","cat":"防腐层质量","hazard":"构件防腐涂层脱落、掉渣","advice":"将防腐涂层破损位置处涂层清理干净，涂防锈底漆两遍后再涂面漆两遍"},{"level":"C级","cat":"塔体周边环境","hazard":"塔体距离电力塔、电线或其他设施及建筑物过近","advice":""}];
+  var nextId = 1;
+  rows.forEach(function (r) {
+    r.id = nextId++;
+    if (!r.status) r.status = "上架";
+  });
+  var levels = ["A级", "B级", "C级"];
+  var cats = [];
+  rows.forEach(function (r) {
+    if (!cats.some(function (c) { return c.level === r.level && c.cat === r.cat; })) cats.push({ level: r.level, cat: r.cat });
+  });
+  var current = "A级";
+  var editingId = 0;
+  var pendingDeleteId = 0;
+  var pendingDeleteCat = null;
+  var body = document.getElementById("rectifyBody");
+  var countEl = document.getElementById("rectifyCount");
+  var catFilter = document.getElementById("catFilter");
+
+  function byId(id) {
+    for (var i = 0; i < rows.length; i++) if (rows[i].id === id) return rows[i];
+    return null;
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  }
+  function catKey(level, cat) { return level + "\t" + cat; }
+  function parseCatFilter() {
+    var raw = catFilter.value;
+    if (!raw) return { level: "", cat: "" };
+    if (current === "全部") {
+      var p = raw.split("\t");
+      return { level: p[0], cat: p.slice(1).join("\t") };
+    }
+    return { level: current, cat: raw };
+  }
+  function fillCats() {
+    var prev = catFilter.value;
+    var html = '<option value="">全部分类</option>';
+    cats.forEach(function (c) {
+      if (current !== "全部" && c.level !== current) return;
+      var value = current === "全部" ? catKey(c.level, c.cat) : c.cat;
+      var label = current === "全部" ? (c.level + " / " + c.cat) : c.cat;
+      html += '<option value="' + esc(value) + '">' + esc(label) + "</option>";
+    });
+    catFilter.innerHTML = html;
+    if (prev && [].some.call(catFilter.options, function (o) { return o.value === prev; })) catFilter.value = prev;
+  }
+  function fillFormCats(level, selected) {
+    var sel = document.getElementById("formCat");
+    var list = cats.filter(function (c) { return c.level === level; });
+    sel.innerHTML = "";
+    if (!list.length) {
+      var empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "请先新增分类";
+      sel.appendChild(empty);
+      return;
+    }
+    list.forEach(function (c) {
+      var o = document.createElement("option");
+      o.value = c.cat;
+      o.textContent = c.cat;
+      sel.appendChild(o);
+    });
+    if (selected && list.some(function (c) { return c.cat === selected; })) sel.value = selected;
+  }
+  function renderTabs() {
+    var box = document.getElementById("levelTabs");
+    box.innerHTML = "";
+    var items = [{ id: "全部", label: "全部分类等级" }].concat(levels.map(function (lv) {
+      return { id: lv, label: lv + "隐患" };
+    }));
+    items.forEach(function (item) {
+      var n = rows.filter(function (r) { return item.id === "全部" || r.level === item.id; }).length;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-default" + (item.id === current ? " on" : "");
+      btn.textContent = item.label + "（" + n + "）";
+      btn.addEventListener("click", function () {
+        current = item.id;
+        document.getElementById("kwFilter").value = "";
+        document.getElementById("statusFilter").value = "";
+        catFilter.value = "";
+        fillCats();
+        renderTabs();
+        apply();
+      });
+      box.appendChild(btn);
+    });
+  }
+  function filtered() {
+    var picked = parseCatFilter();
+    var kw = document.getElementById("kwFilter").value.trim();
+    var st = document.getElementById("statusFilter").value;
+    return rows.filter(function (r) {
+      if (current !== "全部" && r.level !== current) return false;
+      if (picked.level && current === "全部" && r.level !== picked.level) return false;
+      if (picked.cat && r.cat !== picked.cat) return false;
+      if (st && r.status !== st) return false;
+      if (!kw) return true;
+      return ((r.level || "") + (r.cat || "") + (r.hazard || "") + (r.advice || "")).indexOf(kw) >= 0;
+    });
+  }
+  function emptyCats() {
+    var kw = document.getElementById("kwFilter").value.trim();
+    if (document.getElementById("statusFilter").value) return [];
+    var picked = parseCatFilter();
+    return cats.filter(function (c) {
+      if (current !== "全部" && c.level !== current) return false;
+      if (picked.level && c.level !== picked.level) return false;
+      if (picked.cat && c.cat !== picked.cat) return false;
+      if (kw && (c.level + c.cat).indexOf(kw) < 0) return false;
+      return !rows.some(function (r) { return r.level === c.level && r.cat === c.cat; });
+    });
+  }
+  function advicePlan(list) {
+    var skip = {};
+    var span = {};
+    for (var i = 0; i < list.length; i++) {
+      var need = list[i].adviceSpan || 0;
+      if (!need || list[i].adviceSkip) continue;
+      var ok = true;
+      for (var k = 1; k < need; k++) {
+        if (!list[i + k] || !list[i + k].adviceSkip) { ok = false; break; }
+      }
+      if (!ok) continue;
+      span[i] = need;
+      for (var k2 = 1; k2 < need; k2++) skip[i + k2] = 1;
+    }
+    return { skip: skip, span: span };
+  }
+  function breakGroup(row) {
+    var i = rows.indexOf(row);
+    if (i < 0) return;
+    var s = i;
+    if (row.adviceSkip) {
+      while (s > 0 && rows[s].adviceSkip) s--;
+      if (s > 0 && rows[s - 1].adviceSpan && !rows[s - 1].adviceSkip) s--;
+    }
+    var span = rows[s] && rows[s].adviceSpan ? rows[s].adviceSpan : (row.adviceSpan || 0);
+    if (!span) return;
+    for (var k = 0; k < span && rows[s + k]; k++) {
+      delete rows[s + k].adviceSpan;
+      delete rows[s + k].adviceSkip;
+    }
+  }
+  function place(row) {
+    var i = rows.indexOf(row);
+    if (i >= 0) rows.splice(i, 1);
+    var at = rows.length;
+    var foundCat = false;
+    for (var k = rows.length - 1; k >= 0; k--) {
+      if (rows[k].level === row.level && rows[k].cat === row.cat) { at = k + 1; foundCat = true; break; }
+    }
+    if (!foundCat) {
+      for (var k2 = rows.length - 1; k2 >= 0; k2--) {
+        if (rows[k2].level === row.level) { at = k2 + 1; break; }
+      }
+    }
+    rows.splice(at, 0, row);
+  }
+  function addCategory(level, name) {
+    var at = cats.length;
+    var found = false;
+    for (var i = cats.length - 1; i >= 0; i--) {
+      if (cats[i].level === level) { at = i + 1; found = true; break; }
+    }
+    if (!found) {
+      var order = { "A级": 0, "B级": 1, "C级": 2 };
+      at = 0;
+      cats.forEach(function (c, idx) {
+        if (order[c.level] < order[level]) at = idx + 1;
+      });
+    }
+    cats.splice(at, 0, { level: level, cat: name });
+  }
+  function openCatForm() {
+    document.getElementById("catLevel").value = current === "全部" ? "A级" : current;
+    document.getElementById("catName").value = "";
+    document.getElementById("catMask").classList.add("open");
+    document.getElementById("catName").focus();
+  }
+  function closeCatForm() { document.getElementById("catMask").classList.remove("open"); }
+  function saveCatForm() {
+    var level = document.getElementById("catLevel").value;
+    var name = document.getElementById("catName").value.trim();
+    if (!level) { alert("请选择级别"); return; }
+    if (!name) { alert("请填写分类名称"); return; }
+    if (cats.some(function (c) { return c.level === level && c.cat === name; })) {
+      alert("该级别下已有相同分类");
+      return;
+    }
+    addCategory(level, name);
+    if (current !== "全部") current = level;
+    document.getElementById("statusFilter").value = "";
+    document.getElementById("kwFilter").value = "";
+    closeCatForm();
+    fillCats();
+    catFilter.value = current === "全部" ? catKey(level, name) : name;
+    renderTabs();
+    apply();
+  }
+  function openForm(row) {
+    editingId = row ? row.id : 0;
+    document.getElementById("formTitle").textContent = row ? "编辑整改建议" : "新增隐患";
+    var level = row ? row.level : (current === "全部" ? "A级" : current);
+    var selected = row ? row.cat : "";
+    if (!row) {
+      var picked = parseCatFilter();
+      if (picked.level) level = picked.level;
+      if (picked.cat) selected = picked.cat;
+    }
+    document.getElementById("formLevel").value = level;
+    fillFormCats(level, selected);
+    document.getElementById("formHazard").value = row ? row.hazard : "";
+    document.getElementById("formAdvice").value = row ? (row.advice || "") : "";
+    document.getElementById("formStatus").value = row ? row.status : "上架";
+    document.getElementById("formMask").classList.add("open");
+  }
+  function closeForm() { document.getElementById("formMask").classList.remove("open"); editingId = 0; }
+  function saveForm() {
+    var level = document.getElementById("formLevel").value;
+    var cat = document.getElementById("formCat").value.trim();
+    var hazard = document.getElementById("formHazard").value.trim();
+    var advice = document.getElementById("formAdvice").value.trim();
+    var status = document.getElementById("formStatus").value;
+    if (!level) { alert("请选择级别"); return; }
+    if (!cat) { alert("请先新增分类"); return; }
+    if (!cats.some(function (c) { return c.level === level && c.cat === cat; })) { alert("请选择已有分类"); return; }
+    if (!hazard) { alert("请填写隐患描述"); return; }
+    var dup = rows.some(function (r) {
+      return r.id !== editingId && r.level === level && r.cat === cat && r.hazard === hazard;
+    });
+    if (dup) { alert("同一级别、同一分类下已有相同隐患描述"); return; }
+    var row = editingId ? byId(editingId) : null;
+    if (row) {
+      breakGroup(row);
+      row.level = level;
+      row.cat = cat;
+      row.hazard = hazard;
+      row.advice = advice;
+      row.status = status;
+      place(row);
+    } else {
+      row = { id: nextId++, level: level, cat: cat, hazard: hazard, advice: advice, status: status };
+      place(row);
+    }
+    if (current !== "全部") current = level;
+    document.getElementById("statusFilter").value = "";
+    document.getElementById("kwFilter").value = "";
+    closeForm();
+    fillCats();
+    catFilter.value = current === "全部" ? catKey(level, cat) : cat;
+    renderTabs();
+    apply();
+  }
+  function openDelete(row) {
+    pendingDeleteCat = null;
+    pendingDeleteId = row.id;
+    document.getElementById("delMsg").textContent = "确定删除「" + row.hazard + "」？将从整改建议中物理删除，且不可恢复。已产生的记录数据不受影响。";
+    document.getElementById("delMask").classList.add("open");
+  }
+  function openDeleteCat(c) {
+    pendingDeleteId = 0;
+    pendingDeleteCat = c;
+    document.getElementById("delMsg").textContent = "确定删除分类「" + c.cat + "」？该分类下暂无隐患，删除后不可恢复。已产生的记录数据不受影响。";
+    document.getElementById("delMask").classList.add("open");
+  }
+  function closeDelete() {
+    pendingDeleteId = 0;
+    pendingDeleteCat = null;
+    document.getElementById("delMask").classList.remove("open");
+  }
+  function statusCell(row) {
+    var td = document.createElement("td");
+    var tag = document.createElement("span");
+    tag.className = "tag " + (row.status === "上架" ? "tag-green" : "tag-gray");
+    tag.textContent = row.status;
+    td.appendChild(tag);
+    return td;
+  }
+  function actionCell(row) {
+    var td = document.createElement("td");
+    td.className = "col-action";
+    function btn(text, color, fn) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn btn-text";
+      b.textContent = text;
+      if (color) b.style.color = color;
+      b.addEventListener("click", fn);
+      td.appendChild(b);
+    }
+    btn("编辑", "", function () { openForm(row); });
+    btn(row.status === "上架" ? "下架" : "上架", row.status === "上架" ? "var(--warning)" : "var(--success)", function () {
+      breakGroup(row);
+      row.status = row.status === "上架" ? "下架" : "上架";
+      apply();
+    });
+    btn("删除", "var(--danger)", function () { openDelete(row); });
+    return td;
+  }
+  function render(list) {
+    body.innerHTML = "";
+    var showLevel = current === "全部";
+    var cols = showLevel ? 6 : 5;
+    document.getElementById("levelHead").style.display = showLevel ? "" : "none";
+    document.getElementById("hazardHead").textContent = showLevel ? "隐患描述" : current + "隐患";
+    var empties = emptyCats();
+    var groups = [];
+    cats.forEach(function (c) {
+      if (current !== "全部" && c.level !== current) return;
+      var picked = parseCatFilter();
+      if (picked.level && c.level !== picked.level) return;
+      if (picked.cat && c.cat !== picked.cat) return;
+      var mine = list.filter(function (r) { return r.level === c.level && r.cat === c.cat; });
+      var isEmpty = empties.some(function (e) { return e.level === c.level && e.cat === c.cat; });
+      if (mine.length || isEmpty) groups.push({ level: c.level, cat: c.cat, rows: mine });
+    });
+    if (!groups.length) {
+      body.innerHTML = '<tr><td colspan="' + cols + '" style="text-align:center;color:var(--text-3);padding:28px;">没有匹配的整改建议</td></tr>';
+      countEl.textContent = "共 0 条记录";
+      return;
+    }
+    var plan = advicePlan(list);
+    var cursor = 0;
+    groups.forEach(function (g) {
+      if (!g.rows.length) {
+        var tr0 = document.createElement("tr");
+        if (showLevel) {
+          var lv0 = document.createElement("td");
+          lv0.textContent = g.level;
+          tr0.appendChild(lv0);
+        }
+        var cat0 = document.createElement("td");
+        cat0.className = "cat-cell";
+        cat0.textContent = g.cat;
+        tr0.appendChild(cat0);
+        var empty = document.createElement("td");
+        empty.className = "empty-hazard";
+        empty.colSpan = 2;
+        empty.style.color = "var(--text-3)";
+        empty.textContent = "暂无隐患";
+        tr0.appendChild(empty);
+        var st0 = document.createElement("td");
+        st0.textContent = "—";
+        tr0.appendChild(st0);
+        var act0 = document.createElement("td");
+        act0.className = "col-action";
+        var delCat = document.createElement("button");
+        delCat.type = "button";
+        delCat.className = "btn btn-text";
+        delCat.style.color = "var(--danger)";
+        delCat.textContent = "删除分类";
+        delCat.addEventListener("click", function () { openDeleteCat(g); });
+        act0.appendChild(delCat);
+        tr0.appendChild(act0);
+        body.appendChild(tr0);
+        return;
+      }
+      g.rows.forEach(function (row, idx) {
+        var k = cursor;
+        var tr = document.createElement("tr");
+        if (idx === 0) {
+          if (showLevel) {
+            var lv = document.createElement("td");
+            lv.rowSpan = g.rows.length;
+            lv.textContent = g.level;
+            tr.appendChild(lv);
+          }
+          var catTd = document.createElement("td");
+          catTd.className = "cat-cell";
+          catTd.rowSpan = g.rows.length;
+          catTd.textContent = g.cat;
+          tr.appendChild(catTd);
+        }
+        var h = document.createElement("td");
+        h.className = "hazard";
+        h.textContent = row.hazard;
+        tr.appendChild(h);
+        if (!plan.skip[k]) {
+          var a = document.createElement("td");
+          a.className = "advice";
+          if (plan.span[k]) { a.rowSpan = plan.span[k]; a.className += " advice-span"; }
+          a.textContent = row.advice || "";
+          tr.appendChild(a);
+        }
+        tr.appendChild(statusCell(row));
+        tr.appendChild(actionCell(row));
+        body.appendChild(tr);
+        cursor++;
+      });
+    });
+    countEl.textContent = "共 " + list.length + " 条记录";
+  }
+  function apply() { render(filtered()); }
+
+  document.getElementById("btnQuery").addEventListener("click", apply);
+  document.getElementById("kwFilter").addEventListener("keydown", function (e) { if (e.key === "Enter") apply(); });
+  document.getElementById("kwFilter").addEventListener("input", apply);
+  document.getElementById("statusFilter").addEventListener("change", apply);
+  document.getElementById("btnReset").addEventListener("click", function () {
+    document.getElementById("kwFilter").value = "";
+    document.getElementById("statusFilter").value = "";
+    catFilter.value = "";
+    apply();
+  });
+  catFilter.addEventListener("change", apply);
+  document.getElementById("btnAdd").addEventListener("click", function () { openForm(null); });
+  document.getElementById("btnAddCat").addEventListener("click", openCatForm);
+  document.getElementById("formLevel").addEventListener("change", function () { fillFormCats(this.value, ""); });
+  document.getElementById("formSave").addEventListener("click", saveForm);
+  document.getElementById("formCancel").addEventListener("click", closeForm);
+  document.getElementById("formClose").addEventListener("click", closeForm);
+  document.getElementById("formMask").addEventListener("click", function (e) { if (e.target.id === "formMask") closeForm(); });
+  document.getElementById("catSave").addEventListener("click", saveCatForm);
+  document.getElementById("catCancel").addEventListener("click", closeCatForm);
+  document.getElementById("catClose").addEventListener("click", closeCatForm);
+  document.getElementById("catMask").addEventListener("click", function (e) { if (e.target.id === "catMask") closeCatForm(); });
+  document.getElementById("catName").addEventListener("keydown", function (e) { if (e.key === "Enter") saveCatForm(); });
+  document.getElementById("delCancel").addEventListener("click", closeDelete);
+  document.getElementById("delMask").addEventListener("click", function (e) { if (e.target.id === "delMask") closeDelete(); });
+  document.getElementById("delOk").addEventListener("click", function () {
+    if (pendingDeleteCat) {
+      var target = pendingDeleteCat;
+      closeDelete();
+      if (rows.some(function (r) { return r.level === target.level && r.cat === target.cat; })) {
+        alert("请先删除该分类下的隐患");
+        return;
+      }
+      cats = cats.filter(function (c) { return !(c.level === target.level && c.cat === target.cat); });
+      if (catFilter.value === catKey(target.level, target.cat) || catFilter.value === target.cat) catFilter.value = "";
+      fillCats();
+      renderTabs();
+      apply();
+      return;
+    }
+    var row = byId(pendingDeleteId);
+    closeDelete();
+    if (!row) return;
+    breakGroup(row);
+    rows.splice(rows.indexOf(row), 1);
+    fillCats();
+    renderTabs();
+    apply();
+  });
+  fillCats();
+  renderTabs();
+  apply();
+})();
+</script>
+</body>
+</html>

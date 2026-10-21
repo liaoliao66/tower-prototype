@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>问题汇总 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+  .sum-grid { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+  .sum-card { flex:1; min-width:160px; text-align:left; border:1px solid var(--border); background:#F7F8FA; border-radius:6px; padding:16px 18px; }
+  .filter-block { border-top:1px solid var(--border); padding-top:16px; }
+  .sum-card .n { font-size:28px; font-weight:600; color:var(--text-1); line-height:1.2; }
+  .sum-card .t { font-size:14px; font-weight:600; color:var(--text-1); margin-top:6px; }
+  .sum-card .s { font-size:12px; color:var(--text-3); margin-top:2px; }
+  .date-pair { display:inline-flex; align-items:center; gap:6px; }
+  .date-pair .form-label { margin:0; white-space:nowrap; }
+  .date-pair .form-input { width:138px; }
+  .table-wrap { overflow-x:auto; margin-top:4px; }
+  .clamp { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; max-width:280px; white-space:normal; }
+</style>
+</head>
+<body>
+<div id="page-content">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">问题汇总</div>
+    </div>
+    <div class="card-body">
+      <div class="sum-grid" id="sumGrid"></div>
+      <div class="filter-block">
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <input id="kw" class="form-input" placeholder="区域 / 站名 / 站址编码 / 报告编号 / 工程 / 订单" style="width:320px">
+          <span class="date-pair">
+            <span class="form-label">检测日期</span>
+            <input id="inspectStart" type="date" class="form-input">
+            <span style="color:var(--text-3);font-size:12px;">至</span>
+            <input id="inspectEnd" type="date" class="form-input">
+          </span>
+          <span class="date-pair">
+            <span class="form-label">报告日期</span>
+            <input id="reportStart" type="date" class="form-input">
+            <span style="color:var(--text-3);font-size:12px;">至</span>
+            <input id="reportEnd" type="date" class="form-input">
+          </span>
+          <button class="btn btn-primary" id="btnSearch" type="button">查询</button>
+          <button class="btn btn-default" id="btnReset" type="button">重置</button>
+        </div>
+      </div>
+      <div class="pc-table-actions">
+        <button class="btn btn-default" id="btnExportAll" type="button"><i class="fa-solid fa-file-export"></i> 全量导出</button>
+        <button class="btn btn-primary" id="btnExportFilter" type="button"><i class="fa-solid fa-filter"></i> 导出筛选结果</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>区域</th>
+              <th>站名</th>
+              <th>站址编码</th>
+              <th>经度</th>
+              <th>纬度</th>
+              <th>报告编号</th>
+              <th>结论</th>
+              <th>整改建议</th>
+              <th>检测情况</th>
+              <th>检测日期</th>
+              <th>报告日期</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination"><span id="totalText">共 0 条</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../../../assets/pc-shell.js"></script>
+<script>window.__layoutConfig = {active:'problem_summary', breadcrumb:['统计分析','问题汇总']};</script>
+<script>
+(function () {
+  var HEADERS = ["序号","区域","站名","站址编码","经度","纬度","报告编号","结论","整改建议","检测情况","检测日期","报告日期"];
+  var QUARTER_LABEL = ["一季度", "二季度", "三季度", "四季度"];
+  var ROWS = [
+    { taskId:"RW1", area:"宁安", name:"兰岗东进模块局", code:"231084908000000170", lng:"129.365734", lat:"44.312051", reportNo:"GGJC2400905407", conclusion:"该通信塔主肢螺栓缺失多处，主肢锈蚀开裂，法兰锈蚀严重，存在严重安全隐患，建议拆除报废。整体结构安全性评定为四级。", advice:"建议拆除报废。", inspectStatus:"", inspectDate:"2024-11-08", reportDate:"2024-11-20", projectId:"P24", projectName:"牡丹江2024年铁塔安全检测工程", orderId:"O24", orderNo:"MDJ20241101-001" },
+    { taskId:"RW2", area:"宁安", name:"石岩民主模块局", code:"231084908000000183", lng:"129.362816", lat:"44.3105", reportNo:"GGJC2400905408", conclusion:"第二塔段主肢变形严重，第一塔段主肢锈蚀严重，因塔体遭受水灾，建议拆除报废。整体结构安全性评定为三级。", advice:"建议拆除报废。", inspectStatus:"", inspectDate:"2024-11-09", reportDate:"2024-11-21", projectId:"P24", projectName:"牡丹江2024年铁塔安全检测工程", orderId:"O24", orderNo:"MDJ20241101-001" },
+    { taskId:"RW3", area:"宁安", name:"石岩民主模块局", code:"231084908000000183", lng:"129.362816", lat:"44.3105", reportNo:"GGJC2400905419", conclusion:"同日另一次检测任务。拉线松动，地脚锈蚀，整体结构使用性评定为三级。", advice:"紧固塔体松动拉线；对锈蚀地脚除锈并做防腐。", inspectStatus:"", inspectDate:"2024-11-09", reportDate:"2024-11-22", projectId:"P24", projectName:"牡丹江2024年铁塔安全检测工程", orderId:"O24", orderNo:"MDJ20241101-001" },
+    { taskId:"RW4", area:"海林市", name:"海林_二部落_农高_电信_电信落地四角塔", code:"231083908000000349", lng:"129.291619", lat:"44.657123", reportNo:"GGJC2500901001", conclusion:"经整改维护后，目标使用年限为10年。满足风压0.50kN/m2条件下的承载力使用要求。", advice:"矫正塔体变形的辅材构件；按原设计规格补装缺失的辅材构件，主肢螺栓双螺母紧固。", inspectStatus:"", inspectDate:"2025-08-12", reportDate:"2025-08-26", projectId:"P25", projectName:"牡丹江2025年铁塔安全检测工程", orderId:"O25", orderNo:"MDJ20250801-001" },
+    { taskId:"RW5", area:"海林市", name:"牡丹江海林市二部落", code:"23108300000107", lng:"129.29744", lat:"44.656475", reportNo:"GGJC2500901002", conclusion:"经整改维护后，目标使用年限为10年。满足风压0.50、0.55、0.60kN/m2条件下的承载力使用要求。", advice:"矫正变形的辅材构件；主肢螺栓双螺母紧固；除锈后涂防锈底漆两遍、面漆两遍。", inspectStatus:"", inspectDate:"2025-11-03", reportDate:"2025-11-18", projectId:"P25", projectName:"牡丹江2025年铁塔安全检测工程", orderId:"O25", orderNo:"MDJ20250801-001" },
+    { taskId:"RW15", area:"阳明区", name:"阳明区铁塔站", code:"231003908000000221", lng:"129.634210", lat:"44.583102", reportNo:"GGJC2500901003", conclusion:"经整改维护后，目标使用年限为10年。整体结构安全性评定为三级。", advice:"按原设计规格更换锈蚀严重构件；通信塔按技术要求定期维护。", inspectStatus:"", inspectDate:"2025-01-20", reportDate:"2025-02-06", projectId:"P25", projectName:"牡丹江2025年铁塔安全检测工程", orderId:"O25", orderNo:"MDJ20250801-001" },
+    { taskId:"RW6", area:"海林市", name:"牡丹江海林市影视城", code:"231083908000000114", lng:"129.121698", lat:"44.784083", reportNo:"GGJC2600900879", conclusion:"经整改维护后，目标使用年限为10年。不满足风压0.55、0.60kN/m2条件下继续新增天线的承载力要求。", advice:"主肢螺栓双螺母紧固；除锈后涂防锈底漆两遍后再涂面漆两遍。", inspectStatus:"", inspectDate:"2026-01-16", reportDate:"2026-01-28", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" },
+    { taskId:"RW12", area:"林口县", name:"林口县铁塔站", code:"231025908000000088", lng:"130.268441", lat:"45.278902", reportNo:"GGJC2600900881", conclusion:"经整改维护后，目标使用年限为10年。整体结构安全性评定为三级。", advice:"补装缺失螺栓，主肢螺栓双螺母紧固。", inspectStatus:"", inspectDate:"2026-01-09", reportDate:"2026-01-19", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" },
+    { taskId:"RW14", area:"绥芬河市", name:"绥芬河铁塔站", code:"231081908000000056", lng:"131.151230", lat:"44.412880", reportNo:"GGJC2600900883", conclusion:"经整改维护后，目标使用年限为10年。", advice:"通信塔按技术要求定期维护。", inspectStatus:"", inspectDate:"2026-01-15", reportDate:"2026-01-30", projectId:"", projectName:"", orderId:"", orderNo:"" },
+    { taskId:"RW7", area:"穆棱市", name:"穆棱市铁塔站", code:"231085908000000371", lng:"130.524110", lat:"44.918660", reportNo:"GGJC2600904010", conclusion:"经整改维护后，目标使用年限为10年。整体结构安全性评定为四级。", advice:"按原设计规格更换锈蚀严重构件。", inspectStatus:"", inspectDate:"2026-02-11", reportDate:"2026-02-20", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" },
+    { taskId:"RW13", area:"海林市", name:"海林市待补检测日期站", code:"231083908000000400", lng:"129.380120", lat:"44.590330", reportNo:"GGJC2600900882", conclusion:"报告已最终审核通过。检测日期尚未回写。", advice:"待检测日期补齐后纳入对应月份。", inspectStatus:"", inspectDate:"", reportDate:"2026-02-01", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" },
+    { taskId:"RW8", area:"宁安市", name:"宁安市铁塔站", code:"231084908000000501", lng:"129.470220", lat:"44.340880", reportNo:"GGJC2600904011", conclusion:"经整改维护后，目标使用年限为10年。整体结构安全性评定为三级。", advice:"采用人工除锈将锈斑清除干净后，涂防锈底漆两遍后再涂面漆两遍。", inspectStatus:"", inspectDate:"2026-03-06", reportDate:"2026-03-19", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26B", orderNo:"MDJ20260301-002" },
+    { taskId:"RW9", area:"宁安", name:"兰岗东进模块局", code:"231084908000000170", lng:"129.365734", lat:"44.312051", reportNo:"GGJC2600906110", conclusion:"同一站址第二次检测。经整改维护后，目标使用年限为10年。", advice:"主肢螺栓双螺母紧固；按原设计规格更换锈蚀严重构件。", inspectStatus:"", inspectDate:"2026-03-18", reportDate:"2026-04-02", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26B", orderNo:"MDJ20260301-002" },
+    { taskId:"RW10", area:"爱民区", name:"爱民区铁塔站", code:"231004908000000066", lng:"129.590440", lat:"44.595210", reportNo:"GGJC2600904012", conclusion:"经整改维护后，目标使用年限为10年。整体结构使用性评定为三级。", advice:"清理塔脚积水，补做排水。", inspectStatus:"", inspectDate:"2026-03-22", reportDate:"2026-04-08", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26B", orderNo:"MDJ20260301-002" },
+    { taskId:"RW11", area:"东安区", name:"东安区铁塔站", code:"231002908000000033", lng:"129.626770", lat:"44.581090", reportNo:"GGJC2600900880", conclusion:"经整改维护后，目标使用年限为10年。满足风压0.50kN/m2条件下的承载力使用要求。", advice:"通信塔按技术要求定期维护。", inspectStatus:"", inspectDate:"2026-04-09", reportDate:"2026-04-18", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" }
+  ];
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function xml(s) {
+    return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function parts(date) {
+    if (!date) return null;
+    var p = date.split("-");
+    return { y: p[0], q: Math.floor((Number(p[1]) - 1) / 3) + 1, m: Number(p[1]) };
+  }
+  function inRange(value, start, end) {
+    if (!start && !end) return true;
+    if (!value) return false;
+    if (start && value < start) return false;
+    if (end && value > end) return false;
+    return true;
+  }
+  function kwText() { return (document.getElementById("kw").value || "").trim(); }
+  function matchKw(r) {
+    var kw = kwText();
+    if (!kw) return true;
+    var blob = [r.area, r.name, r.code, r.reportNo, r.projectName, r.orderNo].join(" ");
+    return blob.indexOf(kw) >= 0;
+  }
+  function matchDates(r) {
+    return inRange(r.inspectDate, document.getElementById("inspectStart").value, document.getElementById("inspectEnd").value)
+      && inRange(r.reportDate, document.getElementById("reportStart").value, document.getElementById("reportEnd").value);
+  }
+  function baseFiltered() {
+    return ROWS.filter(function (r) { return matchKw(r) && matchDates(r); });
+  }
+  function shown() {
+    return baseFiltered().sort(function (a, b) {
+      var da = a.inspectDate || "0000-00-00";
+      var db = b.inspectDate || "0000-00-00";
+      if (da !== db) return da < db ? 1 : -1;
+      return a.reportNo < b.reportNo ? 1 : -1;
+    });
+  }
+  function allSorted() {
+    return ROWS.slice().sort(function (a, b) {
+      var da = a.inspectDate || "0000-00-00";
+      var db = b.inspectDate || "0000-00-00";
+      if (da !== db) return da < db ? 1 : -1;
+      return a.reportNo < b.reportNo ? 1 : -1;
+    });
+  }
+
+  function card(title, sub, count) {
+    return '<div class="sum-card"><div class="n">' + count + '</div><div class="t">' + esc(title) + '</div><div class="s">' + esc(sub) + "</div></div>";
+  }
+  function nowPeriod() {
+    var now = new Date();
+    var month = now.getMonth() + 1;
+    return { y: String(now.getFullYear()), m: month, q: Math.floor((month - 1) / 3) + 1 };
+  }
+  function countWhere(list, pred) {
+    var n = 0;
+    list.forEach(function (r) {
+      var p = parts(r.inspectDate);
+      if (p && pred(p)) n += 1;
+    });
+    return n;
+  }
+  function renderSummary() {
+    var list = baseFiltered();
+    var now = nowPeriod();
+    var html = "";
+    html += card("累计", "全部已出报告", list.length);
+    html += card("今年", now.y + "年", countWhere(list, function (p) { return p.y === now.y; }));
+    html += card("本季", now.y + "年" + QUARTER_LABEL[now.q - 1], countWhere(list, function (p) { return p.y === now.y && p.q === now.q; }));
+    html += card("本月", now.y + "年" + now.m + "月", countWhere(list, function (p) { return p.y === now.y && p.m === now.m; }));
+    document.getElementById("sumGrid").innerHTML = html;
+  }
+  function renderTable() {
+    var list = shown();
+    var body = document.getElementById("tbody");
+    if (!list.length) {
+      body.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:28px;">没有匹配的记录</td></tr>';
+    } else {
+      body.innerHTML = list.map(function (r, i) {
+        return "<tr><td>" + (i + 1) + "</td><td>" + esc(r.area) + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.code) + "</td><td>" + esc(r.lng) + "</td><td>" + esc(r.lat) + "</td><td>" + esc(r.reportNo) + "</td><td><div class=\"clamp\" title=\"" + esc(r.conclusion) + "\">" + esc(r.conclusion) + "</div></td><td><div class=\"clamp\" title=\"" + esc(r.advice) + "\">" + esc(r.advice) + "</div></td><td>" + esc(r.inspectStatus) + "</td><td>" + esc(r.inspectDate) + "</td><td>" + esc(r.reportDate) + "</td></tr>";
+      }).join("");
+    }
+    document.getElementById("totalText").textContent = "共 " + list.length + " 条";
+  }
+  function render() {
+    renderSummary();
+    renderTable();
+  }
+  function line(r, index) {
+    var vals = [index, r.area, r.name, r.code, r.lng, r.lat, r.reportNo, r.conclusion, r.advice, r.inspectStatus, r.inspectDate, r.reportDate];
+    return "<Row>" + vals.map(function (v) {
+      return '<Cell><Data ss:Type="String">' + xml(v) + "</Data></Cell>";
+    }).join("") + "</Row>";
+  }
+  function download(list, filename) {
+    var xmlText = '<?xml version="1.0" encoding="UTF-8"?>'
+      + '<?mso-application progid="Excel.Sheet"?>'
+      + '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'
+      + '<Worksheet ss:Name="Sheet1"><Table>'
+      + "<Row>" + HEADERS.map(function (h) { return '<Cell><Data ss:Type="String">' + xml(h) + "</Data></Cell>"; }).join("") + "</Row>"
+      + list.map(function (r, i) { return line(r, i + 1); }).join("")
+      + "</Table></Worksheet></Workbook>";
+    var blob = new Blob([xmlText], { type: "application/vnd.ms-excel;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  document.getElementById("btnSearch").addEventListener("click", render);
+  document.getElementById("kw").addEventListener("input", render);
+  document.getElementById("kw").addEventListener("keydown", function (e) { if (e.key === "Enter") render(); });
+  ["inspectStart","inspectEnd","reportStart","reportEnd"].forEach(function (id) {
+    document.getElementById(id).addEventListener("change", render);
+  });
+  document.getElementById("btnReset").addEventListener("click", function () {
+    document.getElementById("kw").value = "";
+    document.getElementById("inspectStart").value = "";
+    document.getElementById("inspectEnd").value = "";
+    document.getElementById("reportStart").value = "";
+    document.getElementById("reportEnd").value = "";
+    render();
+  });
+  document.getElementById("btnExportAll").addEventListener("click", function () {
+    download(allSorted(), "问题汇总.xls");
+  });
+  document.getElementById("btnExportFilter").addEventListener("click", function () {
+    download(shown(), "问题汇总-筛选.xls");
+  });
+  render();
+})();
+</script>
+</body>
+</html>

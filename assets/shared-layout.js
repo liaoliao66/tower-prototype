@@ -98,7 +98,9 @@ function buildSidebar(activeId) {
     html += `</div></div>`;
   }
   html += `</nav>
-  <div style="padding:12px 20px;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px">
+    <a href="../../../../index.html" style="color:rgba(255,255,255,0.75);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-house"></i>返回总入口</a>
+    <a href="../../../../../docs/versions/v1.0.0/prd.html" style="color:rgba(255,255,255,0.75);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-file-lines"></i>查看 PRD</a>
     <a href="../../系统管理/登录页/pc_login.html" style="color:rgba(255,255,255,0.45);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:6px"><i class="fa-solid fa-right-from-bracket"></i>退出登录</a>
   </div></div>`;
   return html;

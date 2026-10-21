@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<!-- iPad-INSPECT_SEGMENT v2.0 landscape -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>塔段检测</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/app-frame.css">
+<link rel="stylesheet" href="../../../../assets/app-embed.css">
+<link rel="stylesheet" href="../../../../assets/app-inspect-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-tokens.css">
+<link rel="stylesheet" href="../../../../assets/ipad-frame.css">
+<link rel="stylesheet" href="../../../../assets/ipad-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-visual.css">
+<link rel="stylesheet" href="../../../../assets/ipad-inspect-layout.css">
+<link rel="stylesheet" href="../../../../assets/ipad-embed.css">
+<script src="../../../../assets/ipad-adapt.js" defer></script>
+<script src="../../../../assets/app-embed.js" defer></script>
+<script src="../../../../assets/app-inspect-back.js" defer></script>
+<style>
+body.inspect-app-layout.ipad-adapt.inspect-embed-pad-116 #appEmbedContent {
+  padding: 8px 12px 72px !important;
+}
+.form-label { font-size:12px; color:#86909C; margin-bottom:4px; display:block; }
+.form-input { width:100%; height:36px; border:1px solid #E5E6EB; border-radius:8px; padding:0 10px; font-size:14px; outline:none; box-sizing:border-box; background:#fff; }
+.seg-list { padding: 0; }
+.seg-panel { background: #fff; border: 1px solid #E5E6EB; border-radius: 10px; margin-bottom: 6px; overflow: hidden; }
+.seg-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: none;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.seg-chev { width: 14px; color: #86909C; transition: transform .2s ease; flex-shrink: 0; }
+.seg-panel.open .seg-chev { transform: rotate(90deg); color: #165DFF; }
+.seg-name { font-size: 15px; font-weight: 600; color: #1D2129; flex-shrink: 0; }
+.seg-sum { flex: 1; min-width: 0; font-size: 12px; color: #86909C; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seg-del {
+  flex-shrink: 0;
+  border: none;
+  background: #F2F3F5;
+  color: #86909C;
+  width: 28px;
+  height: 28px;
+  min-height: 0 !important;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.seg-body { display: none; padding: 8px 10px 10px; border-top: 1px solid #F2F3F5; }
+.seg-panel.open .seg-body { display: block; }
+.seg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; }
+.seg-grid .span-3 { grid-column: 1 / -1; }
+.seg-field { min-width: 0; }
+.seg-photo {
+  width: 100%; height: 36px; border: 1px dashed #E5E6EB; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 6px; background: #F7F8FA;
+}
+.seg-remark {
+  width: 100%; height: 52px; border: 1px solid #E5E6EB; border-radius: 8px; padding: 8px 10px;
+  font-size: 14px; outline: none; box-sizing: border-box; background: #fff; resize: none; font-family: inherit;
+}
+.seg-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin: 6px 0 0;
+  height: 40px;
+  min-height: 0 !important;
+  border: 1px dashed #165DFF;
+  border-radius: 10px;
+  background: #fff;
+  color: #165DFF;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.seg-add:disabled { opacity: .45; }
+.toggle-pair { display: flex; gap: 8px; }
+.toggle-opt {
+  flex: 1;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #E5E6EB;
+  background: #fff;
+  color: #4E5969;
+  font-size: 13px;
+  text-align: center;
+  line-height: 36px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle-opt.on-pass {
+  border-color: #00B42A;
+  background: #E8FFEA;
+  color: #00B42A;
+  font-weight: 600;
+}
+.toggle-opt.on-fail {
+  border-color: #F53F3F;
+  background: #FFF1F0;
+  color: #F53F3F;
+  font-weight: 600;
+}
+.mask { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; }
+.mask.show { display:flex; }
+.seg-del-dialog {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 18px 16px;
+  box-sizing: border-box;
+}
+.seg-del-dialog h3 { margin: 0 0 8px; font-size: 17px; font-weight: 600; color: #1D2129; text-align: center; }
+.seg-del-dialog p { margin: 0 0 20px; font-size: 14px; color: #4E5969; line-height: 1.5; text-align: center; }
+.seg-del-actions { display: flex; gap: 10px; }
+.seg-del-actions button {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.seg-del-cancel { background: #F2F3F5; color: #4E5969; }
+.seg-del-ok { background: #F53F3F; color: #fff; }
+</style>
+</head>
+<body class="inspect-app-layout inspect-embed-pad-116 ipad-adapt">
+<div id="appStatusBar">
+  <span>9:41</span>
+  <span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+</div>
+<div id="appNavBar">
+  <a href="../../任务/填报主页/ipad_task_inspect_home.html" data-app-inspect-back style="color:#165DFF; text-decoration:none; font-size:14px;"><i class="fa-solid fa-chevron-left"></i> 返回</a>
+  <span style="flex:1; text-align:center; font-size:16px; font-weight:600;">塔段检测</span>
+  <span style="width:40px;"></span>
+</div>
+
+<div id="appEmbedContent">
+  <div id="segmentList" class="seg-list"></div>
+  <button type="button" id="btnAddSegment" class="seg-add"><i class="fa-solid fa-plus"></i> 添加塔段</button>
+</div>
+
+<div class="ipad-flow-footer" data-app-flow-footer style="position:fixed; bottom:0; left:0; right:0; padding:12px 16px; background:#fff; border-top:1px solid #E5E6EB;">
+  <a href="../../检测/平台/ipad_inspect_platform.html" style="display:block; width:100%; height:44px; background:#165DFF; color:#fff; border-radius:8px; font-size:16px; font-weight:600; text-decoration:none; text-align:center; line-height:44px; box-sizing:border-box;">下一步</a>
+</div>
+
+<div id="segDeleteMask" class="mask" role="dialog" aria-modal="true" aria-labelledby="segDelTitle">
+  <div class="seg-del-dialog">
+    <h3 id="segDelTitle">删除塔段</h3>
+    <p id="segDelMsg">确定删除「第1段」？删除后该段已填数据将无法恢复。</p>
+    <div class="seg-del-actions">
+      <button type="button" class="seg-del-cancel" id="segDelCancel">取消</button>
+      <button type="button" class="seg-del-ok" id="segDelOk">删除</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var MAX_SEGMENTS = 20;
+  var pendingDeleteIndex = -1;
+
+  function defaultSegment(i) {
+    return {
+      thickness: i === 0 ? '8.5' : '',
+      corrosion: i === 0 ? '轻微锈蚀' : '无锈蚀',
+      flangeGap: i === 0 ? '0.5' : '',
+      boltLoose: false,
+      resultPass: true,
+      remark: i === 0 ? '第1段整体状况良好，轻微表面锈蚀。' : ''
+    };
+  }
+
+  var segments = [0, 1, 2, 3, 4].map(function (i) { return defaultSegment(i); });
+  var openIndex = 0;
+
+  var listEl = document.getElementById('segmentList');
+  var delMask = document.getElementById('segDeleteMask');
+  var delMsg = document.getElementById('segDelMsg');
+
+  function segmentLabel(i) {
+    return '第' + (i + 1) + '段';
+  }
+
+  function readPanel(panel) {
+    var i = Number(panel.getAttribute('data-index'));
+    var s = segments[i];
+    if (!s) return;
+    var t = panel.querySelector('[data-f="thickness"]');
+    var c = panel.querySelector('[data-f="corrosion"]');
+    var f = panel.querySelector('[data-f="flangeGap"]');
+    var r = panel.querySelector('[data-f="remark"]');
+    if (t) s.thickness = t.value;
+    if (c) s.corrosion = c.value;
+    if (f) s.flangeGap = f.value;
+    if (r) s.remark = r.value;
+    var bolt = panel.querySelector('[data-f="boltLoose"]');
+    s.boltLoose = bolt && bolt.getAttribute('data-val') === '1';
+    var res = panel.querySelector('[data-f="resultPass"]');
+    s.resultPass = !(res && res.getAttribute('data-val') === '0');
+  }
+
+  function syncFromDom() {
+    listEl.querySelectorAll('.seg-panel').forEach(readPanel);
+  }
+
+  function bindToggles(root) {
+    root.querySelectorAll('[data-toggle]').forEach(function (group) {
+      var field = group.getAttribute('data-toggle');
+      group.querySelectorAll('.toggle-opt').forEach(function (opt) {
+        opt.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var val = opt.getAttribute('data-val');
+          group.querySelectorAll('.toggle-opt').forEach(function (o) {
+            o.classList.remove('on-pass', 'on-fail');
+          });
+          if (field === 'boltLoose') {
+            group.setAttribute('data-val', val);
+            if (val === '0') opt.classList.add('on-pass');
+            else opt.classList.add('on-fail');
+          } else {
+            group.setAttribute('data-val', val);
+            if (val === '1') opt.classList.add('on-pass');
+            else opt.classList.add('on-fail');
+          }
+        });
+      });
+    });
+  }
+
+  function summaryText(s) {
+    if (s.thickness) return '壁厚 ' + s.thickness + ' mm · ' + (s.corrosion || '未选锈蚀');
+    return '未填写';
+  }
+
+  function fieldBlock(label, inner, extraClass) {
+    return '<div class="seg-field' + (extraClass ? ' ' + extraClass : '') + '"><label class="form-label">' + label + '</label>' + inner + '</div>';
+  }
+
+  function bodyHtml(s) {
+    var bolt0 = s.boltLoose ? '' : ' on-pass';
+    var bolt1 = s.boltLoose ? ' on-fail' : '';
+    var res1 = s.resultPass ? ' on-pass' : '';
+    var res0 = s.resultPass ? '' : ' on-fail';
+    return '<div class="seg-grid">' +
+      fieldBlock('壁厚（mm）', '<input type="number" class="form-input" data-f="thickness" value="' + escapeAttr(s.thickness) + '" placeholder="请输入">') +
+      fieldBlock('锈蚀程度', '<select class="form-input" data-f="corrosion" style="appearance:auto;">' +
+        optionHtml('无锈蚀', s.corrosion) + optionHtml('轻微锈蚀', s.corrosion) +
+        optionHtml('中度锈蚀', s.corrosion) + optionHtml('严重锈蚀', s.corrosion) +
+        '</select>') +
+      fieldBlock('法兰间隙（mm）', '<input type="number" class="form-input" data-f="flangeGap" value="' + escapeAttr(s.flangeGap) + '" placeholder="请输入">') +
+      fieldBlock('螺栓松动', '<div class="toggle-pair" data-toggle="boltLoose" data-f="boltLoose" data-val="' + (s.boltLoose ? '1' : '0') + '">' +
+        '<div class="toggle-opt' + bolt0 + '" data-val="0">无松动</div>' +
+        '<div class="toggle-opt' + bolt1 + '" data-val="1">有松动</div></div>') +
+      fieldBlock('检测结果', '<div class="toggle-pair" data-toggle="resultPass" data-f="resultPass" data-val="' + (s.resultPass ? '1' : '0') + '">' +
+        '<div class="toggle-opt' + res1 + '" data-val="1">合格</div>' +
+        '<div class="toggle-opt' + res0 + '" data-val="0">不合格</div></div>') +
+      fieldBlock('拍照记录', '<div class="seg-photo"><i class="fa-solid fa-camera" style="font-size:14px;color:#C9CDD4;"></i><span style="font-size:12px;color:#C9CDD4;">拍照</span></div>') +
+      fieldBlock('备注', '<textarea class="seg-remark" data-f="remark" placeholder="请输入备注信息">' +
+        escapeHtml(s.remark) + '</textarea>', 'span-3') +
+      '</div>';
+  }
+
+  function renderList() {
+    listEl.innerHTML = '';
+    segments.forEach(function (s, i) {
+      var panel = document.createElement('section');
+      panel.className = 'seg-panel' + (i === openIndex ? ' open' : '');
+      panel.setAttribute('data-index', String(i));
+      var head = document.createElement('div');
+      head.className = 'seg-head';
+      head.innerHTML = '<i class="fa-solid fa-chevron-right seg-chev"></i><span class="seg-name"></span><span class="seg-sum"></span>';
+      head.querySelector('.seg-name').textContent = segmentLabel(i);
+      head.querySelector('.seg-sum').textContent = summaryText(s);
+      if (segments.length > 1) {
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'seg-del';
+        del.setAttribute('aria-label', '删除' + segmentLabel(i));
+        del.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        del.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openDeleteConfirm(i);
+        });
+        head.appendChild(del);
+      }
+      head.addEventListener('click', function () {
+        syncFromDom();
+        openIndex = openIndex === i ? -1 : i;
+        renderList();
+        if (openIndex >= 0) {
+          var opened = listEl.querySelector('.seg-panel.open');
+          if (opened) opened.scrollIntoView({ block: 'nearest' });
+        }
+      });
+      var body = document.createElement('div');
+      body.className = 'seg-body';
+      body.innerHTML = bodyHtml(s);
+      bindToggles(body);
+      panel.appendChild(head);
+      panel.appendChild(body);
+      listEl.appendChild(panel);
+    });
+    document.getElementById('btnAddSegment').disabled = segments.length >= MAX_SEGMENTS;
+  }
+
+  function escapeAttr(v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+  function escapeHtml(v) {
+    return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function optionHtml(label, selected) {
+    var sel = label === selected ? ' selected' : '';
+    return '<option' + sel + '>' + escapeHtml(label) + '</option>';
+  }
+
+  function openDeleteConfirm(i) {
+    pendingDeleteIndex = i;
+    delMsg.textContent = '确定删除「' + segmentLabel(i) + '」？删除后该段已填数据将无法恢复。';
+    delMask.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDeleteConfirm() {
+    delMask.classList.remove('show');
+    document.body.style.overflow = '';
+    pendingDeleteIndex = -1;
+  }
+
+  function deleteSegment(i) {
+    if (segments.length <= 1 || i < 0 || i >= segments.length) return;
+    syncFromDom();
+    segments.splice(i, 1);
+    if (openIndex === i) openIndex = Math.min(i, segments.length - 1);
+    else if (openIndex > i) openIndex--;
+    renderList();
+  }
+
+  function addSegment() {
+    if (segments.length >= MAX_SEGMENTS) return;
+    syncFromDom();
+    segments.push(defaultSegment(segments.length));
+    openIndex = segments.length - 1;
+    renderList();
+    var opened = listEl.querySelector('.seg-panel.open');
+    if (opened) opened.scrollIntoView({ block: 'nearest' });
+  }
+
+  document.getElementById('btnAddSegment').addEventListener('click', addSegment);
+  document.getElementById('segDelCancel').addEventListener('click', closeDeleteConfirm);
+  document.getElementById('segDelOk').addEventListener('click', function () {
+    var i = pendingDeleteIndex;
+    closeDeleteConfirm();
+    deleteSegment(i);
+  });
+  delMask.addEventListener('click', function (e) {
+    if (e.target === delMask) closeDeleteConfirm();
+  });
+
+  renderList();
+})();
+</script>
+</body>
+</html>

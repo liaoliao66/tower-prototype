@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>检测模板 - 通信铁塔检测系统</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../../../assets/pc-layout.css">
+<style>
+/* 外层画布：与主布局区形成「底 → 浮层」 */
+.inspect-page-root {
+  margin: -20px -24px;
+  min-height: calc(100vh - 56px);
+  background: linear-gradient(180deg, #EEF1F6 0%, #E4E8EF 100%);
+  padding: 20px 24px 28px;
+}
+.inspect-shell {
+  max-width: 100%;
+  margin: 0 auto;
+}
+.inspect-shell-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 0 4px;
+}
+.inspect-shell-hd .shell-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.inspect-shell-hd .shell-title i {
+  color: var(--primary);
+  font-size: 14px;
+}
+.inspect-shell-hd .shell-hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+/* 一级浮层：整块工作区 */
+.inspect-workspace {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+.inspect-workspace-inner {
+  padding: 16px;
+  background: #F7F8FA;
+}
+.inspect-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 520px;
+}
+/* 左侧塔型列（白底黑字，与列表同级平铺） */
+.inspect-tower-panel {
+  width: 140px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.inspect-tower-panel .tower-panel-title {
+  padding: 14px 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+  border-bottom: 1px solid var(--border);
+}
+.inspect-tower-nav {
+  flex: 1;
+  background: #fff;
+  padding: 8px 10px 12px;
+}
+.inspect-tower-item {
+  display: block;
+  margin: 2px 0;
+  padding: 9px 12px;
+  font-size: 13px;
+  color: var(--text-1);
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.inspect-tower-item:hover {
+  background: #F2F3F5;
+  color: var(--text-1);
+}
+.inspect-tower-item.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 500;
+}
+/* 二级浮层：右侧列表 */
+.inspect-table-panel {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.inspect-table-panel .panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+.inspect-table-panel .panel-head .card-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.inspect-table-panel .panel-body {
+  padding: 16px 18px 18px;
+  flex: 1;
+  min-width: 0;
+  background: #FAFBFC;
+  display: flex;
+  flex-direction: column;
+}
+.inspect-table-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+.inspect-table-panel .data-table {
+  margin: 0;
+  min-width: 1200px;
+  width: max-content;
+  border: none;
+  border-radius: 0;
+}
+.inspect-table-panel .data-table thead th {
+  background: #F7F8FA;
+  white-space: nowrap;
+}
+.inspect-table-panel .data-table tbody td {
+  white-space: nowrap;
+}
+.inspect-table-panel .pagination {
+  margin-top: 16px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.tpl-sub-links {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tpl-sub-links .sep { color: var(--text-4); }
+
+/* ---- 新增检测模板弹窗 ---- */
+.modal-mask { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.45); z-index:1000; align-items:center; justify-content:center; }
+.modal-mask.show { display:flex; }
+.modal-box { background:#fff; border-radius:10px; width:660px; max-height:80vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,.15); }
+.modal-hd { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); }
+.modal-hd h3 { font-size:15px; font-weight:600; color:var(--text-1); margin:0; }
+.modal-x { background:none; border:none; font-size:18px; color:var(--text-3); cursor:pointer; }
+.modal-x:hover { color:var(--text-1); }
+.modal-bd { padding:18px 20px; }
+.required { color:var(--danger); margin-left:2px; }
+.form-input[readonly] { background:#f7f8fa; color:var(--text-3); cursor:not-allowed; }
+.upload-area-wrap { border:1px dashed var(--border); border-radius:6px; padding:28px 16px; text-align:center; cursor:pointer; background:#FAFBFC; transition:all .15s; }
+.upload-area-wrap:hover { border-color:var(--primary); background:#F0F5FF; }
+.upload-area-wrap .upload-icon { font-size:28px; color:var(--text-3); margin-bottom:8px; }
+.upload-area-wrap .upload-title { font-size:13px; font-weight:500; color:var(--text-1); }
+.upload-area-wrap .upload-hint { font-size:12px; color:var(--text-3); margin-top:4px; }
+.upload-area-wrap.uploaded { border-color:#00B42A; background:#E8FFEA; }
+.upload-area-wrap.uploaded .upload-title { color:#00B42A; }
+.upload-area-wrap.uploaded .upload-hint { color:#00B42A; }
+.upload-file-input { display:none; }
+.invalid-feedback { font-size:12px; color:var(--danger); margin-top:4px; display:none; }
+.form-help { font-size:12px; color:var(--text-3); margin-top:4px; line-height:1.5; }
+.alert-success-bar { background:#E8FFEA; color:#00B42A; border-radius:6px; padding:10px 14px; font-size:13px; margin-bottom:16px; display:none; }
+.code-badge { display:inline-block; background:#EEEDFE; color:#534AB7; font-size:12px; font-weight:500; padding:2px 8px; border-radius:4px; }
+</style>
+</head>
+<body>
+<div id="page-content" class="inspect-page-root">
+  <div class="inspect-shell">
+    <div class="inspect-shell-hd">
+      <div class="shell-title">
+        <i class="fa-solid fa-layer-group"></i>
+        检测模板工作台
+      </div>
+      <span class="shell-hint">先选择塔型，再管理该塔型下的模板版本与子模板</span>
+    </div>
+    <div class="inspect-workspace">
+      <div class="inspect-workspace-inner">
+        <div class="inspect-layout">
+          <aside class="inspect-tower-panel" aria-label="塔型">
+            <div class="tower-panel-title">塔型</div>
+            <nav class="inspect-tower-nav">
+              <a class="inspect-tower-item active" data-tower="连接单管塔" href="#">连接单管塔</a>
+              <a class="inspect-tower-item" data-tower="法兰单管塔" href="#">法兰单管塔</a>
+              <a class="inspect-tower-item" data-tower="格构塔" href="#">格构塔</a>
+              <a class="inspect-tower-item" data-tower="角钢塔" href="#">角钢塔</a>
+              <a class="inspect-tower-item" data-tower="支柱塔" href="#">支柱塔</a>
+              <a class="inspect-tower-item" data-tower="拉线塔杆" href="#">拉线塔杆</a>
+            </nav>
+          </aside>
+          <section class="inspect-table-panel">
+            <div class="panel-head">
+              <div class="card-title">检测模板</div>
+              <button type="button" class="btn btn-primary btn-sm" id="btnAdd" onclick="window._openAddTemplateModal && window._openAddTemplateModal()"><i class="fa-solid fa-plus"></i> 新增</button>
+            </div>
+            <div class="panel-body">
+              <div class="inspect-table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width:52px">序号</th>
+                    <th>模板编号</th>
+                    <th style="width:72px">模板版本</th>
+                    <th>任务模板</th>
+                    <th>记录模板</th>
+                    <th>报告模板</th>
+                    <th style="width:88px">状态</th>
+                    <th style="width:150px">启用时间</th>
+                    <th style="width:150px">创建时间</th>
+                    <th style="width:72px">创建人</th>
+                    <th class="col-action" style="width:100px">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="tplBody"></tbody>
+              </table>
+              </div>
+              <div class="pagination">
+                <span>共 6 条记录</span>
+                <div class="pagination-btns">
+                  <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                  <button class="page-btn active">1</button>
+                  <button class="page-btn">2</button>
+                  <button class="page-btn">3</button>
+                  <button class="page-btn">4</button>
+                  <button class="page-btn">5</button>
+                  <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                  <span style="font-size:12px;color:var(--text-3);margin-left:8px">跳至 <input type="number" class="form-input" style="width:48px;height:28px;padding:2px 6px" value="1"> 页</span>
+                  <select class="form-select" style="width:100px;height:28px;margin-left:8px"><option>10 条/页</option></select>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 新增检测模板弹窗 -->
+  <div class="modal-mask" id="modal-add-template">
+    <div class="modal-box">
+      <div class="modal-hd"><h3>新增检测模板</h3><button class="modal-x" data-close="modal-add-template">&times;</button></div>
+      <div class="modal-bd">
+        <div id="add-template-form">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">模板编号</label>
+            <input type="text" class="form-input" id="add-tpl-code" readonly placeholder="非必填，保存后系统自动填充" style="width:100%;">
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">检测类型 <span class="required">*</span></label>
+            <select class="form-select" id="add-inspect-type" data-source="基础数据-检测类型" style="width:100%;">
+              <option value="">请选择检测类型</option>
+            </select>
+            <div class="form-help">枚举值来源于「基础数据-检测类型」中已启用的数据。</div>
+            <div class="invalid-feedback" id="fb-type">请选择检测类型</div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">上传记录模板 <span class="required">*</span></label>
+            <input type="file" class="upload-file-input" id="upload-record-input" accept=".doc,.docx">
+            <div class="upload-area-wrap" id="upload-record-zone" onclick="window._selectTemplateFile('record')">
+              <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div class="upload-title">点击或拖拽上传记录模板</div>
+              <div class="upload-hint">支持 docx，最大 500M</div>
+            </div>
+            <div class="invalid-feedback" id="fb-record">请上传记录模板</div>
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">上传报告模板 <span class="required">*</span></label>
+            <input type="file" class="upload-file-input" id="upload-report-input" accept=".doc,.docx">
+            <div class="upload-area-wrap" id="upload-report-zone" onclick="window._selectTemplateFile('report')">
+              <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+              <div class="upload-title">点击或拖拽上传报告模板</div>
+              <div class="upload-hint">支持 docx，最大 500M</div>
+            </div>
+            <div class="invalid-feedback" id="fb-report">请上传报告模板</div>
+          </div>
+        </div>
+        <div id="add-template-result" style="display:none;">
+          <div class="alert-success-bar" style="display:block;" id="result-alert">
+            <i class="fa-solid fa-circle-check"></i> 模板创建成功！系统已自动分配编号
+          </div>
+          <div style="padding:6px 0;">
+            <div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f2f3f5;">
+              <span style="font-size:12px;color:var(--text-3);min-width:72px;">模板编号</span>
+              <span style="font-size:13px;font-weight:500;color:var(--text-1);"><span class="code-badge" id="result-code">&mdash;</span></span>
+            </div>
+            <div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f2f3f5;">
+              <span style="font-size:12px;color:var(--text-3);min-width:72px;">检测类型</span>
+              <span style="font-size:13px;font-weight:500;color:var(--text-1);" id="result-type">&mdash;</span>
+            </div>
+            <div style="display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f2f3f5;">
+              <span style="font-size:12px;color:var(--text-3);min-width:72px;">记录模板</span>
+              <span style="font-size:13px;font-weight:500;color:#00B42A;" id="result-record">&mdash;</span>
+            </div>
+            <div style="display:flex;align-items:center;padding:10px 0;">
+              <span style="font-size:12px;color:var(--text-3);min-width:72px;">报告模板</span>
+              <span style="font-size:13px;font-weight:500;color:#00B42A;" id="result-report">&mdash;</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;border-top:1px solid var(--border);padding-top:14px;">
+          <button class="btn btn-default" data-close="modal-add-template" id="btn-add-cancel">取消</button>
+          <button class="btn btn-primary" id="btn-add-save"><i class="fa-solid fa-check"></i> 保存</button>
+          <button class="btn btn-default" id="btn-add-back" style="display:none;">返回列表</button>
+          <button class="btn btn-primary" id="btn-add-fields" style="display:none;">配置字段</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../../../assets/shared-layout.js"></script>
+<script>
+window.__layoutConfig = { active: 'inspect_template_list', breadcrumb: ['模板配置', '检测模板'] };
+
+/* ====== 新增检测模板弹窗 ====== */
+(function(){
+  var _recordUploaded = false;
+  var _reportUploaded = false;
+  var _mockFiles = {
+    record: { name: '单管塔检测记录模板_V2.1.docx', size: '2.8M' },
+    report: { name: '单管塔检测报告模板_V2.1.docx', size: '3.1M' }
+  };
+  var _inspectTypesFromBaseData = [
+    { code: 'INSP-AQ', name: '安全性鉴定', enabled: true },
+    { code: 'INSP-DQ', name: '定期检测', enabled: true },
+    { code: 'INSP-TZ', name: '铁塔垂直度专项', enabled: false }
+  ];
+
+  function _renderInspectTypeOptions(){
+    var select = document.getElementById('add-inspect-type');
+    if(!select) return;
+    select.innerHTML = '<option value="">请选择检测类型</option>' +
+      _inspectTypesFromBaseData.filter(function(item){ return item.enabled; }).map(function(item){
+        return '<option value="' + item.code + '">' + item.name + '</option>';
+      }).join('');
+  }
+
+  function _setUploadState(type, uploaded, fileInfo){
+    var isRecord = type === 'record';
+    var zone = document.getElementById(isRecord ? 'upload-record-zone' : 'upload-report-zone');
+    var fb = document.getElementById(isRecord ? 'fb-record' : 'fb-report');
+    var input = document.getElementById(isRecord ? 'upload-record-input' : 'upload-report-input');
+    if(!zone) return;
+    if(isRecord) _recordUploaded = uploaded;
+    else _reportUploaded = uploaded;
+    if(uploaded){
+      var file = fileInfo || _mockFiles[type];
+      _mockFiles[type] = file;
+      zone.classList.add('uploaded');
+      var ic = zone.querySelector('.upload-icon'); if(ic) ic.innerHTML = '<i class="fa-solid fa-file-lines"></i>';
+      var title = zone.querySelector('.upload-title'); if(title) title.textContent = '已上传: ' + file.name;
+      var hint = zone.querySelector('.upload-hint'); if(hint) hint.textContent = file.size + ' - 点击重新上传';
+      if(fb) fb.style.display = 'none';
+    } else {
+      zone.classList.remove('uploaded');
+      var ic2 = zone.querySelector('.upload-icon'); if(ic2) ic2.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i>';
+      var title2 = zone.querySelector('.upload-title'); if(title2) title2.textContent = isRecord ? '点击或拖拽上传记录模板' : '点击或拖拽上传报告模板';
+      var hint2 = zone.querySelector('.upload-hint'); if(hint2) hint2.textContent = '支持 docx，最大 500M';
+      if(input) input.value = '';
+    }
+  }
+
+  function _resetAddModal(){
+    _renderInspectTypeOptions();
+    document.getElementById('add-tpl-code').value = '';
+    document.getElementById('add-inspect-type').value = '';
+    var fbType = document.getElementById('fb-type'); if(fbType) fbType.style.display = 'none';
+    var fbRec = document.getElementById('fb-record'); if(fbRec) fbRec.style.display = 'none';
+    var fbRep = document.getElementById('fb-report'); if(fbRep) fbRep.style.display = 'none';
+    _setUploadState('record', false);
+    _setUploadState('report', false);
+    var f = document.getElementById('add-template-form'); if(f) f.style.display = 'block';
+    var r = document.getElementById('add-template-result'); if(r) r.style.display = 'none';
+    var c = document.getElementById('btn-add-cancel'); if(c) c.style.display = '';
+    var s = document.getElementById('btn-add-save'); if(s) s.style.display = '';
+    var b = document.getElementById('btn-add-back'); if(b) b.style.display = 'none';
+    var fd = document.getElementById('btn-add-fields'); if(fd) fd.style.display = 'none';
+  }
+
+  function _doOpenAddModal(){
+    _resetAddModal();
+    var m = document.getElementById('modal-add-template');
+    if(m) {
+      if (m.parentElement !== document.body) document.body.appendChild(m);
+      m.classList.add('show');
+    }
+  }
+
+  function _doCloseAddModal(){
+    var m = document.getElementById('modal-add-template');
+    if(m) m.classList.remove('show');
+  }
+
+  window._openAddTemplateModal = _doOpenAddModal;
+
+  window._selectTemplateFile = function(type){
+    var input = document.getElementById(type === 'record' ? 'upload-record-input' : 'upload-report-input');
+    if(input) input.click();
+  };
+
+  window._saveAddTemplate = function(){
+    var typeEl = document.getElementById('add-inspect-type');
+    var type = typeEl ? typeEl.value : '';
+    var hasErr = false;
+    var fbType = document.getElementById('fb-type');
+    if(!type){ if(fbType) fbType.style.display = 'block'; hasErr = true; }
+    else { if(fbType) fbType.style.display = 'none'; }
+    if(!_recordUploaded){ var fbRec = document.getElementById('fb-record'); if(fbRec) fbRec.style.display = 'block'; hasErr = true; }
+    if(!_reportUploaded){ var fbRep = document.getElementById('fb-report'); if(fbRep) fbRep.style.display = 'block'; hasErr = true; }
+    if(hasErr) return;
+
+    var newCode = 'GD001001-' + String(new Date().getTime()).slice(-3);
+    var typeLabel = typeEl && typeEl.options[typeEl.selectedIndex] ? typeEl.options[typeEl.selectedIndex].text : type;
+
+    document.getElementById('add-tpl-code').value = newCode;
+    var rc = document.getElementById('result-code'); if(rc) rc.textContent = newCode;
+    var rt = document.getElementById('result-type'); if(rt) rt.textContent = typeLabel;
+    var rr = document.getElementById('result-record'); if(rr) rr.innerHTML = '<i class="fa-solid fa-check"></i> ' + _mockFiles.record.name;
+    var rp = document.getElementById('result-report'); if(rp) rp.innerHTML = '<i class="fa-solid fa-check"></i> ' + _mockFiles.report.name;
+
+    var f = document.getElementById('add-template-form'); if(f) f.style.display = 'none';
+    var ra = document.getElementById('add-template-result'); if(ra) ra.style.display = 'block';
+    var c = document.getElementById('btn-add-cancel'); if(c) c.style.display = 'none';
+    var s = document.getElementById('btn-add-save'); if(s) s.style.display = 'none';
+    var b = document.getElementById('btn-add-back'); if(b) b.style.display = '';
+    var fd = document.getElementById('btn-add-fields'); if(fd) fd.style.display = '';
+  };
+
+  // Event delegation for modal buttons
+  document.addEventListener('click',function(e){
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    if(target.closest('#btnAdd')){ e.preventDefault(); _doOpenAddModal(); return; }
+    if(target.closest('#btn-add-save')){ e.preventDefault(); window._saveAddTemplate(); return; }
+    if(target.closest('#btn-add-back')){ _doCloseAddModal(); return; }
+    if(target.closest('#btn-add-cancel') || (target.closest('[data-close]') && target.closest('[data-close]').getAttribute('data-close')==='modal-add-template')){
+      _doCloseAddModal(); return;
+    }
+  });
+
+  document.addEventListener('change', function(e){
+    var target = e.target;
+    if(!(target instanceof HTMLInputElement)) return;
+    if(target.id !== 'upload-record-input' && target.id !== 'upload-report-input') return;
+    var type = target.id === 'upload-record-input' ? 'record' : 'report';
+    var file = target.files && target.files[0];
+    if(file){
+      _setUploadState(type, true, {
+        name: file.name,
+        size: file.size ? (Math.max(file.size / 1024 / 1024, 0.1).toFixed(1) + 'M') : _mockFiles[type].size
+      });
+    } else {
+      _setUploadState(type, true, _mockFiles[type]);
+    }
+  });
+
+  ['record','report'].forEach(function(type){
+    var zone = document.getElementById(type === 'record' ? 'upload-record-zone' : 'upload-report-zone');
+    if(!zone) return;
+    zone.addEventListener('dragover', function(e){ e.preventDefault(); zone.style.borderColor = 'var(--primary)'; });
+    zone.addEventListener('dragleave', function(){ zone.style.borderColor = ''; });
+    zone.addEventListener('drop', function(e){
+      e.preventDefault();
+      zone.style.borderColor = '';
+      var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      _setUploadState(type, true, file ? {
+        name: file.name,
+        size: file.size ? (Math.max(file.size / 1024 / 1024, 0.1).toFixed(1) + 'M') : _mockFiles[type].size
+      } : _mockFiles[type]);
+    });
+  });
+})();
+
+window.__prototypePageInit = function initInspectTemplateListPage() {
+  var rows = [
+    { no: 1, code: 'GD001001-001', ver: 'V9', task: 'configured', record: 'configured', report: 'pending', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 2, code: 'GD001001-002', ver: 'V8', task: 'view', record: 'view', report: 'view', status: '启用中', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 3, code: 'GD001001-003', ver: 'V7', task: 'configure', record: 'configure', report: 'pending', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 4, code: 'GD001001-004', ver: 'V6', task: 'view', record: 'view', report: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 5, code: 'GD001001-005', ver: 'V5', task: 'configure', record: 'configure', report: 'configure', status: '待启用', enableAt: '—', createdAt: '2012-08-09 12:00:00', creator: '郑飞' },
+    { no: 6, code: 'GD001001-006', ver: 'V4', task: 'view', record: 'view', report: 'view', status: '已禁用', enableAt: '2012-08-09 12:00:00', createdAt: '2012-08-09 12:00:00', creator: '郑飞' }
+  ];
+
+  function statusClassFor(status) {
+    if (status === '启用中') return 'tag-green';
+    if (status === '待启用') return 'tag-orange';
+    return 'tag-blue';
+  }
+
+  function syncRowMeta(row) {
+    row.statusClass = statusClassFor(row.status);
+    row.op = row.status === '待启用' ? 'enable' : 'copy';
+  }
+
+  function nowText() {
+    var d = new Date();
+    var p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' +
+      p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+
+  /** 同一塔型下仅允许一条「启用中」 */
+  function normalizeSingleActive() {
+    var active = rows.filter(function (r) { return r.status === '启用中'; });
+    if (active.length <= 1) {
+      rows.forEach(syncRowMeta);
+      return;
+    }
+    active.sort(function (a, b) {
+      return (b.enableAt || '').localeCompare(a.enableAt || '');
+    });
+    active.forEach(function (r, i) {
+      if (i > 0) r.status = '已禁用';
+    });
+    rows.forEach(syncRowMeta);
+  }
+
+  function enableTemplate(code) {
+    var target = rows.find(function (r) { return r.code === code; });
+    if (!target) return;
+    if (target.status !== '待启用') {
+      alert('仅「待启用」状态的模板可执行启用');
+      return;
+    }
+    if (!confirm('启用后，当前塔型下原「启用中」版本将自动变为「已禁用」，且同时仅保留一条启用中记录。确定启用「' + target.code + '」？')) {
+      return;
+    }
+    rows.forEach(function (r) {
+      if (r.status === '启用中') {
+        r.status = '已禁用';
+      }
+    });
+    target.status = '启用中';
+    target.enableAt = nowText();
+    rows.forEach(syncRowMeta);
+    render();
+    alert('已启用「' + target.code + ' · ' + target.ver + '」（原型）');
+  }
+
+  normalizeSingleActive();
+
+  var RECORD_TEMPLATE_CONFIG_URL = 'https://www.kdocs.cn/l/coZBoK9xbMAA';
+
+  function subCol(kind, mode, code, ver, rowStatus) {
+    if (rowStatus === '已禁用') {
+      return '<div class="tpl-sub-links"><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
+    var taskHref = 'pc_inspect_template_task.html?tpl=' + encodeURIComponent(code) + '&ver=' + encodeURIComponent(ver);
+    var reportHref = 'pc_inspect_template_report_edit.html?tpl=' + encodeURIComponent(code) + '&ver=' + encodeURIComponent(ver);
+    if (kind === 'task' && (mode === 'configured' || mode === 'configure')) {
+      var label = mode === 'configured' ? '配置 (已配)' : '配置 (待配)';
+      return '<div class="tpl-sub-links"><a href="' + taskHref + '" class="btn-text">' + label + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button></div>';
+    }
+    if (kind === 'record' && (mode === 'configured' || mode === 'configure' || mode === 'pending')) {
+      var recordLabel = (mode === 'pending' || mode === 'configure') ? '配置 (待配)' : '配置 (已配)';
+      return '<div class="tpl-sub-links"><a href="' + RECORD_TEMPLATE_CONFIG_URL + '" class="btn-text" target="_blank" rel="noopener noreferrer">' + recordLabel + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button><span class="sep">|</span><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
+    if (kind === 'report' && (mode === 'configured' || mode === 'configure' || mode === 'pending')) {
+      var reportLabel = (mode === 'pending' || mode === 'configure') ? '配置 (待配)' : '配置 (已配)';
+      return '<div class="tpl-sub-links"><a href="' + reportHref + '" class="btn-text">' + reportLabel + '</a><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button><span class="sep">|</span><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
+    if (mode === 'view') {
+      return '<div class="tpl-sub-links"><button type="button" class="btn-text btn-view">查看</button></div>';
+    }
+    var pending = mode === 'pending' || mode === 'configure';
+    var label2 = pending ? '配置 (待配)' : '配置 (已配)';
+    return '<div class="tpl-sub-links"><button type="button" class="btn-text btn-sub-config" data-kind="' + kind + '">' + label2 + '</button><span class="sep">|</span><button type="button" class="btn-text btn-preview">预览</button><span class="sep">|</span><button type="button" class="btn-text btn-view">查看</button></div>';
+  }
+
+  function render() {
+    var tbody = document.getElementById('tplBody');
+    if (!tbody) return;
+    tbody.innerHTML = rows.map(function (r) {
+      var opHtml = r.op === 'enable'
+        ? '<button type="button" class="btn-text btn-enable">启用</button>'
+        : '<button type="button" class="btn-text btn-copy">复制</button>';
+      return '<tr data-code="' + r.code + '">' +
+        '<td>' + r.no + '</td>' +
+        '<td>' + r.code + '</td>' +
+        '<td>' + r.ver + '</td>' +
+        '<td>' + subCol('task', r.task, r.code, r.ver, r.status) + '</td>' +
+        '<td>' + subCol('record', r.record, r.code, r.ver, r.status) + '</td>' +
+        '<td>' + subCol('report', r.report, r.code, r.ver, r.status) + '</td>' +
+        '<td><span class="tag ' + r.statusClass + '">' + r.status + '</span></td>' +
+        '<td style="font-size:12px;white-space:nowrap">' + r.enableAt + '</td>' +
+        '<td style="font-size:12px;white-space:nowrap">' + r.createdAt + '</td>' +
+        '<td>' + r.creator + '</td>' +
+        '<td class="col-action">' + opHtml + '</td></tr>';
+    }).join('');
+  }
+
+  document.querySelectorAll('.inspect-tower-item').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.querySelectorAll('.inspect-tower-item').forEach(function (n) { n.classList.remove('active'); });
+      el.classList.add('active');
+    });
+  });
+
+  var tplBody = document.getElementById('tplBody');
+  if (tplBody) {
+    tplBody.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!(t instanceof Element)) return;
+      if (t.closest('.btn-preview')) return alert('模板预览（原型）');
+      if (t.closest('.btn-view')) return alert('查看模板（原型）');
+      if (t.closest('.btn-sub-config')) {
+        var cfgBtn = t.closest('.btn-sub-config');
+        var kind = cfgBtn && cfgBtn.getAttribute('data-kind');
+        if (kind === 'record') {
+          window.open(RECORD_TEMPLATE_CONFIG_URL, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        if (kind === 'report') {
+          var tr = cfgBtn.closest('tr');
+          if (tr) {
+            var code = tr.getAttribute('data-code') || '';
+            var row = rows.find(function (r) { return r.code === code; });
+            if (row) {
+              location.href = 'pc_inspect_template_report_edit.html?tpl=' + encodeURIComponent(row.code) + '&ver=' + encodeURIComponent(row.ver);
+              return;
+            }
+          }
+        }
+        return alert('子模板配置（原型）');
+      }
+      var enableBtn = t.closest('.btn-enable');
+      if (enableBtn) {
+        var tr = enableBtn.closest('tr');
+        if (tr) enableTemplate(tr.getAttribute('data-code'));
+        return;
+      }
+      if (t.closest('.btn-copy')) return alert('已复制为新版本（原型）');
+    });
+  }
+
+  render();
+};
+</script>
+</body>
+</html>

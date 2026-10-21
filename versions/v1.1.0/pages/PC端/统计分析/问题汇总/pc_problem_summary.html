@@ -8,12 +8,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../../../assets/pc-layout.css">
 <style>
-  .sum-grid { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
-  .sum-card { flex:1; min-width:160px; text-align:left; border:1px solid var(--border); background:#F7F8FA; border-radius:6px; padding:16px 18px; }
-  .filter-block { border-top:1px solid var(--border); padding-top:16px; }
-  .sum-card .n { font-size:28px; font-weight:600; color:var(--text-1); line-height:1.2; }
-  .sum-card .t { font-size:14px; font-weight:600; color:var(--text-1); margin-top:6px; }
-  .sum-card .s { font-size:12px; color:var(--text-3); margin-top:2px; }
   .date-pair { display:inline-flex; align-items:center; gap:6px; }
   .date-pair .form-label { margin:0; white-space:nowrap; }
   .date-pair .form-input { width:138px; }
@@ -28,11 +22,12 @@
       <div class="card-title">问题汇总</div>
     </div>
     <div class="card-body">
-      <div class="sum-grid" id="sumGrid"></div>
-      <div class="filter-block">
       <div class="toolbar">
         <div class="toolbar-left">
           <input id="kw" class="form-input" placeholder="区域 / 站名 / 站址编码 / 报告编号 / 工程 / 订单" style="width:320px">
+          <select id="provinceFilter" class="form-select" style="min-width:120px"></select>
+          <select id="cityFilter" class="form-select" style="min-width:120px"></select>
+          <select id="districtFilter" class="form-select" style="min-width:120px"></select>
           <span class="date-pair">
             <span class="form-label">检测日期</span>
             <input id="inspectStart" type="date" class="form-input">
@@ -69,13 +64,14 @@
               <th>检测情况</th>
               <th>检测日期</th>
               <th>报告日期</th>
+              <th>工程</th>
+              <th>订单</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
       <div class="pagination"><span id="totalText">共 0 条</span></div>
-      </div>
     </div>
   </div>
 </div>
@@ -83,8 +79,7 @@
 <script>window.__layoutConfig = {active:'problem_summary', breadcrumb:['统计分析','问题汇总']};</script>
 <script>
 (function () {
-  var HEADERS = ["序号","区域","站名","站址编码","经度","纬度","报告编号","结论","整改建议","检测情况","检测日期","报告日期"];
-  var QUARTER_LABEL = ["一季度", "二季度", "三季度", "四季度"];
+  var HEADERS = ["序号","区域","站名","站址编码","经度","纬度","报告编号","结论","整改建议","检测情况","检测日期","报告日期","工程","订单"];
   var ROWS = [
     { taskId:"RW1", area:"宁安", name:"兰岗东进模块局", code:"231084908000000170", lng:"129.365734", lat:"44.312051", reportNo:"GGJC2400905407", conclusion:"该通信塔主肢螺栓缺失多处，主肢锈蚀开裂，法兰锈蚀严重，存在严重安全隐患，建议拆除报废。整体结构安全性评定为四级。", advice:"建议拆除报废。", inspectStatus:"", inspectDate:"2024-11-08", reportDate:"2024-11-20", projectId:"P24", projectName:"牡丹江2024年铁塔安全检测工程", orderId:"O24", orderNo:"MDJ20241101-001" },
     { taskId:"RW2", area:"宁安", name:"石岩民主模块局", code:"231084908000000183", lng:"129.362816", lat:"44.3105", reportNo:"GGJC2400905408", conclusion:"第二塔段主肢变形严重，第一塔段主肢锈蚀严重，因塔体遭受水灾，建议拆除报废。整体结构安全性评定为三级。", advice:"建议拆除报废。", inspectStatus:"", inspectDate:"2024-11-09", reportDate:"2024-11-21", projectId:"P24", projectName:"牡丹江2024年铁塔安全检测工程", orderId:"O24", orderNo:"MDJ20241101-001" },
@@ -103,16 +98,17 @@
     { taskId:"RW11", area:"东安区", name:"东安区铁塔站", code:"231002908000000033", lng:"129.626770", lat:"44.581090", reportNo:"GGJC2600900880", conclusion:"经整改维护后，目标使用年限为10年。满足风压0.50kN/m2条件下的承载力使用要求。", advice:"通信塔按技术要求定期维护。", inspectStatus:"", inspectDate:"2026-04-09", reportDate:"2026-04-18", projectId:"P26", projectName:"牡丹江2026年铁塔安全检测工程", orderId:"O26A", orderNo:"MDJ20260108-001" }
   ];
 
+  ROWS.forEach(function (r) {
+    r.province = "黑龙江省";
+    r.city = "牡丹江市";
+    r.district = r.area || "";
+  });
+
   function esc(s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
   function xml(s) {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  }
-  function parts(date) {
-    if (!date) return null;
-    var p = date.split("-");
-    return { y: p[0], q: Math.floor((Number(p[1]) - 1) / 3) + 1, m: Number(p[1]) };
   }
   function inRange(value, start, end) {
     if (!start && !end) return true;
@@ -132,8 +128,17 @@
     return inRange(r.inspectDate, document.getElementById("inspectStart").value, document.getElementById("inspectEnd").value)
       && inRange(r.reportDate, document.getElementById("reportStart").value, document.getElementById("reportEnd").value);
   }
+  function matchRegion(r) {
+    var province = document.getElementById("provinceFilter").value;
+    var city = document.getElementById("cityFilter").value;
+    var district = document.getElementById("districtFilter").value;
+    if (province && r.province !== province) return false;
+    if (city && r.city !== city) return false;
+    if (district && r.district !== district) return false;
+    return true;
+  }
   function baseFiltered() {
-    return ROWS.filter(function (r) { return matchKw(r) && matchDates(r); });
+    return ROWS.filter(function (r) { return matchKw(r) && matchDates(r) && matchRegion(r); });
   }
   function shown() {
     return baseFiltered().sort(function (a, b) {
@@ -152,50 +157,55 @@
     });
   }
 
-  function card(title, sub, count) {
-    return '<div class="sum-card"><div class="n">' + count + '</div><div class="t">' + esc(title) + '</div><div class="s">' + esc(sub) + "</div></div>";
-  }
-  function nowPeriod() {
-    var now = new Date();
-    var month = now.getMonth() + 1;
-    return { y: String(now.getFullYear()), m: month, q: Math.floor((month - 1) / 3) + 1 };
-  }
-  function countWhere(list, pred) {
-    var n = 0;
+  function uniqueValues(list, key) {
+    var out = [];
     list.forEach(function (r) {
-      var p = parts(r.inspectDate);
-      if (p && pred(p)) n += 1;
+      var value = r[key];
+      if (value && out.indexOf(value) < 0) out.push(value);
     });
-    return n;
+    return out;
   }
-  function renderSummary() {
-    var list = baseFiltered();
-    var now = nowPeriod();
-    var html = "";
-    html += card("累计", "全部已出报告", list.length);
-    html += card("今年", now.y + "年", countWhere(list, function (p) { return p.y === now.y; }));
-    html += card("本季", now.y + "年" + QUARTER_LABEL[now.q - 1], countWhere(list, function (p) { return p.y === now.y && p.q === now.q; }));
-    html += card("本月", now.y + "年" + now.m + "月", countWhere(list, function (p) { return p.y === now.y && p.m === now.m; }));
-    document.getElementById("sumGrid").innerHTML = html;
+  function fillSelect(id, placeholder, values, current) {
+    var html = '<option value="">' + placeholder + "</option>";
+    values.forEach(function (value) {
+      html += '<option value="' + esc(value) + '"' + (value === current ? " selected" : "") + ">" + esc(value) + "</option>";
+    });
+    document.getElementById(id).innerHTML = html;
   }
+  function refreshRegionSelects() {
+    var province = document.getElementById("provinceFilter").value;
+    var city = document.getElementById("cityFilter").value;
+    var district = document.getElementById("districtFilter").value;
+    var provinces = uniqueValues(ROWS, "province");
+    if (provinces.indexOf(province) < 0) province = "";
+    var cities = uniqueValues(ROWS.filter(function (r) { return !province || r.province === province; }), "city");
+    if (cities.indexOf(city) < 0) city = "";
+    var districts = uniqueValues(ROWS.filter(function (r) {
+      return (!province || r.province === province) && (!city || r.city === city);
+    }), "district");
+    if (districts.indexOf(district) < 0) district = "";
+    fillSelect("provinceFilter", "全部省", provinces, province);
+    fillSelect("cityFilter", "全部市", cities, city);
+    fillSelect("districtFilter", "全部区", districts, district);
+  }
+
   function renderTable() {
     var list = shown();
     var body = document.getElementById("tbody");
     if (!list.length) {
-      body.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:28px;">没有匹配的记录</td></tr>';
+      body.innerHTML = '<tr><td colspan="14" style="text-align:center;color:var(--text-3);padding:28px;">没有匹配的记录</td></tr>';
     } else {
       body.innerHTML = list.map(function (r, i) {
-        return "<tr><td>" + (i + 1) + "</td><td>" + esc(r.area) + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.code) + "</td><td>" + esc(r.lng) + "</td><td>" + esc(r.lat) + "</td><td>" + esc(r.reportNo) + "</td><td><div class=\"clamp\" title=\"" + esc(r.conclusion) + "\">" + esc(r.conclusion) + "</div></td><td><div class=\"clamp\" title=\"" + esc(r.advice) + "\">" + esc(r.advice) + "</div></td><td>" + esc(r.inspectStatus) + "</td><td>" + esc(r.inspectDate) + "</td><td>" + esc(r.reportDate) + "</td></tr>";
+        return "<tr><td>" + (i + 1) + "</td><td>" + esc(r.area) + "</td><td>" + esc(r.name) + "</td><td>" + esc(r.code) + "</td><td>" + esc(r.lng) + "</td><td>" + esc(r.lat) + "</td><td>" + esc(r.reportNo) + "</td><td><div class=\"clamp\" title=\"" + esc(r.conclusion) + "\">" + esc(r.conclusion) + "</div></td><td><div class=\"clamp\" title=\"" + esc(r.advice) + "\">" + esc(r.advice) + "</div></td><td>" + esc(r.inspectStatus) + "</td><td>" + esc(r.inspectDate) + "</td><td>" + esc(r.reportDate) + "</td><td>" + esc(r.projectName) + "</td><td>" + esc(r.orderNo) + "</td></tr>";
       }).join("");
     }
     document.getElementById("totalText").textContent = "共 " + list.length + " 条";
   }
   function render() {
-    renderSummary();
     renderTable();
   }
   function line(r, index) {
-    var vals = [index, r.area, r.name, r.code, r.lng, r.lat, r.reportNo, r.conclusion, r.advice, r.inspectStatus, r.inspectDate, r.reportDate];
+    var vals = [index, r.area, r.name, r.code, r.lng, r.lat, r.reportNo, r.conclusion, r.advice, r.inspectStatus, r.inspectDate, r.reportDate, r.projectName, r.orderNo];
     return "<Row>" + vals.map(function (v) {
       return '<Cell><Data ss:Type="String">' + xml(v) + "</Data></Cell>";
     }).join("") + "</Row>";
@@ -218,6 +228,18 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   }
 
+  document.getElementById("provinceFilter").addEventListener("change", function () {
+    document.getElementById("cityFilter").value = "";
+    document.getElementById("districtFilter").value = "";
+    refreshRegionSelects();
+    render();
+  });
+  document.getElementById("cityFilter").addEventListener("change", function () {
+    document.getElementById("districtFilter").value = "";
+    refreshRegionSelects();
+    render();
+  });
+  document.getElementById("districtFilter").addEventListener("change", render);
   document.getElementById("btnSearch").addEventListener("click", render);
   document.getElementById("kw").addEventListener("input", render);
   document.getElementById("kw").addEventListener("keydown", function (e) { if (e.key === "Enter") render(); });
@@ -230,6 +252,10 @@
     document.getElementById("inspectEnd").value = "";
     document.getElementById("reportStart").value = "";
     document.getElementById("reportEnd").value = "";
+    document.getElementById("provinceFilter").value = "";
+    document.getElementById("cityFilter").value = "";
+    document.getElementById("districtFilter").value = "";
+    refreshRegionSelects();
     render();
   });
   document.getElementById("btnExportAll").addEventListener("click", function () {
@@ -238,6 +264,7 @@
   document.getElementById("btnExportFilter").addEventListener("click", function () {
     download(shown(), "问题汇总-筛选.xls");
   });
+  refreshRegionSelects();
   render();
 })();
 </script>

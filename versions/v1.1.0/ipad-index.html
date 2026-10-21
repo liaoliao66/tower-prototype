@@ -18,14 +18,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI"
 </head>
 <body style="background:#F2F3F5; min-height:100vh;">
 <div style="background:#0f172a;color:#e2e8f0;font-size:12px;line-height:1.6;padding:8px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-  <span>版本 v1.1.0 · iPad 已对齐 APP：订单入口与塔段检测</span>
+  <span>版本 v1.1.0 · iPad 已对齐 APP：订单入口、任务详情、塔段页签</span>
   <span><a href="../../../docs/versions/v1.1.0/prd.html" style="color:#e2e8f0;">查看 PRD</a> · <a href="index.html" style="color:#e2e8f0;">版本门户</a> · <a href="../../index.html" style="color:#e2e8f0;">返回总入口</a></span>
 </div>
 
 <div style="max-width:1440px; margin:0 auto; padding:32px 24px;">
   <header style="margin-bottom:24px;">
     <h1 style="font-size:22px; font-weight:700; color:#1D2129; margin:0;">通信铁塔检测系统 · v1.1.0</h1>
-    <p style="font-size:13px; color:#86909C; margin:6px 0 0;">iPad 端与 APP 对齐：我的、订单入口、新增订单、塔段检测。</p>
+    <p style="font-size:13px; color:#86909C; margin:6px 0 0;">iPad 端与 APP 对齐：我的、订单入口、新增订单、任务详情、塔段顶部页签。</p>
   </header>
 
   <div style="display:flex; gap:32px; align-items:flex-start; flex-wrap:wrap;">
@@ -45,6 +45,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI"
       </div>
       <div class="nav-group-title">检测任务</div>
       <div style="padding:0 8px 16px;">
+        <a class="nav-link" onclick="loadPage('任务/详情/ipad_task_detail.html', this)"><i class="fa-solid fa-list-check" style="width:20px;"></i> 任务详情</a>
         <a class="nav-link" onclick="loadPage('检测/分段/ipad_inspect_segment.html', this)"><i class="fa-solid fa-layer-group" style="width:20px;"></i> 塔段检测</a>
       </div>
     </div>

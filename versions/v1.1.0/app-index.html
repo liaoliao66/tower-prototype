@@ -43,7 +43,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI"
     <div style="flex:1; min-width:0; background:#fff; border-radius:16px; border:1px solid #E5E6EB; box-shadow:0 1px 4px rgba(0,0,0,0.04); max-height:844px; overflow-y:auto;">
       <div style="padding:16px 14px 8px; border-bottom:1px solid #F2F3F5;">
         <div style="font-size:15px; font-weight:600; color:#1D2129;">页面导航</div>
-        <div style="font-size:12px; color:#86909C;">订单入口，以及检测任务中的塔段页</div>
+        <div style="font-size:12px; color:#86909C;">订单入口，以及检测任务的详情和塔段页</div>
       </div>
       <div class="nav-group-title">订单入口</div>
       <div style="padding:0 8px 16px;">
@@ -53,6 +53,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI"
       </div>
       <div class="nav-group-title">检测任务</div>
       <div style="padding:0 8px 16px;">
+        <a class="nav-link" onclick="loadPage('任务/详情/app_task_detail.html', this)"><i class="fa-solid fa-list-check" style="width:20px;"></i> 任务详情</a>
         <a class="nav-link" onclick="loadPage('检测/分段/app_inspect_segment.html', this)"><i class="fa-solid fa-layer-group" style="width:20px;"></i> 塔段检测</a>
       </div>
     </div>
